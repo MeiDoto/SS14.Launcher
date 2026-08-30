@@ -1,0 +1,21 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Type=Application
+Version=1.5
+Name=Space Station 14 Launcher
+Name[en_US]=Space Station 14 Launcher
+Name[ru]=Лаунчер Space Station 14
+GenericName=Space Station 14 Launcher
+GenericName[en_US]=Space Station 14
+GenericName[ru]=Лаунчер Space Station 14
+Comment=A multiplayer disaster simulator
+Comment[ru]=Многопользовательский симулятор космической станции
+Icon=SS14
+Exec=sh -c 'DIR="$(dirname "$(readlink -f "%k" 2>/dev/null || realpath "%k" 2>/dev/null || echo "$0")")"; if [ -x "$DIR/SS14.Launcher" ]; then exec "$DIR/SS14.Launcher" "$@"; elif [ -x "$HOME/.local/bin/SS14.Launcher" ]; then exec "$HOME/.local/bin/SS14.Launcher" "$@"; else exec SS14.Launcher "$@"; fi' -- %u
+Categories=Game;
+Keywords=game;gaming;launcher;multiplayer;ss14;
+StartupNotify=true
+StartupWMClass=SS14.Launcher
+SingleMainWindow=true
+Terminal=false
+PrefersNonDefaultGPU=false

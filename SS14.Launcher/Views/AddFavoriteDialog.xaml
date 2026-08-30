@@ -1,0 +1,36 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+        mc:Ignorable="d" d:DesignWidth="520" d:DesignHeight="220"
+        MinWidth="480" MinHeight="190"
+        Width="520" Height="220"
+        x:Class="SS14.Launcher.Views.AddFavoriteDialog"
+        Icon="/Assets/icon.ico"
+        Title="{loc:Loc add-favorite-window-title}"
+        Padding="10"
+        Background="{DynamicResource ThemePopupBackgroundBrush}"
+        WindowStartupLocation="CenterOwner">
+
+  <DockPanel LastChildFill="true">
+    <DockPanel DockPanel.Dock="Bottom" Margin="0, 8, 0, 0">
+      <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Name="SubmitButton" Content="{loc:Loc add-favorite-window-button-add}" Click="TrySubmit"
+              Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="Bold" />
+      <TextBlock Text="{loc:Loc add-favorite-window-address-invalid}" Foreground="#FF6B6B" VerticalAlignment="Center" Name="TxtInvalid" FontSize="11" />
+    </DockPanel>
+
+    <Border Classes="Card" Padding="10">
+      <Grid ColumnDefinitions="100,*,Auto" RowDefinitions="Auto,Auto" Margin="0, 2">
+        <TextBlock VerticalAlignment="Center" Margin="0,0,8,8" Grid.Column="0" Grid.Row="0" Text="{loc:Loc add-favorite-window-label-name}" Foreground="{DynamicResource ThemeSubTextBrush}" />
+        <TextBox Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" Name="NameBox" Watermark="{loc:Loc add-favorite-window-example-name}"
+                 TextChanged="UpdateSubmitValid" Margin="0,0,0,8" />
+
+        <TextBlock VerticalAlignment="Center" Margin="0,0,8,0" Grid.Column="0" Grid.Row="1" Text="{loc:Loc add-favorite-window-label-address}" Foreground="{DynamicResource ThemeSubTextBrush}" />
+        <TextBox Grid.Column="1" Grid.Row="1" Name="AddressBox" Watermark="ss14://example.com:1212"
+                 TextChanged="UpdateSubmitValid" Margin="0,0,4,0" />
+        <Button Grid.Column="2" Grid.Row="1" Content="📋" Click="PasteClicked" ToolTip.Tip="Вставить из буфера" VerticalAlignment="Center" />
+      </Grid>
+    </Border>
+  </DockPanel>
+</Window>

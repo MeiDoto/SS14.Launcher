@@ -1,0 +1,99 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:SS14.Launcher.ViewModels"
+        xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+        mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="550"
+        MinWidth="600" MinHeight="450"
+        Width="700" Height="550"
+        x:Class="SS14.Launcher.Views.LocalBuildsDialog"
+        x:DataType="vm:LocalBuildsViewModel"
+        Icon="/Assets/icon.ico"
+        Title="{loc:Loc local-builds-title}"
+        Padding="12"
+        Background="{DynamicResource ThemePopupBackgroundBrush}"
+        WindowStartupLocation="CenterOwner">
+  <Design.DataContext>
+    <vm:LocalBuildsViewModel />
+  </Design.DataContext>
+  <Window.DataContext>
+    <vm:LocalBuildsViewModel />
+  </Window.DataContext>
+
+  <DockPanel>
+    <!-- BOTTOM BAR -->
+    <DockPanel DockPanel.Dock="Bottom" Margin="0, 10, 0, 0" LastChildFill="False">
+      <TextBlock DockPanel.Dock="Left" Text="{Binding StatusMessage}" VerticalAlignment="Center"
+                 Foreground="{DynamicResource ThemeSubTextBrush}" FontSize="12" />
+      <Button DockPanel.Dock="Right" Click="CloseClicked" Content="{loc:Loc local-builds-close}" />
+    </DockPanel>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Spacing="10" Margin="4">
+
+        <!-- CARD 1: ADD NEW BUILD FORM -->
+        <Border Classes="Card">
+          <StackPanel Spacing="8">
+            <TextBlock Text="{loc:Loc local-builds-section-add}" Classes="SectionTitle" />
+
+            <Grid ColumnDefinitions="120, *" Margin="0, 2">
+              <TextBlock Grid.Column="0" Text="{loc:Loc local-builds-name}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
+              <TextBox Grid.Column="1" Text="{Binding NewBuildName}" Watermark="{loc:Loc local-builds-name-watermark}" />
+            </Grid>
+
+            <Grid ColumnDefinitions="120, *, Auto" Margin="0, 2">
+              <TextBlock Grid.Column="0" Text="{loc:Loc local-builds-path}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
+              <TextBox Grid.Column="1" Text="{Binding NewBuildPath}" Watermark="{loc:Loc local-builds-path-watermark}" Margin="0, 0, 4, 0" />
+              <Button Grid.Column="2" Content="{loc:Loc local-builds-browse}" Click="BrowseClicked" />
+            </Grid>
+
+            <Button Content="{loc:Loc local-builds-add-button}" Command="{Binding AddBuild}"
+                    HorizontalAlignment="Left" Margin="0, 4, 0, 0"
+                    Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
+          </StackPanel>
+        </Border>
+
+        <!-- CARD 2: SAVED BUILDS LIST -->
+        <Border Classes="Card">
+          <StackPanel Spacing="8">
+            <TextBlock Text="{loc:Loc local-builds-section-saved}" Classes="SectionTitle" />
+
+            <ItemsControl ItemsSource="{Binding Builds}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="vm:LocalBuildItemViewModel">
+                  <Border Background="#16181F" BorderBrush="#2F3545" BorderThickness="1"
+                          CornerRadius="6" Padding="10" Margin="0, 0, 0, 8">
+                    <Grid ColumnDefinitions="*, Auto">
+                      <!-- BUILD INFO -->
+                      <StackPanel Grid.Column="0" Spacing="3">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"
+                                     Foreground="{DynamicResource ThemeNanoGoldBrush}" VerticalAlignment="Center" />
+                          <Border Background="#252A38" CornerRadius="4" Padding="6, 1" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding TypeBadge}" FontSize="11" Foreground="#A0A5B5" />
+                          </Border>
+                        </StackPanel>
+
+                        <TextBlock Text="{Binding Path}" FontSize="12" Foreground="#808595" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding AddedDateText}" FontSize="11" Foreground="#606575" />
+                      </StackPanel>
+
+                      <!-- ACTION BUTTONS -->
+                      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="8, 0, 0, 0">
+                        <Button Content="{loc:Loc local-builds-launch}" Click="LaunchClicked"
+                                Foreground="#5BD969" FontWeight="SemiBold" />
+                        <Button Content="{loc:Loc local-builds-delete}" Command="{Binding Delete}" />
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+
+      </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</Window>

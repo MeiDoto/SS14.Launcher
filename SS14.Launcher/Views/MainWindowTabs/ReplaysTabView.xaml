@@ -1,0 +1,109 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mainWindowTabs="clr-namespace:SS14.Launcher.ViewModels.MainWindowTabs"
+             xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+             x:Class="SS14.Launcher.Views.MainWindowTabs.ReplaysTabView"
+             x:DataType="mainWindowTabs:ReplaysTabViewModel">
+  <Design.DataContext>
+    <mainWindowTabs:ReplaysTabViewModel />
+  </Design.DataContext>
+
+  <DockPanel Margin="10" LastChildFill="True">
+    <!-- Top Action Bar -->
+    <Border DockPanel.Dock="Top" Classes="Card" Margin="0, 0, 0, 8" Padding="8">
+      <Grid ColumnDefinitions="*, 160, Auto, Auto, Auto" RowDefinitions="Auto">
+        <!-- Search -->
+        <TextBox Grid.Column="0" Text="{Binding SearchString}"
+                 Watermark="{loc:Loc tab-replays-search-watermark}"
+                 Margin="0, 0, 8, 0" VerticalAlignment="Center" />
+
+        <!-- Sort ComboBox -->
+        <ComboBox Grid.Column="1" ItemsSource="{Binding SortOptions}" SelectedIndex="{Binding SelectedSortIndex}"
+                  Margin="0, 0, 8, 0" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+
+        <!-- Open External File -->
+        <Button Grid.Column="2" Content="{loc:Loc tab-replays-browse-zip}" Command="{Binding OpenFilePickerAndPlay}"
+                Classes="OpenBoth" Margin="0, 0, 6, 0" VerticalAlignment="Center" />
+
+        <!-- Open Folder -->
+        <Button Grid.Column="3" Content="{loc:Loc tab-replays-open-folder}" Command="{Binding OpenReplaysFolder}"
+                Classes="OpenBoth" Margin="0, 0, 6, 0" VerticalAlignment="Center" />
+
+        <!-- Refresh -->
+        <Button Grid.Column="4" Content="🔄" Command="{Binding RefreshReplays}"
+                Classes="OpenLeft" VerticalAlignment="Center" ToolTip.Tip="{loc:Loc tab-replays-refresh-tooltip}" />
+      </Grid>
+    </Border>
+
+    <!-- Status / Info Bar -->
+    <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusMessage}"
+               Classes="SubText" FontSize="11" Margin="4, 4, 4, 0" />
+
+    <!-- Replays List -->
+    <Border Classes="Card" Padding="4">
+      <Panel>
+        <!-- Empty State -->
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                    IsVisible="{Binding !FilteredReplays.Count}" Spacing="8">
+          <TextBlock Text="🎬" FontSize="36" HorizontalAlignment="Center" />
+          <TextBlock Text="{loc:Loc tab-replays-empty-title}" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" />
+          <TextBlock Text="{loc:Loc tab-replays-empty-desc}"
+                     Classes="SubText" TextWrapping="Wrap" MaxWidth="440" TextAlignment="Center" />
+          <Button Content="{loc:Loc tab-replays-select-file}" Command="{Binding OpenFilePickerAndPlay}"
+                  HorizontalAlignment="Center" Margin="0, 6, 0, 0" />
+        </StackPanel>
+
+        <!-- List of Items -->
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+                      IsVisible="{Binding FilteredReplays.Count}">
+          <ItemsControl ItemsSource="{Binding FilteredReplays}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="mainWindowTabs:ReplayItemViewModel">
+                <Border Background="#1C1C24" BorderBrush="#2C2C36" BorderThickness="1"
+                        CornerRadius="6" Margin="4, 3" Padding="10, 8">
+                  <DockPanel LastChildFill="True">
+                    <!-- Actions Right -->
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                      <Button Content="{loc:Loc tab-replays-play}" Command="{Binding Play}"
+                              Background="#27AE60" Foreground="White" FontWeight="Bold" Padding="14, 6" />
+                      <Button Content="🗑" Command="{Binding Delete}"
+                              Background="#C0392B" Foreground="White" Padding="8, 6" ToolTip.Tip="{loc:Loc tab-replays-delete-tooltip}" />
+                    </StackPanel>
+
+                    <!-- Icon Left -->
+                    <Border DockPanel.Dock="Left" Background="#262734" CornerRadius="4" Width="40" Height="40"
+                            Margin="0, 0, 10, 0" VerticalAlignment="Center">
+                      <TextBlock Text="🎥" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+
+                    <!-- Info Center -->
+                    <StackPanel VerticalAlignment="Center" Spacing="3">
+                      <DockPanel LastChildFill="True">
+                        <Border IsVisible="{Binding MapName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                DockPanel.Dock="Right" Background="#2E4053" CornerRadius="3" Padding="5, 1" Margin="6, 0, 0, 0">
+                          <TextBlock Text="{Binding MapName}" FontSize="11" FontWeight="SemiBold" Foreground="#E5E8E8" />
+                        </Border>
+                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="13" TextTrimming="CharacterEllipsis" />
+                      </DockPanel>
+
+                      <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="{Binding DateFormatted, StringFormat='📅 {0}'}" FontSize="11" Foreground="{DynamicResource ThemeSubTextBrush}" />
+                        <TextBlock Text="{Binding FileSizeFormatted, StringFormat='💾 {0}'}" FontSize="11" Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding ServerName, StringFormat='🪐 {0}'}"
+                                   IsVisible="{Binding ServerName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                   FontSize="11" Foreground="#A9DFBF" TextTrimming="CharacterEllipsis" MaxWidth="220" />
+                      </StackPanel>
+                    </StackPanel>
+                  </DockPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Panel>
+    </Border>
+  </DockPanel>
+</UserControl>

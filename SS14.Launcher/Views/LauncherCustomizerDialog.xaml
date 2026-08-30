@@ -1,0 +1,258 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:SS14.Launcher.ViewModels"
+        xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+        mc:Ignorable="d" d:DesignWidth="760" d:DesignHeight="640"
+        MinWidth="700" MinHeight="500"
+        Width="760" Height="640"
+        x:Class="SS14.Launcher.Views.LauncherCustomizerDialog"
+        Icon="/Assets/icon.ico"
+        Title="{loc:Loc tab-options-launcher-customizer}"
+        Padding="12"
+        Background="{DynamicResource ThemePopupBackgroundBrush}"
+        WindowStartupLocation="CenterOwner">
+  <Design.DataContext>
+    <vm:LauncherCustomizerViewModel />
+  </Design.DataContext>
+  <Window.DataContext>
+    <vm:LauncherCustomizerViewModel />
+  </Window.DataContext>
+
+  <DockPanel>
+    <!-- Bottom Action Buttons -->
+    <DockPanel Height="36" Margin="0 10 0 0" DockPanel.Dock="Bottom" LastChildFill="False">
+      <Button DockPanel.Dock="Left" Command="{Binding ExportThemeToClipboard}" Content="{loc:Loc launcher-customizer-export}" Margin="0,0,6,0" />
+      <Button DockPanel.Dock="Left" Command="{Binding ImportThemeFromClipboard}" Content="{loc:Loc launcher-customizer-import}" Margin="0,0,6,0" />
+      <Button DockPanel.Dock="Right" Name="DoneButton" Click="Done" Content="{loc:Loc hub-settings-button-done}" Classes="OpenLeft" />
+      <Button DockPanel.Dock="Right" Click="Cancel" Content="{loc:Loc hub-settings-button-cancel}" Classes="OpenBoth" />
+      <Button DockPanel.Dock="Right" Click="ResetClicked" Content="{loc:Loc hub-settings-button-reset}" Classes="OpenRight"
+              ToolTip.Tip="{loc:Loc hub-settings-button-reset-tooltip}" />
+    </DockPanel>
+
+    <!-- MAIN TAB CONTROL -->
+    <TabControl TabStripPlacement="Top" Margin="0">
+
+      <!-- TAB 1: VISUALS, BACKGROUND & PALETTE -->
+      <TabItem Header="{loc:Loc launcher-customizer-tab-visuals}">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" Margin="0, 6, 0, 0">
+          <StackPanel Spacing="10" Margin="4">
+
+            <!-- PRESETS BAR -->
+            <Border Classes="Card">
+              <StackPanel Spacing="6">
+                <TextBlock Text="{loc:Loc launcher-customizer-presets-title}" Classes="SectionTitle" />
+                <WrapPanel Orientation="Horizontal">
+                  <Button Content="{loc:Loc launcher-customizer-preset-classic}" Command="{Binding SetPresetClassic}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-cyberpunk}" Command="{Binding SetPresetCyberpunk}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-syndicate}" Command="{Binding SetPresetSyndicate}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-solar}" Command="{Binding SetPresetSolar}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-deep-space}" Command="{Binding SetPresetDeepSpace}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-matrix}" Command="{Binding SetPresetMatrix}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-monochrome}" Command="{Binding SetPresetMonochrome}" Margin="0, 0, 6, 4" />
+                </WrapPanel>
+              </StackPanel>
+            </Border>
+
+            <!-- CARD: BACKGROUND & GLASS EFFECT -->
+            <Border Classes="Card">
+              <StackPanel Spacing="6">
+                <TextBlock Text="{loc:Loc launcher-customizer-bg-heading}" Classes="SectionTitle" />
+                <DockPanel>
+                  <Button DockPanel.Dock="Right" Content="{loc:Loc launcher-customizer-browse}" Click="PickBackgroundImage" Margin="4, 0, 0, 0" Classes="OpenLeft" />
+                  <Button DockPanel.Dock="Right" Content="✕" Command="{Binding ClearBackground}" ToolTip.Tip="{loc:Loc launcher-customizer-clear-bg-tooltip}" Margin="4, 0, 0, 0" Classes="OpenRight" />
+                  <TextBox Text="{Binding CustomBackgroundImagePath}" Watermark="{loc:Loc launcher-customizer-bg-watermark}" />
+                </DockPanel>
+
+                <!-- Background Opacity / Glass Tint Slider with Percentage -->
+                <Grid ColumnDefinitions="Auto, *, Auto" Margin="0, 4, 0, 0">
+                  <TextBlock Grid.Column="0" Text="{loc:Loc launcher-customizer-glass-opacity}" VerticalAlignment="Center" Margin="0, 0, 10, 0" />
+                  <Slider Grid.Column="1" Minimum="0.1" Maximum="1.0" Value="{Binding CustomBackgroundOpacity}" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="2" Text="{Binding OpacityPercentageText}" FontWeight="Bold" Width="45" TextAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource ThemeNanoGoldBrush}" Margin="8, 0, 0, 0" />
+                </Grid>
+
+                <!-- Background Preview Box -->
+                <Border Background="#18181C" BorderBrush="#333748" BorderThickness="1" CornerRadius="4" Height="85" Margin="0, 4, 0, 0" IsVisible="{Binding HasPreviewBackground}">
+                  <Panel>
+                    <Image Source="{Binding PreviewBackground}" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Panel Background="#1A1B24" Opacity="{Binding CustomBackgroundOpacity}" />
+                    <TextBlock Text="{loc:Loc launcher-customizer-preview-glass}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold" />
+                  </Panel>
+                </Border>
+              </StackPanel>
+            </Border>
+
+            <!-- CARD: CUSTOM LOGO -->
+            <Border Classes="Card">
+              <StackPanel Spacing="6">
+                <TextBlock Text="{loc:Loc launcher-customizer-logo-heading}" Classes="SectionTitle" />
+                <DockPanel>
+                  <Button DockPanel.Dock="Right" Content="{loc:Loc launcher-customizer-browse}" Click="PickLogoImage" Margin="4, 0, 0, 0" Classes="OpenLeft" />
+                  <Button DockPanel.Dock="Right" Content="✕" Command="{Binding ClearLogo}" ToolTip.Tip="{loc:Loc launcher-customizer-clear-logo-tooltip}" Margin="4, 0, 0, 0" Classes="OpenRight" />
+                  <TextBox Text="{Binding CustomLogoImagePath}" Watermark="{loc:Loc launcher-customizer-logo-watermark}" />
+                </DockPanel>
+
+                <!-- Logo Preview Box -->
+                <Border Background="#18181C" BorderBrush="#333748" BorderThickness="1" CornerRadius="4" Height="50" Margin="0, 4, 0, 0" IsVisible="{Binding HasPreviewLogo}">
+                  <Image Source="{Binding PreviewLogo}" Height="40" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+              </StackPanel>
+            </Border>
+
+            <!-- CARD: ADVANCED COLOR PALETTE -->
+            <Border Classes="Card">
+              <StackPanel Spacing="6">
+                <TextBlock Text="{loc:Loc launcher-customizer-colors-title}" Classes="SectionTitle" />
+
+                <Grid ColumnDefinitions="180, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" Margin="0, 2">
+                  <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc launcher-customizer-color-accent}" VerticalAlignment="Center" Margin="0, 0, 8, 6" />
+                  <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CustomAccentColor}" Watermark="#ADA24B" Margin="0, 0, 0, 6" />
+
+                  <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc launcher-customizer-color-button}" VerticalAlignment="Center" Margin="0, 0, 8, 6" />
+                  <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CustomButtonColor}" Watermark="#464966" Margin="0, 0, 0, 6" />
+
+                  <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc launcher-customizer-color-tab-selected}" VerticalAlignment="Center" Margin="0, 0, 8, 6" />
+                  <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CustomTabSelectedColor}" Watermark="#3E6C45" Margin="0, 0, 0, 6" />
+
+                  <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc launcher-customizer-color-text}" VerticalAlignment="Center" Margin="0, 0, 8, 6" />
+                  <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding CustomTextColor}" Watermark="#EEEEEE" Margin="0, 0, 0, 6" />
+
+                  <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Loc launcher-customizer-color-popup}" VerticalAlignment="Center" Margin="0, 0, 8, 6" />
+                  <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding CustomPopupBackgroundColor}" Watermark="#202025" Margin="0, 0, 0, 6" />
+
+                  <TextBlock Grid.Row="5" Grid.Column="0" Text="{loc:Loc launcher-customizer-window-title}" VerticalAlignment="Center" Margin="0, 0, 8, 0" />
+                  <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding CustomWindowTitle}" Watermark="{loc:Loc launcher-customizer-window-title-watermark}" Margin="0, 0, 0, 0" />
+                </Grid>
+
+                <!-- Font Size Slider -->
+                <Grid ColumnDefinitions="180, *, Auto" Margin="0, 8, 0, 0">
+                  <TextBlock Grid.Column="0" Text="{loc:Loc launcher-customizer-font-scale}" VerticalAlignment="Center" Margin="0, 0, 8, 0" />
+                  <Slider Grid.Column="1" Minimum="12" Maximum="20" Value="{Binding CustomFontSize}" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="2" Text="{Binding FontSizeText}" FontWeight="Bold" Width="45" TextAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource ThemeNanoGoldBrush}" Margin="8, 0, 0, 0" />
+                </Grid>
+
+                <CheckBox Margin="0, 8, 0, 0" IsChecked="{Binding EnableClickVfx}" Content="{loc:Loc launcher-customizer-click-vfx}" />
+              </StackPanel>
+            </Border>
+
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- TAB 2: TAB NAMES & DOCKING PLACEMENT -->
+      <TabItem Header="{loc:Loc launcher-customizer-tab-docking}">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" Margin="0, 6, 0, 0">
+          <StackPanel Spacing="10" Margin="4">
+
+            <!-- TAB DOCK PLACEMENT -->
+            <Border Classes="Card">
+              <StackPanel Spacing="8">
+                <TextBlock Text="{loc:Loc launcher-customizer-dock-placement-title}" Classes="SectionTitle" />
+                <TextBlock Text="{loc:Loc launcher-customizer-dock-placement-desc}"
+                           Classes="SubText" FontSize="11" />
+
+                <Grid ColumnDefinitions="160, *" Margin="0, 4, 0, 0">
+                  <TextBlock Grid.Column="0" Text="{loc:Loc launcher-customizer-dock-placement-label}" VerticalAlignment="Center" FontWeight="SemiBold" />
+                  <ComboBox Grid.Column="1" ItemsSource="{Binding PlacementOptions}" SelectedItem="{Binding CustomTabPlacement}"
+                            HorizontalAlignment="Left" MinWidth="180" />
+                </Grid>
+                <TextBlock Text="{loc:Loc launcher-customizer-dock-placement-hint}"
+                           Classes="SubText" FontSize="11" Margin="0, 2, 0, 0" />
+              </StackPanel>
+            </Border>
+
+            <!-- TAB NAMES -->
+            <Border Classes="Card">
+              <StackPanel Spacing="8">
+                <TextBlock Text="{loc:Loc launcher-customizer-tab-names-heading}" Classes="SectionTitle" />
+
+                <Grid ColumnDefinitions="Auto, *, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto" Margin="0, 2">
+                  <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc launcher-customizer-tab-home}" VerticalAlignment="Center" Margin="0, 0, 8, 6" />
+                  <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CustomHomeTabName}" Watermark="{loc:Loc tab-home-title}" Margin="0, 0, 4, 6" />
+                  <Button Grid.Row="0" Grid.Column="2" Content="✕" Command="{Binding ClearHomeTab}" Margin="0, 0, 0, 6" />
+
+                  <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc launcher-customizer-tab-servers}" VerticalAlignment="Center" Margin="0, 0, 8, 6" />
+                  <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CustomServersTabName}" Watermark="{loc:Loc tab-servers-title}" Margin="0, 0, 4, 6" />
+                  <Button Grid.Row="1" Grid.Column="2" Content="✕" Command="{Binding ClearServersTab}" Margin="0, 0, 0, 6" />
+
+                  <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc launcher-customizer-tab-news}" VerticalAlignment="Center" Margin="0, 0, 8, 6" />
+                  <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CustomNewsTabName}" Watermark="{loc:Loc tab-news-title}" Margin="0, 0, 4, 6" />
+                  <Button Grid.Row="2" Grid.Column="2" Content="✕" Command="{Binding ClearNewsTab}" Margin="0, 0, 0, 6" />
+
+                  <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc launcher-customizer-tab-replays}" VerticalAlignment="Center" Margin="0, 0, 8, 6" />
+                  <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding CustomReplaysTabName}" Watermark="{loc:Loc tab-replays-title}" Margin="0, 0, 4, 6" />
+                  <Button Grid.Row="3" Grid.Column="2" Content="✕" Command="{Binding ClearReplaysTab}" Margin="0, 0, 0, 6" />
+
+                  <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Loc launcher-customizer-tab-options}" VerticalAlignment="Center" Margin="0, 0, 8, 0" />
+                  <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding CustomOptionsTabName}" Watermark="{loc:Loc tab-options-title}" Margin="0, 0, 4, 0" />
+                  <Button Grid.Row="4" Grid.Column="2" Content="✕" Command="{Binding ClearOptionsTab}" Margin="0, 0, 0, 0" />
+                </Grid>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <!-- TAB 3: EXTENDED CODE SANDBOX -->
+      <TabItem Header="{loc:Loc launcher-customizer-tab-sandbox}">
+        <DockPanel Margin="4">
+          <!-- Top Sandbox Toolbar / Templates -->
+          <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0, 0, 0, 8">
+            <TextBlock Text="{loc:Loc launcher-customizer-sandbox-title}" Classes="SectionTitle" />
+            <DockPanel LastChildFill="False">
+              <TextBlock DockPanel.Dock="Left" Text="{loc:Loc launcher-customizer-sandbox-templates}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="0, 0, 8, 0" />
+              <Button DockPanel.Dock="Left" Content="{loc:Loc launcher-customizer-template-neon}" Command="{Binding LoadNeonTemplate}" Margin="0, 0, 6, 0" />
+              <Button DockPanel.Dock="Left" Content="{loc:Loc launcher-customizer-template-matrix}" Command="{Binding LoadMatrixTemplate}" Margin="0, 0, 6, 0" />
+              <Button DockPanel.Dock="Left" Content="{loc:Loc launcher-customizer-template-minimalist}" Command="{Binding LoadMinimalistTemplate}" Margin="0, 0, 6, 0" />
+            </DockPanel>
+          </StackPanel>
+
+          <!-- Bottom Execution Status & Action -->
+          <DockPanel DockPanel.Dock="Bottom" Margin="0, 8, 0, 0" LastChildFill="False">
+            <Button DockPanel.Dock="Left" Content="{loc:Loc launcher-customizer-sandbox-execute}" Command="{Binding ExecuteUserCode}" />
+            <TextBlock DockPanel.Dock="Right" Text="{Binding ScriptOutputText}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeNanoGoldBrush}" Margin="8, 0, 0, 0" />
+          </DockPanel>
+
+          <!-- Code Editor Body with Cheat Sheet -->
+          <Grid ColumnDefinitions="*, 200" Margin="0">
+            <Border Grid.Column="0" Classes="Card" Margin="0, 0, 8, 0">
+              <TextBox Text="{Binding CustomUserCode}"
+                       AcceptsReturn="True"
+                       TextWrapping="NoWrap"
+                       FontFamily="Consolas,DejaVu Sans Mono,Monospace,Courier New"
+                       FontSize="13"
+                       Watermark="{loc:Loc launcher-customizer-sandbox-watermark}" />
+            </Border>
+
+            <!-- Cheat Sheet Reference Box -->
+            <Border Grid.Column="1" Classes="Card" Padding="8">
+              <ScrollViewer>
+                <StackPanel Spacing="4">
+                  <TextBlock Text="{loc:Loc launcher-customizer-sandbox-cheatsheet-title}" FontWeight="Bold" Foreground="{DynamicResource ThemeNanoGoldBrush}" />
+                  <TextBlock Text="Accent = #HEX" FontSize="11" />
+                  <TextBlock Text="Button = #HEX" FontSize="11" />
+                  <TextBlock Text="TabSelected = #HEX" FontSize="11" />
+                  <TextBlock Text="TextColor = #HEX" FontSize="11" />
+                  <TextBlock Text="PopupBg = #HEX" FontSize="11" />
+                  <TextBlock Text="Opacity = 0.1..1.0" FontSize="11" />
+                  <TextBlock Text="FontSize = 12..20" FontSize="11" />
+                  <TextBlock Text="Title = Text" FontSize="11" />
+                  <TextBlock Text="Home = Text" FontSize="11" />
+                  <TextBlock Text="Servers = Text" FontSize="11" />
+                  <TextBlock Text="Replays = Text" FontSize="11" />
+                  <TextBlock Text="Options = Text" FontSize="11" />
+                  <TextBlock Text="BgImage = path" FontSize="11" />
+                  <TextBlock Text="LogoImage = path" FontSize="11" />
+                  <TextBlock Text="Vfx = true/false" FontSize="11" />
+                  <TextBlock Text="Clear = bg/logo/all" FontSize="11" />
+                </StackPanel>
+              </ScrollViewer>
+            </Border>
+          </Grid>
+        </DockPanel>
+      </TabItem>
+
+    </TabControl>
+  </DockPanel>
+</Window>

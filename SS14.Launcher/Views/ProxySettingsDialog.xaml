@@ -1,0 +1,99 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:SS14.Launcher.ViewModels"
+        xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+        mc:Ignorable="d" d:DesignWidth="580" d:DesignHeight="520"
+        Width="580" Height="520"
+        CanResize="False"
+        x:Class="SS14.Launcher.Views.ProxySettingsDialog"
+        x:DataType="vm:ProxySettingsViewModel"
+        Icon="/Assets/icon.ico"
+        Title="{loc:Loc proxy-dialog-title}"
+        Padding="16"
+        Background="{DynamicResource ThemePopupBackgroundBrush}"
+        WindowStartupLocation="CenterOwner">
+  <Design.DataContext>
+    <vm:ProxySettingsViewModel />
+  </Design.DataContext>
+  <Window.DataContext>
+    <vm:ProxySettingsViewModel />
+  </Window.DataContext>
+
+  <DockPanel>
+    <!-- BOTTOM ACTION BAR -->
+    <DockPanel DockPanel.Dock="Bottom" Margin="0, 12, 0, 0" LastChildFill="False">
+      <Button DockPanel.Dock="Right" Click="CancelClicked" Content="{loc:Loc proxy-dialog-cancel}" Margin="6, 0, 0, 0" />
+      <Button DockPanel.Dock="Right" Click="SaveClicked" Content="{loc:Loc proxy-dialog-save}" Classes="OpenLeft"
+              Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="Bold" />
+    </DockPanel>
+
+    <!-- CONTENT SCROLL -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel Spacing="12">
+
+        <!-- TOGGLE PROXY -->
+        <Border Classes="Card" Padding="12">
+          <StackPanel Spacing="6">
+            <CheckBox IsChecked="{Binding ProxyEnabled}" Content="{loc:Loc proxy-dialog-enable}"
+                      FontWeight="Bold" FontSize="14" />
+            <TextBlock Text="{loc:Loc proxy-dialog-enable-desc}"
+                       Classes="SubText" FontSize="12" TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+
+        <!-- PROXY CONFIGURATION -->
+        <Border Classes="Card" Padding="12" IsEnabled="{Binding ProxyEnabled}">
+          <StackPanel Spacing="10">
+            <TextBlock Text="{loc:Loc proxy-dialog-section-params}" Classes="SectionTitle" />
+
+            <!-- PROTOCOL, HOST, PORT -->
+            <Grid ColumnDefinitions="120, *, 100" RowDefinitions="Auto, Auto" Margin="0, 2">
+              <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc proxy-dialog-protocol}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
+              <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Loc proxy-dialog-host}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="8, 0, 0, 0" />
+              <TextBlock Grid.Row="0" Grid.Column="2" Text="{loc:Loc proxy-dialog-port}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="8, 0, 0, 0" />
+
+              <ComboBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding AvailableProxyTypes}"
+                        SelectedItem="{Binding ProxyType}" HorizontalAlignment="Stretch" Margin="0, 4, 0, 0" />
+              <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ProxyHost}" Watermark="127.0.0.1"
+                       Margin="8, 4, 0, 0" />
+              <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding ProxyPort}" Watermark="1080"
+                       Margin="8, 4, 0, 0" />
+            </Grid>
+
+            <!-- AUTHENTICATION (OPTIONAL) -->
+            <TextBlock Text="{loc:Loc proxy-dialog-section-auth}" FontWeight="SemiBold" FontSize="12" Margin="0, 4, 0, 0" />
+            <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto">
+              <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc proxy-dialog-username}" Foreground="{DynamicResource ThemeSubTextBrush}" />
+              <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Loc proxy-dialog-password}" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="8, 0, 0, 0" />
+
+              <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding ProxyUsername}" Watermark="username" Margin="0, 4, 0, 0" />
+              <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ProxyPassword}" PasswordChar="●" Margin="8, 4, 0, 0" />
+            </Grid>
+
+            <!-- TARGET ROUTING SCOPE -->
+            <TextBlock Text="{loc:Loc proxy-dialog-section-scope}" FontWeight="SemiBold" FontSize="12" Margin="0, 4, 0, 0" />
+            <CheckBox IsChecked="{Binding ProxyApplyToGameClient}" Content="{loc:Loc proxy-dialog-scope-game}" />
+            <CheckBox IsChecked="{Binding ProxyApplyToLauncher}" Content="{loc:Loc proxy-dialog-scope-launcher}" />
+          </StackPanel>
+        </Border>
+
+        <!-- TEST CONNECTION -->
+        <Border Classes="Card" Padding="12" IsEnabled="{Binding ProxyEnabled}">
+          <StackPanel Spacing="8">
+            <TextBlock Text="{loc:Loc proxy-dialog-section-test}" Classes="SectionTitle" />
+            <DockPanel LastChildFill="False">
+              <Button DockPanel.Dock="Left" Content="{loc:Loc proxy-dialog-test-button}" Click="TestClicked"
+                      IsEnabled="{Binding !IsTesting}" />
+            </DockPanel>
+
+            <TextBlock Text="{Binding TestStatus}" TextWrapping="Wrap" FontWeight="SemiBold"
+                       FontSize="12" Margin="2, 2, 0, 0" />
+          </StackPanel>
+        </Border>
+
+      </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</Window>

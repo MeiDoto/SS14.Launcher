@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:SS14.Launcher.ViewModels"
+             xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+             mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="300"
+             x:Class="SS14.Launcher.Views.LauncherUpdatePromptOverlayView"
+             HorizontalAlignment="Center" VerticalAlignment="Center">
+
+  <Design.DataContext>
+    <vm:LauncherUpdatePromptOverlayViewModel />
+  </Design.DataContext>
+
+  <StackPanel Orientation="Vertical" Spacing="8" Width="440" Margin="16">
+    <TextBlock HorizontalAlignment="Center" Classes="NanoHeadingMedium"
+               Text="{Binding TitleText}" />
+
+    <TextBlock HorizontalAlignment="Center" TextAlignment="Center"
+               Text="{Binding MessageText}"
+               FontWeight="Bold"
+               Foreground="{DynamicResource ThemeNanoGoldBrush}"
+               FontSize="15" />
+
+    <TextBlock HorizontalAlignment="Center" TextAlignment="Center"
+               Text="{Binding CurrentVersionText}"
+               Foreground="{DynamicResource ThemeSubTextBrush}"
+               FontSize="12" />
+
+    <Border Background="{DynamicResource ThemeServerListBackgroundBrush}"
+            BorderBrush="{DynamicResource ThemeListSeparatorBrush}"
+            BorderThickness="1"
+            CornerRadius="4" Padding="10" MaxHeight="140"
+            IsVisible="{Binding HasReleaseNotes}" Margin="0, 4">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <TextBlock Text="{Binding ReleaseNotes}" TextWrapping="Wrap"
+                   FontSize="12" Foreground="{DynamicResource ThemeForegroundBrush}" />
+      </ScrollViewer>
+    </Border>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="0, 8, 0, 0">
+      <Button Content="{loc:Loc launcher-update-btn-update-now}"
+              Command="{Binding UpdateNow}"
+              Classes="OpenRight"
+              FontWeight="SemiBold"
+              MinWidth="120" />
+      <Button Content="{loc:Loc launcher-update-btn-later}"
+              Command="{Binding RemindLater}"
+              MinWidth="90" />
+      <Button Content="{loc:Loc launcher-update-btn-skip}"
+              Command="{Binding SkipThisVersion}"
+              Classes="OpenLeft"
+              Foreground="{DynamicResource ThemeSubTextBrush}"
+              MinWidth="90" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

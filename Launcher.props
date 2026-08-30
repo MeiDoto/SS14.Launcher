@@ -1,0 +1,19 @@
+<Project>
+    <PropertyGroup>
+        <!--
+        Общие свойства сборки для всех проектов лаунчера.
+        При изменении TargetFramework убедитесь в актуальности:
+        1. Скриптов публикации (publish.py, download_net_runtime.py)
+        2. Рабочих процессов CI/CD GitHub Actions (.github/workflows/)
+        -->
+        <TargetFramework>net10.0</TargetFramework>
+        <Version>1.1.8</Version>
+
+        <!--
+        CET breaks for people on older, but still supported Windows versions:
+        https://github.com/space-wizards/SS14.Launcher/issues/198
+        -->
+        <CETCompat>false</CETCompat>
+        <NoWarn>$(NoWarn);NU1903;NU1902;NETSDK1206;IL2104</NoWarn>
+    </PropertyGroup>
+</Project>

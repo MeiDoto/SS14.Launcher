@@ -1,0 +1,84 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:SS14.Launcher.ViewModels"
+        xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+        mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="500"
+        Width="700" Height="500"
+        MinWidth="550" MinHeight="400"
+        x:Class="SS14.Launcher.Views.ServerHistoryDialog"
+        x:DataType="vm:ServerHistoryViewModel"
+        Icon="/Assets/icon.ico"
+        Title="{loc:Loc server-history-title}"
+        Padding="14"
+        Background="{DynamicResource ThemePopupBackgroundBrush}"
+        WindowStartupLocation="CenterOwner">
+  <Design.DataContext>
+    <vm:ServerHistoryViewModel />
+  </Design.DataContext>
+  <Window.DataContext>
+    <vm:ServerHistoryViewModel />
+  </Window.DataContext>
+
+  <DockPanel>
+    <!-- TOP TOOLBAR -->
+    <Border DockPanel.Dock="Top" Classes="Card" Margin="0, 0, 0, 8" Padding="8">
+      <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto">
+        <TextBox Grid.Column="0" Text="{Binding SearchFilter}"
+                 Watermark="{loc:Loc server-history-search-watermark}"
+                 VerticalAlignment="Center" Margin="0, 0, 8, 0" />
+
+        <Button Grid.Column="1" Content="{loc:Loc server-history-clear}"
+                Command="{Binding ClearAll}"
+                IsEnabled="{Binding HasEntries}"
+                VerticalAlignment="Center" />
+      </Grid>
+    </Border>
+
+    <!-- BOTTOM ACTION BAR -->
+    <DockPanel DockPanel.Dock="Bottom" Margin="0, 8, 0, 0" LastChildFill="False">
+      <Button DockPanel.Dock="Right" Click="CloseClicked" Content="{loc:Loc server-history-close}" Classes="OpenLeft" />
+    </DockPanel>
+
+    <!-- CONTENT AREA -->
+    <Panel>
+      <!-- EMPTY STATE -->
+      <StackPanel IsVisible="{Binding IsEmpty}" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
+        <TextBlock Text="{loc:Loc server-history-empty}" Classes="SubText" FontSize="14" HorizontalAlignment="Center" />
+      </StackPanel>
+
+      <!-- HISTORY LIST -->
+      <ScrollViewer IsVisible="{Binding HasEntries}" VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding Entries}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="vm:ServerHistoryItemViewModel">
+              <Border Classes="Card" Margin="0, 0, 0, 6" Padding="10">
+                <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto">
+                  <!-- LEFT: SERVER INFO -->
+                  <StackPanel Grid.Row="0" Grid.Column="0" Spacing="2">
+                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="13" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding Address}" Classes="SubText" FontSize="11" TextTrimming="CharacterEllipsis" />
+                  </StackPanel>
+
+                  <!-- TIME -->
+                  <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding FormattedTime}" Classes="SubText" FontSize="11" Margin="0, 4, 0, 0"
+                             Foreground="{DynamicResource ThemeNanoGoldBrush}" />
+
+                  <!-- RIGHT: ACTION BUTTONS -->
+                  <StackPanel Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Button Content="{loc:Loc server-history-connect}" Command="{Binding Connect}"
+                            Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
+                    <Button Content="{loc:Loc server-history-add-favorite}" Command="{Binding AddFavorite}" />
+                    <Button Content="{loc:Loc server-history-copy}" Command="{Binding CopyAddress}" />
+                    <Button Content="✕" Command="{Binding Remove}" ToolTip.Tip="{loc:Loc server-history-remove}" />
+                  </StackPanel>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Panel>
+  </DockPanel>
+</Window>

@@ -1,0 +1,182 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mainWindowTabs="clr-namespace:SS14.Launcher.ViewModels.MainWindowTabs"
+             xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="850"
+             x:Class="SS14.Launcher.Views.MainWindowTabs.DevelopmentTabView"
+             x:DataType="mainWindowTabs:DevelopmentTabViewModel">
+  <Design.DataContext>
+    <mainWindowTabs:DevelopmentTabViewModel />
+  </Design.DataContext>
+
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" Margin="4, 2, 4, 4">
+    <StackPanel Orientation="Vertical" Spacing="8" Margin="4">
+
+      <!-- CARD 1: LAUNCH ARGUMENTS & LOGGING -->
+      <Border Classes="Card">
+        <StackPanel Spacing="8">
+          <TextBlock Text="{loc:Loc tab-development-launch-card}" Classes="SectionTitle" />
+
+          <TextBlock Text="{loc:Loc tab-development-launch-args-title}" FontWeight="SemiBold" FontSize="12" />
+          <TextBox Text="{Binding DevCustomLaunchArguments}"
+                   Watermark="{loc:Loc tab-development-launch-args-watermark}" />
+          <TextBlock Text="{loc:Loc tab-development-launch-args-desc}"
+                     Classes="SubText" FontSize="11" />
+
+          <Grid ColumnDefinitions="160, *, 180" RowDefinitions="Auto, Auto" Margin="0, 4, 0, 0">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc tab-development-log-level}" VerticalAlignment="Center" Margin="0, 0, 8, 8" />
+            <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding LogLevels}" SelectedItem="{Binding DevLogLevel}" Margin="0, 0, 8, 8" HorizontalAlignment="Left" MinWidth="140" />
+
+            <CheckBox Grid.Row="1" Grid.ColumnSpan="3" IsChecked="{Binding DevUncappedFps}" Content="{loc:Loc tab-development-uncapped-fps}" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- CARD 2: GRAPHICS, DISPLAY & IN-GAME DEBUG OVERLAYS -->
+      <Border Classes="Card">
+        <StackPanel Spacing="8">
+          <TextBlock Text="{loc:Loc tab-development-graphics-card}" Classes="SectionTitle" />
+
+          <Grid ColumnDefinitions="160, *, 160, *" RowDefinitions="Auto, Auto" Margin="0, 2">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc tab-development-graphics-backend}" VerticalAlignment="Center" Margin="0, 0, 8, 8" />
+            <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding GraphicsBackends}" SelectedItem="{Binding DevGraphicsBackend}" Margin="0, 0, 8, 8" MinWidth="130" />
+
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="{loc:Loc tab-development-display-mode}" VerticalAlignment="Center" Margin="0, 0, 8, 8" />
+            <ComboBox Grid.Row="0" Grid.Column="3" ItemsSource="{Binding DisplayModes}" SelectedItem="{Binding DevDisplayMode}" Margin="0, 0, 0, 8" MinWidth="130" />
+          </Grid>
+
+          <!-- 2-column structured table for graphics debug checkboxes -->
+          <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto, Auto" Margin="0, 4, 0, 0">
+            <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding DevDebugFpsOverlay}" Content="{loc:Loc tab-development-fps-overlay}" Margin="0, 0, 12, 6" />
+            <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding DevDebugNetGraph}" Content="{loc:Loc tab-development-net-graph}" Margin="0, 0, 0, 6" />
+
+            <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding DevPhysicsDebug}" Content="{loc:Loc tab-development-physics-debug}" Margin="0, 0, 12, 6" />
+            <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding DevShowLightMap}" Content="{loc:Loc tab-development-show-lightmap}" Margin="0, 0, 0, 6" />
+
+            <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding DevShowEntityBounds}" Content="{loc:Loc tab-development-show-entity-bounds}" Margin="0, 0, 12, 6" />
+            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding DevOpenConsoleOnStart}" Content="{loc:Loc tab-development-open-console}" Margin="0, 0, 0, 6" />
+
+            <CheckBox Grid.Row="3" Grid.Column="0" IsChecked="{Binding DevMuteAudio}" Content="{loc:Loc tab-development-mute-audio}" Margin="0, 0, 12, 2" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- CARD 3: LOW-LEVEL RUNTIME & MEMORY TUNING -->
+      <Border Classes="Card">
+        <StackPanel Spacing="8">
+          <TextBlock Text="{loc:Loc tab-development-lowlevel-card}" Classes="SectionTitle" />
+
+          <CheckBox VerticalAlignment="Center" IsChecked="{Binding DisableSigning}" Content="{loc:Loc tab-development-disable-signing}" />
+          <TextBlock Text="{loc:Loc tab-development-disable-signing-desc}" Classes="SubText" FontSize="11" Margin="24, 0, 0, 4" />
+
+          <Grid ColumnDefinitions="Auto, *">
+            <CheckBox Grid.Column="0" VerticalAlignment="Center" Margin="0, 0, 8, 0" IsChecked="{Binding EngineOverrideEnabled}" Content="{loc:Loc tab-development-enable-engine-override}" />
+            <TextBox Grid.Column="1" Text="{Binding EngineOverridePath}" Watermark="/path/to/Robust.Client" />
+          </Grid>
+          <TextBlock Text="{loc:Loc tab-development-enable-engine-override-desc}" Classes="SubText" FontSize="11" Margin="24, 0, 0, 4" />
+
+          <Grid ColumnDefinitions="*, Auto" Margin="0, 4, 0, 4">
+            <TextBlock Grid.Column="0" Text="{loc:Loc tab-development-gc-limit}" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding DevGcHeapLimitMb}" Width="120" VerticalAlignment="Center" Watermark="0 = unlim" />
+          </Grid>
+
+          <!-- 2-column structured table for CLR runtime and performance checkboxes -->
+          <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" Margin="0, 4, 0, 0">
+            <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding DevTieredPgo}" Content="{loc:Loc tab-development-dynamic-pgo}" Margin="0, 0, 12, 6" />
+            <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding DevGenerateCrashDumps}" Content="{loc:Loc tab-development-crash-dumps}" Margin="0, 0, 0, 6" />
+
+            <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding DevRenderValidation}" Content="{loc:Loc tab-development-render-validation}" Margin="0, 0, 12, 6" />
+            <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding DevFastThreadPool}" Content="{loc:Loc tab-development-fast-threadpool}" Margin="0, 0, 0, 6" />
+
+            <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding DevAggressiveLohTrim}" Content="{loc:Loc tab-development-loh-compact}" Margin="0, 0, 12, 6" />
+            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding DevStrictDiagnostics}" Content="{loc:Loc tab-development-strict-diagnostics}" Margin="0, 0, 0, 6" />
+
+            <CheckBox Grid.Row="3" Grid.Column="0" IsChecked="{Binding DevGCNoAffinitize}" Content="{loc:Loc tab-development-gc-no-affinitize}" Margin="0, 0, 12, 6" />
+            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding HighProcessPriority}" Content="{loc:Loc tab-options-process-priority}" Margin="0, 0, 0, 6" />
+
+            <CheckBox Grid.Row="4" Grid.Column="0" IsChecked="{Binding ForceDedicatedGpu}" Content="{loc:Loc tab-options-dedicated-gpu}" Margin="0, 0, 12, 6" />
+            <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding MaxPerformanceJit}" Content="{loc:Loc tab-options-max-jit}" Margin="0, 0, 0, 6" />
+
+            <CheckBox Grid.Row="5" Grid.Column="0" IsChecked="{Binding LowLatencyNetworking}" Content="{loc:Loc tab-options-low-latency-net}" Margin="0, 0, 12, 2" />
+            <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding DevForceScalarSearch}" Content="{loc:Loc tab-dev-force-scalar-search}" Margin="0, 0, 0, 2" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- CARD 4: NETWORK EMULATION & CUSTOM ENV VARS -->
+      <Border Classes="Card">
+        <StackPanel Spacing="8">
+          <TextBlock Text="{loc:Loc tab-development-network-card}" Classes="SectionTitle" />
+
+          <Grid ColumnDefinitions="180, *, Auto" RowDefinitions="Auto, Auto, Auto" Margin="0, 2">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc tab-development-simulated-ping}" VerticalAlignment="Center" Margin="0, 0, 8, 6" />
+            <Slider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="1000" Value="{Binding DevSimulatedPingMs}" VerticalAlignment="Center" Margin="0, 0, 8, 6" />
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding DevSimulatedPingMs, StringFormat='{}{0} ms'}" Width="60" TextAlignment="Right" FontWeight="Bold" Foreground="{DynamicResource ThemeNanoGoldBrush}" VerticalAlignment="Center" Margin="0, 0, 0, 6" />
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc tab-development-simulated-jitter}" VerticalAlignment="Center" Margin="0, 0, 8, 6" />
+            <Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="250" Value="{Binding DevSimulatedJitterMs}" VerticalAlignment="Center" Margin="0, 0, 8, 6" />
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding DevSimulatedJitterMs, StringFormat='{}{0} ms'}" Width="60" TextAlignment="Right" FontWeight="Bold" Foreground="{DynamicResource ThemeNanoGoldBrush}" VerticalAlignment="Center" Margin="0, 0, 0, 6" />
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc tab-development-simulated-loss}" VerticalAlignment="Center" Margin="0, 0, 8, 0" />
+            <Slider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="50" Value="{Binding DevSimulatedPacketLoss}" VerticalAlignment="Center" Margin="0, 0, 8, 0" />
+            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding DevSimulatedPacketLoss, StringFormat='{}{0} %'}" Width="60" TextAlignment="Right" FontWeight="Bold" Foreground="{DynamicResource ThemeNanoGoldBrush}" VerticalAlignment="Center" Margin="0, 0, 0, 0" />
+          </Grid>
+
+          <CheckBox IsChecked="{Binding DevDisableNetCompression}" Content="{loc:Loc tab-development-disable-net-compression}" Margin="0, 2, 0, 2" />
+
+          <TextBlock Text="{loc:Loc tab-development-custom-env}" FontWeight="SemiBold" FontSize="12" Margin="0, 4, 0, 0" />
+          <TextBox Text="{Binding DevCustomEnvVars}" Watermark="ROBUST_DEBUG=1;DOTNET_GCHeapCount=4" />
+        </StackPanel>
+      </Border>
+
+      <!-- CARD 5: DIAGNOSTICS & ALGORITHM BENCHMARKS -->
+      <Border Classes="Card">
+        <StackPanel Spacing="8">
+          <TextBlock Text="{loc:Loc tab-dev-diagnostics-card}" Classes="SectionTitle" />
+
+          <WrapPanel Orientation="Horizontal">
+            <Button Content="{loc:Loc tab-dev-btn-benchmark}" Command="{Binding RunAlgorithmBenchmarkAsync}" Margin="0, 0, 8, 6" />
+            <Button Content="{loc:Loc tab-dev-btn-sysinfo}" Command="{Binding RunSystemDiagnostics}" Margin="0, 0, 8, 6" />
+            <Button Content="{loc:Loc tab-dev-btn-netdiag}" Command="{Binding RunNetworkDiagnosticsAsync}" Margin="0, 0, 8, 6" />
+            <Button Content="{loc:Loc tab-dev-btn-force-gc}" Command="{Binding ForceGarbageCollection}" Margin="0, 0, 8, 6" />
+          </WrapPanel>
+
+          <TextBlock Text="{Binding BenchmarkResultsText}" IsVisible="{Binding BenchmarkResultsText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                     FontFamily="Consolas,monospace" FontSize="12" Foreground="{DynamicResource ThemeNanoGoldBrush}" TextWrapping="Wrap" />
+
+          <TextBlock Text="{Binding DiagnosticsReportText}" IsVisible="{Binding DiagnosticsReportText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                     FontFamily="Consolas,monospace" FontSize="12" Foreground="#88FF88" TextWrapping="Wrap" />
+
+          <TextBlock Text="{Binding NetworkReportText}" IsVisible="{Binding NetworkReportText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                     FontFamily="Consolas,monospace" FontSize="12" Foreground="#88DDFF" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+
+      <!-- CARD 6: QUICK FOLDERS & MAINTENANCE -->
+      <Border Classes="Card">
+        <StackPanel Spacing="8">
+          <TextBlock Text="{loc:Loc tab-development-maintenance-card}" Classes="SectionTitle" />
+
+          <WrapPanel Orientation="Horizontal">
+            <Button Content="{loc:Loc tab-development-open-user-data}" Command="{Binding OpenUserDataFolder}" Margin="0, 0, 8, 6" />
+            <Button Content="{loc:Loc tab-development-open-logs}" Command="{Binding OpenLogsFolder}" Margin="0, 0, 8, 6" />
+            <Button Content="{loc:Loc tab-development-clear-engines}" Command="{Binding ClearAllInstalledEngines}" Margin="0, 0, 8, 6" />
+            <Button Content="{loc:Loc tab-development-clear-servers}" Command="{Binding ClearAllInstalledServers}" Margin="0, 0, 8, 6" />
+            <Button Content="{loc:Loc tab-development-clear-logs}" Command="{Binding ClearLogs}" Margin="0, 0, 8, 6" />
+            <Button Content="{loc:Loc tab-dev-clear-playtime}" Command="{Binding ClearServerPlaytime}" Margin="0, 0, 8, 6" />
+            <Button Content="{loc:Loc tab-dev-clear-slots}" Command="{Binding ClearWatchedSlots}" Margin="0, 0, 8, 6" />
+            <Button Content="{loc:Loc tab-dev-clear-news-cache}" Command="{Binding ClearNewsCache}" Margin="0, 0, 8, 6" />
+            <Button Content="{loc:Loc tab-dev-reset-all-cvars}" Command="{Binding ResetAllCVarsToDefaults}" Margin="0, 0, 8, 6"
+                    Foreground="#FF8888" FontWeight="SemiBold" />
+          </WrapPanel>
+
+          <TextBlock Text="{Binding ActionStatus}" IsVisible="{Binding ActionStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                     Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" FontSize="12" />
+        </StackPanel>
+      </Border>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

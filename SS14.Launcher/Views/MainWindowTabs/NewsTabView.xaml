@@ -1,0 +1,102 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mainWindowTabs="clr-namespace:SS14.Launcher.ViewModels.MainWindowTabs"
+             xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+             xmlns:v="clr-namespace:SS14.Launcher.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+             x:Class="SS14.Launcher.Views.MainWindowTabs.NewsTabView"
+             x:DataType="mainWindowTabs:NewsTabViewModel">
+  <Design.DataContext>
+    <mainWindowTabs:NewsTabViewModel />
+  </Design.DataContext>
+
+  <DockPanel Margin="10" LastChildFill="True">
+    <!-- Top Action Bar -->
+    <Border DockPanel.Dock="Top" Classes="Card" Margin="0, 0, 0, 8" Padding="8">
+      <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto">
+        <!-- Search -->
+        <TextBox Grid.Column="0" Text="{Binding SearchString}"
+                 Watermark="{loc:Loc tab-news-search-watermark}"
+                 Margin="0, 0, 8, 0" VerticalAlignment="Center" />
+
+        <!-- Refresh -->
+        <Button Grid.Column="1" Content="{loc:Loc tab-news-refresh}" Command="{Binding RefreshNews}"
+                Classes="OpenBoth" VerticalAlignment="Center" ToolTip.Tip="{loc:Loc tab-news-refresh-tooltip}" />
+      </Grid>
+    </Border>
+
+    <!-- Status Bar -->
+    <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusMessage}"
+               Classes="SubText" FontSize="11" Margin="4, 4, 4, 0" />
+
+    <!-- News List / Cards -->
+    <Border Classes="Card" Padding="4">
+      <Panel>
+        <!-- Loading State -->
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                    IsVisible="{Binding IsBusy}" Spacing="10">
+          <Viewbox Classes="DungSpinnerBox">
+            <v:DungSpinner IsVisible="{Binding IsBusy}" />
+          </Viewbox>
+          <TextBlock Text="{loc:Loc tab-news-pulling-news}" FontWeight="SemiBold" HorizontalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Empty State -->
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                    IsVisible="{Binding !FilteredNewsEntries.Count}" Spacing="8">
+          <TextBlock Text="📰" FontSize="36" HorizontalAlignment="Center" />
+          <TextBlock Text="{loc:Loc tab-news-empty-title}" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" />
+          <TextBlock Text="{loc:Loc tab-news-empty-desc}"
+                     Classes="SubText" TextWrapping="Wrap" MaxWidth="440" TextAlignment="Center" />
+          <Button Content="{loc:Loc tab-news-retry}" Command="{Binding RefreshNews}"
+                  HorizontalAlignment="Center" Margin="0, 6, 0, 0" />
+        </StackPanel>
+
+        <!-- News Articles List -->
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+                      IsVisible="{Binding FilteredNewsEntries.Count}">
+          <ItemsControl ItemsSource="{Binding FilteredNewsEntries}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="mainWindowTabs:NewsEntryViewModel">
+                <Border Background="#1C1C24" BorderBrush="#2C2C36" BorderThickness="1"
+                        CornerRadius="6" Margin="4, 3" Padding="12, 10">
+                  <DockPanel LastChildFill="True">
+                    <!-- Action Right -->
+                    <Button DockPanel.Dock="Right" Content="{loc:Loc tab-news-read-more}" Command="{Binding Open}"
+                            Background="#34495E" Foreground="White" FontWeight="SemiBold"
+                            Padding="12, 6" VerticalAlignment="Center" Margin="8, 0, 0, 0"
+                            ToolTip.Tip="{loc:Loc tab-news-read-more-tooltip}" />
+
+                    <!-- Icon Left -->
+                    <Border DockPanel.Dock="Left" Background="#262734" CornerRadius="4" Width="40" Height="40"
+                            Margin="0, 0, 10, 0" VerticalAlignment="Center">
+                      <TextBlock Text="📡" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+
+                    <!-- Text Content -->
+                    <StackPanel VerticalAlignment="Center" Spacing="3">
+                      <DockPanel LastChildFill="True">
+                        <Border IsVisible="{Binding HasDate}"
+                                DockPanel.Dock="Right" Background="#2E4053" CornerRadius="3" Padding="6, 1" Margin="6, 0, 0, 0">
+                          <TextBlock Text="{Binding DateFormatted, StringFormat='📅 {0}'}" FontSize="11" FontWeight="SemiBold" Foreground="#E5E8E8" />
+                        </Border>
+                        <TextBlock Text="{Binding Headline}" FontWeight="Bold" FontSize="13" TextTrimming="CharacterEllipsis" />
+                      </DockPanel>
+
+                      <TextBlock Text="{Binding Description}"
+                                 IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                 FontSize="11" Foreground="{DynamicResource ThemeSubTextBrush}"
+                                 TextTrimming="CharacterEllipsis" MaxLines="2" />
+                    </StackPanel>
+                  </DockPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Panel>
+    </Border>
+  </DockPanel>
+</UserControl>

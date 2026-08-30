@@ -1,0 +1,329 @@
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Net.Sockets;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Serilog;
+using Splat;
+using SS14.Launcher.Api;
+using SS14.Launcher.Utility;
+
+namespace SS14.Launcher.Models.ServerStatus;
+
+/// <summary>
+///     Caches information pulled from servers and updates it asynchronously.
+/// </summary>
+public sealed class ServerStatusCache : IServerSource
+{
+    // Yes this class "memory leaks" because it never frees these data objects.
+    // Oh well!
+    private readonly Dictionary<string, CacheReg> _cachedData = new();
+    private readonly HttpClient _http;
+
+    public ServerStatusCache()
+    {
+        _http = Locator.Current.GetRequiredService<HttpClient>();
+    }
+
+    /// <summary>
+    ///     Gets an uninitialized status for a server address.
+    ///     This does NOT start fetching the data.
+    /// </summary>
+    /// <param name="serverAddress">The address of the server to fetch data for.</param>
+    public ServerStatusData GetStatusFor(string serverAddress)
+    {
+        if (_cachedData.TryGetValue(serverAddress, out var reg))
+            return reg.Data;
+
+        var data = new ServerStatusData(serverAddress);
+        reg = new CacheReg(data);
+        _cachedData.Add(serverAddress, reg);
+
+        return data;
+    }
+
+    /// <summary>
+    ///     Do the initial status update for a server status. This only acts once.
+    /// </summary>
+    public void InitialUpdateStatus(ServerStatusData data)
+    {
+        var reg = _cachedData[data.Address];
+        if (reg.DidInitialStatusUpdate)
+            return;
+
+        UpdateStatusFor(reg);
+    }
+
+    private async void UpdateStatusFor(CacheReg reg)
+    {
+        reg.DidInitialStatusUpdate = true;
+        await reg.Semaphore.WaitAsync();
+        var cancelSource = reg.Cancellation = new CancellationTokenSource();
+        var cancel = cancelSource.Token;
+        try
+        {
+            await UpdateStatusFor(reg.Data, _http, cancel);
+        }
+        finally
+        {
+            reg.Semaphore.Release();
+        }
+    }
+
+    public static async Task UpdateStatusFor(ServerStatusData data, HttpClient http, CancellationToken cancel)
+    {
+        try
+        {
+            if (!UriHelper.TryParseSs14Uri(data.Address, out var parsedAddress))
+            {
+                Log.Warning("Server {Server} has invalid URI {Uri}", data.Name, data.Address);
+                data.Status = ServerStatusCode.Offline;
+                return;
+            }
+
+            var statusAddr = UriHelper.GetServerStatusAddress(parsedAddress);
+            if (data.Status != ServerStatusCode.Online)
+                data.Status = ServerStatusCode.FetchingStatus;
+
+            ServerApi.ServerStatus status;
+            try
+            {
+                // await Task.Delay(Random.Shared.Next(150, 5000), cancel);
+
+                using (var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(cancel))
+                {
+                    linkedToken.CancelAfter(ConfigConstants.ServerStatusTimeout);
+
+                    status = await http.GetFromJsonAsync<ServerApi.ServerStatus>(statusAddr, linkedToken.Token)
+                             ?? throw new InvalidDataException();
+                }
+
+                cancel.ThrowIfCancellationRequested();
+            }
+            catch (Exception e) when (e is JsonException or HttpRequestException or InvalidDataException or IOException
+                                          or SocketException)
+            {
+                data.Status = ServerStatusCode.Offline;
+                return;
+            }
+
+            ApplyStatus(data, status);
+        }
+        catch (OperationCanceledException)
+        {
+            data.Status = ServerStatusCode.Offline;
+        }
+    }
+
+    public static void ApplyStatus(ServerStatusData data, ServerApi.ServerStatus status)
+    {
+        try
+        {
+            data.Status = ServerStatusCode.Online;
+            data.Name = status.Name;
+            data.PlayerCount = Math.Max(0, status.PlayerCount);
+            data.SoftMaxPlayerCount = Math.Max(0, status.SoftMaxPlayerCount);
+
+            switch (status.RunLevel)
+            {
+                case ServerApi.GameRunLevel.InRound:
+                    data.RoundStatus = GameRoundStatus.InRound;
+                    break;
+                case ServerApi.GameRunLevel.PostRound:
+                case ServerApi.GameRunLevel.PreRoundLobby:
+                    data.RoundStatus = GameRoundStatus.InLobby;
+                    break;
+                default:
+                    data.RoundStatus = GameRoundStatus.Unknown;
+                    break;
+            }
+
+            if (!string.IsNullOrWhiteSpace(status.RoundStartTime) &&
+                DateTime.TryParse(status.RoundStartTime, null, System.Globalization.DateTimeStyles.RoundtripKind, out var roundStart))
+            {
+                data.RoundStartTime = roundStart;
+            }
+            else
+            {
+                data.RoundStartTime = null;
+            }
+
+            var baseTags = status.Tags ?? Array.Empty<string>();
+            var inferredTags = ServerTagInfer.InferTags(status);
+
+            data.Tags = baseTags.Concat(inferredTags).ToArray();
+            data.PanicBunker = status.PanicBunker ?? false;
+            data.PanicBunkerMinAccountAge = status.PanicBunkerMinAccountAge;
+            data.PanicBunkerMinOverallHours = status.PanicBunkerMinOverallHours;
+        }
+        catch
+        {
+            // Fallback to basic online status if complex metadata fails
+            data.Status = ServerStatusCode.Online;
+        }
+    }
+
+    public static async void UpdateInfoForCore(ServerStatusData data, Func<CancellationToken, Task<ServerInfo?>> fetch)
+    {
+        if (data.StatusInfo == ServerStatusInfoCode.Fetching)
+            return;
+
+        if (data.Status != ServerStatusCode.Online)
+        {
+            Log.Error("Refusing to fetch info for server {Server} before we know it's online", data.Address);
+            return;
+        }
+
+        data.InfoCancel?.Cancel();
+        data.InfoCancel = new CancellationTokenSource();
+        var cancel = data.InfoCancel.Token;
+
+        data.StatusInfo = ServerStatusInfoCode.Fetching;
+
+        ServerInfo info;
+        try
+        {
+            using (var linkedToken = CancellationTokenSource.CreateLinkedTokenSource(cancel))
+            {
+                linkedToken.CancelAfter(ConfigConstants.ServerStatusTimeout);
+
+                info = await fetch(linkedToken.Token) ?? throw new InvalidDataException();
+            }
+
+            cancel.ThrowIfCancellationRequested();
+        }
+        catch (OperationCanceledException)
+        {
+            data.StatusInfo = ServerStatusInfoCode.NotFetched;
+            return;
+        }
+        catch (Exception e) when (e is JsonException or HttpRequestException or InvalidDataException)
+        {
+            data.StatusInfo = ServerStatusInfoCode.Error;
+            return;
+        }
+
+        data.StatusInfo = ServerStatusInfoCode.Fetched;
+        data.Description = info.Desc;
+        data.Links = info.Links;
+    }
+
+    public void Refresh()
+    {
+        // TODO: This refreshes everything.
+        // Which means if you're hitting refresh on your home page, it'll refresh the servers list too.
+        // This is wasteful.
+
+        foreach (var datum in _cachedData.Values)
+        {
+            if (!datum.DidInitialStatusUpdate)
+                continue;
+
+            datum.Cancellation?.Cancel();
+            datum.Data.InfoCancel?.Cancel();
+
+            datum.Data.StatusInfo = ServerStatusInfoCode.NotFetched;
+            datum.Data.Links = null;
+            datum.Data.Description = null;
+
+            UpdateStatusFor(datum);
+        }
+    }
+
+    public void Clear()
+    {
+        foreach (var value in _cachedData.Values)
+        {
+            value.Cancellation?.Cancel();
+            value.Data.InfoCancel?.Cancel();
+        }
+
+        _cachedData.Clear();
+    }
+
+    private static readonly ConcurrentDictionary<string, AdvancedAlgorithms.KalmanLatencyTracker> _kalmanTrackers = new();
+    private static readonly ConcurrentDictionary<string, (System.Net.IPAddress[] IPs, long ExpiryTicks)> _dnsCache = new();
+
+    public static async Task MeasurePingAsync(ServerStatusData data, CancellationToken cancel = default)
+    {
+        if (!UriHelper.TryParseSs14Uri(data.Address, out var parsedAddress))
+            return;
+
+        var host = parsedAddress.Host;
+        var port = parsedAddress.Port != -1 ? parsedAddress.Port : 1212;
+
+        try
+        {
+            System.Net.IPAddress[] ips;
+            var nowTicks = Environment.TickCount64;
+            if (_dnsCache.TryGetValue(host, out var cached) && nowTicks < cached.ExpiryTicks)
+            {
+                ips = cached.IPs;
+            }
+            else
+            {
+                try
+                {
+                    ips = await System.Net.Dns.GetHostAddressesAsync(host, cancel);
+                    if (ips.Length > 0)
+                        _dnsCache[host] = (ips, nowTicks + 300000);
+                }
+                catch
+                {
+                    return;
+                }
+            }
+
+            if (ips.Length == 0) return;
+
+            using var client = new Socket(ips[0].AddressFamily, SocketType.Stream, ProtocolType.Tcp)
+            {
+                NoDelay = true
+            };
+
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancel);
+            cts.CancelAfter(1500);
+
+            await client.ConnectAsync(new System.Net.IPEndPoint(ips[0], port), cts.Token);
+            sw.Stop();
+
+            var current = sw.Elapsed;
+            var tracker = _kalmanTrackers.GetOrAdd(data.Address, _ => new AdvancedAlgorithms.KalmanLatencyTracker());
+            var (smoothedMs, _) = tracker.Update((float)current.TotalMilliseconds);
+            data.Ping = TimeSpan.FromMilliseconds(smoothedMs);
+        }
+        catch
+        {
+        }
+    }
+
+    void IServerSource.UpdateInfoFor(ServerStatusData statusData)
+    {
+        UpdateInfoForCore(statusData, async cancel =>
+        {
+            var uriBuilder = new UriBuilder(UriHelper.GetServerInfoAddress(statusData.Address));
+            uriBuilder.Query = "?can_skip_build=1";
+            return await _http.GetFromJsonAsync<ServerInfo>(uriBuilder.ToString(), cancel);
+        });
+    }
+
+    private sealed class CacheReg
+    {
+        public readonly ServerStatusData Data;
+        public readonly SemaphoreSlim Semaphore = new(1);
+        public CancellationTokenSource? Cancellation;
+        public bool DidInitialStatusUpdate;
+
+        public CacheReg(ServerStatusData data)
+        {
+            Data = data;
+        }
+    }
+}

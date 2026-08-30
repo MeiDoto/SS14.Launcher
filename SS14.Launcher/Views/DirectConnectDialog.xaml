@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+        mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="180"
+        MinWidth="420" MinHeight="160"
+        Width="450" Height="180"
+        x:Class="SS14.Launcher.Views.DirectConnectDialog"
+        Icon="/Assets/icon.ico"
+        Title="{loc:Loc direct-connect-title}"
+        Background="{DynamicResource ThemePopupBackgroundBrush}"
+        WindowStartupLocation="CenterOwner"
+        Padding="10">
+
+  <DockPanel>
+    <DockPanel DockPanel.Dock="Bottom" Margin="0 8 0 0">
+      <Button DockPanel.Dock="Right" Name="SubmitButton" Content="{loc:Loc direct-connect-connect}" IsDefault="True" Click="TrySubmit"
+              Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="Bold" />
+      <TextBlock Name="InvalidLabel" Text="{loc:Loc direct-connect-address-invalid}" Foreground="#FF6B6B" VerticalAlignment="Center" FontSize="11" />
+    </DockPanel>
+
+    <Border Classes="Card" Padding="10">
+      <StackPanel Spacing="6">
+        <TextBlock Classes="NanoHeadingMedium" Text="{loc:Loc direct-connect-text}" />
+        <Grid ColumnDefinitions="*, Auto">
+          <TextBox Grid.Column="0" Name="AddressBox" Watermark="ss14://example.com:1212" VerticalAlignment="Center" Margin="0, 0, 4, 0" />
+          <Button Grid.Column="1" Name="PasteButton" Content="📋" Click="PasteClicked" ToolTip.Tip="Вставить из буфера" VerticalAlignment="Center" />
+        </Grid>
+        <TextBlock Text="💡 Порт по умолчанию: 1212 (ss14://host:port)" Classes="SubText" FontSize="10" />
+      </StackPanel>
+    </Border>
+  </DockPanel>
+</Window>
