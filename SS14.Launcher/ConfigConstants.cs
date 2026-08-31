@@ -7,7 +7,7 @@ namespace SS14.Launcher;
 public static class ConfigConstants
 {
     public const string CurrentLauncherVersion = "61";
-    public static readonly string LauncherCustomVersion = typeof(ConfigConstants).Assembly.GetName().Version?.ToString(3) ?? "1.1.9";
+    public static readonly string LauncherCustomVersion = typeof(ConfigConstants).Assembly.GetName().Version?.ToString(3) ?? "1.2.0";
     public const string LauncherGitHubRepo = "MeiDoto/SS14.Launcher";
     public static readonly bool DoVersionCheck = true;
 
