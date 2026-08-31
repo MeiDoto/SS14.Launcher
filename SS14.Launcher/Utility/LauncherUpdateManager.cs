@@ -77,6 +77,12 @@ public sealed class LauncherUpdateManager
                 return CachedUpdate;
             }
 
+            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                Log.Warning("GitHub releases API rate limit exceeded (HTTP 403 Forbidden). Postponing update check.");
+                return null;
+            }
+
             if (!response.IsSuccessStatusCode)
             {
                 Log.Warning("GitHub releases API returned {StatusCode}", response.StatusCode);
@@ -545,7 +551,11 @@ rm -f ""$0""
         }
     }
 
-    private static bool TryParseVersion(string versionStr, out Version version)
+    /// <summary>
+    /// Parses a semantic/numerical version string into a <see cref="Version"/> object,
+    /// stripping prefixes like 'v', 'V' and prerelease tags like '-beta'.
+    /// </summary>
+    public static bool TryParseVersion(string versionStr, out Version version)
     {
         versionStr = versionStr.Trim().TrimStart('v', 'V');
         var dash = versionStr.IndexOf('-');

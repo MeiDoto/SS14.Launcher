@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -10,10 +10,22 @@ using System.Threading.Tasks;
 
 namespace SS14.Launcher.Utility;
 
+/// <summary>
+/// HTTP utility extensions for network requests, compression handling and stream management.
+/// </summary>
 public static class HttpUtility
 {
     private static readonly StringWithQualityHeaderValue ZStdHeader = new StringWithQualityHeaderValue("zstd", 1);
 
+    /// <summary>
+    /// Sends an HTTP request with ZStandard (<c>zstd</c>) compression accepted,
+    /// automatically wrapping the response stream in a transparent decompressor if encoded with zstd.
+    /// </summary>
+    /// <param name="client">The HTTP client instance.</param>
+    /// <param name="message">The HTTP request message.</param>
+    /// <param name="completionOption">HTTP response completion option.</param>
+    /// <param name="cancel">Cancellation token.</param>
+    /// <returns>HTTP response message with decompressed content if applicable.</returns>
     public static async Task<HttpResponseMessage> SendZStdAsync(
         this HttpClient client,
         HttpRequestMessage message,

@@ -259,12 +259,42 @@ public sealed class DataManager : ObservableObject
 
     /// <summary>
     ///     Loads config file from disk, or resets the loaded config to default if the config doesn't exist on disk.
+    ///     In case of database corruption, automatically backs up the corrupt database and initializes a fresh one.
     /// </summary>
     public void Load()
     {
         InitializeCVars();
 
-        using var connection = new SqliteConnection(GetCfgDbConnectionString());
+        var dbPath = Path.Combine(LauncherPaths.DirUserData, "settings.db");
+        try
+        {
+            LoadCore(GetCfgDbConnectionString());
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Failed to load SQLite configuration DB. Attempting graceful recovery with backup.");
+            if (File.Exists(dbPath))
+            {
+                var backupPath = Path.Combine(LauncherPaths.DirUserData, $"settings.db.corrupted.{DateTime.UtcNow:yyyyMMddHHmmss}");
+                try
+                {
+                    File.Move(dbPath, backupPath, true);
+                    Log.Warning("Corrupted database moved to {BackupPath}", backupPath);
+                }
+                catch (Exception moveEx)
+                {
+                    Log.Error(moveEx, "Failed to backup corrupted database file {DbPath}", dbPath);
+                }
+            }
+
+            // Retry initialization on a fresh database
+            LoadCore(GetCfgDbConnectionString());
+        }
+    }
+
+    private void LoadCore(string connectionString)
+    {
+        using var connection = new SqliteConnection(connectionString);
         connection.Open();
         connection.Execute("PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA temp_store=MEMORY;");
 

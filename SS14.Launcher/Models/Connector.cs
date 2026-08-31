@@ -44,6 +44,12 @@ public partial class Connector : ObservableObject
     [ObservableProperty] private bool _privacyPolicyDifferentVersion;
     public ServerPrivacyPolicyInfo? PrivacyPolicyInfo { get; private set; }
 
+    /// <summary>
+    /// Initiates an asynchronous connection to a game server address (e.g. ss14://..., http://...),
+    /// managing authentication token exchange, engine version verification/download, and game process launching.
+    /// </summary>
+    /// <param name="address">Target server address.</param>
+    /// <param name="cancel">Cancellation token.</param>
     public async void Connect(string address, CancellationToken cancel = default)
     {
         try
@@ -71,6 +77,11 @@ public partial class Connector : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Launches a local content bundle (.zip package containing game build) in standalone client mode.
+    /// </summary>
+    /// <param name="file">Storage file reference to the content bundle.</param>
+    /// <param name="cancel">Cancellation token.</param>
     public async void LaunchContentBundle(IStorageFile file, CancellationToken cancel = default)
     {
         Log.Information("Launching content bundle: {FileName}", file.Path);

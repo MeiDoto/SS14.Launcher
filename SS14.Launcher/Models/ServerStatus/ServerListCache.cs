@@ -59,6 +59,12 @@ public sealed partial class ServerListCache : ObservableObject, IServerSource
         RefreshServerList(_refreshCancel.Token);
     }
 
+    /// <summary>
+    /// Refreshes the server list asynchronously by querying all configured SS14 hub master servers,
+    /// deduplicating entries by priority, and initiating background TCP latency measurements.
+    /// In case of connection drops or errors, preserves existing cached servers (graceful degradation).
+    /// </summary>
+    /// <param name="cancel">Cancellation token to abort the network queries.</param>
     public async void RefreshServerList(CancellationToken cancel)
     {
         Status = RefreshListStatus.UpdatingMaster;
@@ -129,6 +135,13 @@ public sealed partial class ServerListCache : ObservableObject, IServerSource
                             maybeNewEntry.HubAddress);
                     }
                 }
+            }
+
+            if (entries.Count == 0 && !allSucceeded && AllServers.Count > 0)
+            {
+                Log.Warning("Failed to fetch server list from hubs, preserving existing cached list ({Count} servers)", AllServers.Count);
+                Status = RefreshListStatus.Error;
+                return;
             }
 
             var newServerList = entries.Select(entry =>
