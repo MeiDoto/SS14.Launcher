@@ -222,28 +222,10 @@ public class LogViewerViewModel : ViewModelBase
         return SolidColorBrush.Parse("#BDC3C7");
     }
 
-    public async void CopyLogToClipboard()
+    public void CopyLogToClipboard()
     {
-        try
-        {
-            var text = string.Join(Environment.NewLine, FilteredLines.Select(l => l.Text));
-            if (Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                var top = desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow;
-                if (top?.Clipboard != null)
-                {
-                    await top.Clipboard.SetTextAsync(text);
-                    CopyButtonText = LocalizationManager.Instance.GetString("account-info-copied");
-                    var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-                    timer.Tick += (_, _) => { timer.Stop(); CopyButtonText = ""; };
-                    timer.Start();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            StatusText = LocalizationManager.Instance.GetString("log-viewer-error-copy", ("error", ex.Message));
-        }
+        var text = string.Join(Environment.NewLine, FilteredLines.Select(l => l.Text));
+        _ = ClipboardHelper.CopyWithFeedbackAsync(text, s => CopyButtonText = s);
     }
 
     public void OpenLogsDirectory()

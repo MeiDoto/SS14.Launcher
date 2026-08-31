@@ -91,17 +91,9 @@ public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<Favor
         set => SetProperty(ref _copyAddressButtonText, value);
     }
 
-    public async void CopyAddress()
+    public void CopyAddress()
     {
-        if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop &&
-            (desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow)?.Clipboard is { } clipboard)
-        {
-            await clipboard.SetTextAsync(Address);
-            CopyAddressButtonText = _loc.GetString("account-info-copied");
-            var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-            timer.Tick += (_, _) => { timer.Stop(); CopyAddressButtonText = ""; };
-            timer.Start();
-        }
+        _ = ClipboardHelper.CopyWithFeedbackAsync(Address, s => CopyAddressButtonText = s);
     }
 
     public FavoriteServer? Favorite { get; }

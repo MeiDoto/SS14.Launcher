@@ -4,8 +4,20 @@ using SS14.Launcher.Models.ServerStatus;
 
 namespace SS14.Launcher.Utility;
 
+/// <summary>
+/// Provides multi-stage fuzzy and ranked string search algorithms for servers.
+/// </summary>
 public static class SearchAlgorithm
 {
+    /// <summary>
+    /// Computes a relevance match score between a user search query and a candidate server name.
+    /// </summary>
+    /// <param name="query">The user's search text.</param>
+    /// <param name="target">The server name or address to compare against.</param>
+    /// <returns>
+    /// An integer score where 1000 is an exact match, 800 is prefix, 600 is word boundary,
+    /// 200-400 is substring/fuzzy, and 0 indicates no match.
+    /// </returns>
     public static int GetMatchScore(string? query, string? target)
     {
         if (string.IsNullOrWhiteSpace(query))

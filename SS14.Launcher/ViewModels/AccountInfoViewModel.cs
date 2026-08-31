@@ -146,73 +146,28 @@ public sealed class AccountInfoViewModel : ViewModelBase
     public void ToggleUserIdVisibility() => IsUserIdRevealed = !IsUserIdRevealed;
     public void ToggleHwidVisibility() => IsHwidRevealed = !IsHwidRevealed;
 
-    public async void CopyUserId()
+    public void CopyUserId()
     {
-        try
-        {
-            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                var top = desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow;
-                if (top?.Clipboard != null)
-                {
-                    await top.Clipboard.SetTextAsync(UserId);
-                    CopyUserIdText = _loc.GetString("account-info-copied");
-                    var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-                    timer.Tick += (_, _) => { timer.Stop(); CopyUserIdText = ""; };
-                    timer.Start();
-                }
-            }
-        }
-        catch { }
+        _ = ClipboardHelper.CopyWithFeedbackAsync(UserId, s => CopyUserIdText = s);
     }
 
-    public async void CopyHwid()
+    public void CopyHwid()
     {
-        try
-        {
-            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                var top = desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow;
-                if (top?.Clipboard != null)
-                {
-                    await top.Clipboard.SetTextAsync(Hwid);
-                    CopyHwidText = _loc.GetString("account-info-copied");
-                    var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-                    timer.Tick += (_, _) => { timer.Stop(); CopyHwidText = ""; };
-                    timer.Start();
-                }
-            }
-        }
-        catch { }
+        _ = ClipboardHelper.CopyWithFeedbackAsync(Hwid, s => CopyHwidText = s);
     }
 
-    public async void CopyAllDiagnostics()
+    public void CopyAllDiagnostics()
     {
-        try
-        {
-            var text = $"### SS14 Account Diagnostics\n" +
-                       $"- **User**: `{Username}`\n" +
-                       $"- **UserID**: `{UserId}`\n" +
-                       $"- **HWID**: `{Hwid}`\n" +
-                       $"- **OS**: `{SystemInfo}`\n" +
-                       $"- **Total Playtime**: `{TotalPlaytimeText}`\n" +
-                       $"- **Token Status**: `{StatusText}`\n" +
-                       $"- **Launcher**: `v{ConfigConstants.LauncherCustomVersion}` (.NET 10.0)";
+        var text = $"### SS14 Account Diagnostics\n" +
+                   $"- **User**: `{Username}`\n" +
+                   $"- **UserID**: `{UserId}`\n" +
+                   $"- **HWID**: `{Hwid}`\n" +
+                   $"- **OS**: `{SystemInfo}`\n" +
+                   $"- **Total Playtime**: `{TotalPlaytimeText}`\n" +
+                   $"- **Token Status**: `{StatusText}`\n" +
+                   $"- **Launcher**: `v{ConfigConstants.LauncherCustomVersion}` (.NET 10.0)";
 
-            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                var top = desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow;
-                if (top?.Clipboard != null)
-                {
-                    await top.Clipboard.SetTextAsync(text);
-                    CopyAllDiagText = _loc.GetString("account-info-copied");
-                    var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-                    timer.Tick += (_, _) => { timer.Stop(); CopyAllDiagText = ""; };
-                    timer.Start();
-                }
-            }
-        }
-        catch { }
+        _ = ClipboardHelper.CopyWithFeedbackAsync(text, s => CopyAllDiagText = s);
     }
 
     public void OpenAccountWebsite()

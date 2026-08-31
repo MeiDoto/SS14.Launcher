@@ -6,8 +6,17 @@ using System.Linq;
 
 namespace SS14.Launcher.Utility;
 
+/// <summary>
+/// High-performance algorithmic primitives for server scoring, latency tracking, and SIMD text search.
+/// </summary>
 public static class AdvancedAlgorithms
 {
+    /// <summary>
+    /// Computes jitter-adaptive exponential moving average (EMA) for ping smoothing.
+    /// </summary>
+    /// <param name="currentSmooth">The current smoothed latency value in ms.</param>
+    /// <param name="newSample">The latest measured round-trip time in ms.</param>
+    /// <returns>Updated smoothed latency estimate in ms.</returns>
     public static float SmoothPingAdaptive(float currentSmooth, float newSample)
     {
         if (currentSmooth <= 0.001f)
@@ -19,6 +28,9 @@ public static class AdvancedAlgorithms
         return (alpha * newSample) + ((1f - alpha) * currentSmooth);
     }
 
+    /// <summary>
+    /// 1D Kalman filter tracker with Chi-squared gating to filter latency spikes and estimate packet jitter.
+    /// </summary>
     public sealed class KalmanLatencyTracker
     {
         private float _estimate;

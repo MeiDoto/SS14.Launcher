@@ -63,11 +63,14 @@ public sealed class LocalizationManager
 
     public string GetString(string key)
     {
-        return _bundle.GetMessage(key) ?? key;
+        return _bundle?.GetMessage(key) ?? key;
     }
 
     public string GetString(string key, params (string, object?)[] args)
     {
+        if (_bundle == null)
+            return key;
+
         var argsDict = new Dictionary<string, IFluentType>(args.Length);
 
         foreach (var (argKey, argValue) in args)
@@ -173,7 +176,24 @@ public sealed class LocalizationManager
         }
     }
 
-    public static LocalizationManager Instance => Locator.Current.GetRequiredService<LocalizationManager>();
+    private static LocalizationManager? _fallbackInstance;
+
+    public static LocalizationManager Instance
+    {
+        get
+        {
+            var registered = Locator.Current.GetService<LocalizationManager>();
+            if (registered != null)
+                return registered;
+
+            if (_fallbackInstance != null)
+                return _fallbackInstance;
+
+            var dataMgr = Locator.Current.GetService<DataManager>() ?? new DataManager();
+            _fallbackInstance = new LocalizationManager(dataMgr);
+            return _fallbackInstance;
+        }
+    }
 
     // ReSharper disable once NotAccessedPositionalProperty.Global
     public sealed record LanguageInfo(string Name)

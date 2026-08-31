@@ -107,24 +107,9 @@ public sealed class ServerHistoryViewModel : ViewModelBase
         IsEmpty = true;
     }
 
-    public async void CopyAddress(ServerHistoryItemViewModel item)
+    public void CopyAddress(ServerHistoryItemViewModel item)
     {
-        try
-        {
-            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                var targetWindow = desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow;
-                if (targetWindow?.Clipboard != null)
-                {
-                    await targetWindow.Clipboard.SetTextAsync(item.Address);
-                    item.CopyButtonText = LocalizationManager.Instance.GetString("account-info-copied");
-                    var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-                    timer.Tick += (_, _) => { timer.Stop(); item.CopyButtonText = ""; };
-                    timer.Start();
-                }
-            }
-        }
-        catch { }
+        _ = ClipboardHelper.CopyWithFeedbackAsync(item.Address, s => item.CopyButtonText = s);
     }
 
     public void AddFavorite(ServerHistoryItemViewModel item)

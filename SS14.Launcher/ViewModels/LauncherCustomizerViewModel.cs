@@ -846,7 +846,7 @@ Opacity = 0.88
                     CustomOptionsTabName = val;
                     appliedCount++;
                     break;
-                case "tabplacement" or "dock" or "placement":
+                case "tabplacement" or "dock" or "placement" or "tabs" or "tabposition":
                     if (val.Equals("Bottom", StringComparison.OrdinalIgnoreCase) ||
                         val.Equals("Left", StringComparison.OrdinalIgnoreCase) ||
                         val.Equals("Right", StringComparison.OrdinalIgnoreCase) ||
@@ -1029,19 +1029,8 @@ Opacity = 0.88
                 vfx = EnableClickVfx
             };
             var json = System.Text.Json.JsonSerializer.Serialize(theme);
-            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                var top = desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow;
-                if (top?.Clipboard != null)
-                {
-                    await top.Clipboard.SetTextAsync(json);
-                    ScriptOutputText = LocalizationManager.Instance.GetString("customizer-export-success");
-                    ExportThemeButtonText = LocalizationManager.Instance.GetString("account-info-copied");
-                    var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-                    timer.Tick += (_, _) => { timer.Stop(); ExportThemeButtonText = ""; };
-                    timer.Start();
-                }
-            }
+            await ClipboardHelper.CopyWithFeedbackAsync(json, s => ExportThemeButtonText = s);
+            ScriptOutputText = LocalizationManager.Instance.GetString("customizer-export-success");
         }
         catch (Exception ex)
         {
@@ -1053,26 +1042,22 @@ Opacity = 0.88
     {
         try
         {
-            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop &&
-                desktop.MainWindow?.Clipboard is { } clipboard)
+            var text = await ClipboardHelper.GetTextAsync();
+            if (!string.IsNullOrWhiteSpace(text))
             {
-                var text = await clipboard.GetTextAsync();
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    using var doc = System.Text.Json.JsonDocument.Parse(text);
-                    var root = doc.RootElement;
-                    if (root.TryGetProperty("accent", out var a)) CustomAccentColor = a.GetString() ?? "";
-                    if (root.TryGetProperty("button", out var b)) CustomButtonColor = b.GetString() ?? "";
-                    if (root.TryGetProperty("tabSelected", out var ts)) CustomTabSelectedColor = ts.GetString() ?? "";
-                    if (root.TryGetProperty("text", out var t)) CustomTextColor = t.GetString() ?? "";
-                    if (root.TryGetProperty("popup", out var p)) CustomPopupBackgroundColor = p.GetString() ?? "";
-                    if (root.TryGetProperty("opacity", out var op)) CustomBackgroundOpacity = (float)op.GetDouble();
-                    if (root.TryGetProperty("fontSize", out var fs)) CustomFontSize = (float)fs.GetDouble();
-                    if (root.TryGetProperty("tabPlacement", out var tp)) CustomTabPlacement = tp.GetString() ?? "Top";
-                    if (root.TryGetProperty("vfx", out var vfx)) EnableClickVfx = vfx.GetBoolean();
+                using var doc = System.Text.Json.JsonDocument.Parse(text);
+                var root = doc.RootElement;
+                if (root.TryGetProperty("accent", out var a)) CustomAccentColor = a.GetString() ?? "";
+                if (root.TryGetProperty("button", out var b)) CustomButtonColor = b.GetString() ?? "";
+                if (root.TryGetProperty("tabSelected", out var ts)) CustomTabSelectedColor = ts.GetString() ?? "";
+                if (root.TryGetProperty("text", out var t)) CustomTextColor = t.GetString() ?? "";
+                if (root.TryGetProperty("popup", out var p)) CustomPopupBackgroundColor = p.GetString() ?? "";
+                if (root.TryGetProperty("opacity", out var op)) CustomBackgroundOpacity = (float)op.GetDouble();
+                if (root.TryGetProperty("fontSize", out var fs)) CustomFontSize = (float)fs.GetDouble();
+                if (root.TryGetProperty("tabPlacement", out var tp)) CustomTabPlacement = tp.GetString() ?? "Top";
+                if (root.TryGetProperty("vfx", out var vfx)) EnableClickVfx = vfx.GetBoolean();
 
-                    ScriptOutputText = LocalizationManager.Instance.GetString("customizer-import-success");
-                }
+                ScriptOutputText = LocalizationManager.Instance.GetString("customizer-import-success");
             }
         }
         catch (Exception ex)
