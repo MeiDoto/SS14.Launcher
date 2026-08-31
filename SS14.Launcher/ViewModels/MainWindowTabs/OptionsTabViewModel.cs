@@ -267,7 +267,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         if (string.IsNullOrWhiteSpace(title))
             title = "Space Station 14";
         if (string.IsNullOrWhiteSpace(msg))
-            msg = "Оповещения на рабочем столе работают исправно!";
+            msg = LocalizationManager.Instance.GetString("tab-options-notify-test-msg");
         DesktopNotificationManager.Notify(title, msg);
     }
 
@@ -339,7 +339,12 @@ public class OptionsTabViewModel : MainWindowTabViewModel
                     ? $"{(bytes / (1024.0 * 1024.0 * 1024.0)):F2} GB"
                     : $"{(bytes / (1024.0 * 1024.0)):F1} MB";
 
-                return $"💾 Диск: Всего {Fmt(total)} (Контент: {Fmt(dbSize)}, Движки: {Fmt(engines)}, Реплеи: {Fmt(replays)}, Логи: {Fmt(logs)})";
+                return LocalizationManager.Instance.GetString("tab-options-storage-usage",
+                    ("total", Fmt(total)),
+                    ("content", Fmt(dbSize)),
+                    ("engines", Fmt(engines)),
+                    ("replays", Fmt(replays)),
+                    ("logs", Fmt(logs)));
             }
             catch
             {

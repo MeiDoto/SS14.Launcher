@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Splat;
+using SS14.Launcher.Localization;
 using SS14.Launcher.Models.Data;
 using SS14.Launcher.Utility;
 
@@ -108,11 +109,22 @@ public sealed class ServerHistoryViewModel : ViewModelBase
 
     public async void CopyAddress(ServerHistoryItemViewModel item)
     {
-        var window = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
-        if (window?.Clipboard != null)
+        try
         {
-            await window.Clipboard.SetTextAsync(item.Address);
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var targetWindow = desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow;
+                if (targetWindow?.Clipboard != null)
+                {
+                    await targetWindow.Clipboard.SetTextAsync(item.Address);
+                    item.CopyButtonText = LocalizationManager.Instance.GetString("account-info-copied");
+                    var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+                    timer.Tick += (_, _) => { timer.Stop(); item.CopyButtonText = ""; };
+                    timer.Start();
+                }
+            }
         }
+        catch { }
     }
 
     public void AddFavorite(ServerHistoryItemViewModel item)
@@ -133,11 +145,18 @@ public sealed class ServerHistoryItemViewModel : ViewModelBase
 {
     private readonly ServerHistoryEntry _entry;
     private readonly ServerHistoryViewModel _parent;
+    private string _copyButtonText = "";
 
     public string Address => _entry.Address;
     public string Name => !string.IsNullOrWhiteSpace(_entry.Name) ? _entry.Name : _entry.Address;
     public DateTime TimeUtc => _entry.TimeUtc;
     public string FormattedTime => _entry.TimeUtc.ToLocalTime().ToString("g");
+
+    public string CopyButtonText
+    {
+        get => string.IsNullOrEmpty(_copyButtonText) ? LocalizationManager.Instance.GetString("server-history-copy") : _copyButtonText;
+        set => SetProperty(ref _copyButtonText, value);
+    }
 
     public ServerHistoryItemViewModel(ServerHistoryEntry entry, ServerHistoryViewModel parent)
     {

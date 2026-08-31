@@ -25,9 +25,9 @@
         <TextBlock Classes="NanoHeadingMedium" Text="{loc:Loc direct-connect-text}" />
         <Grid ColumnDefinitions="*, Auto">
           <TextBox Grid.Column="0" Name="AddressBox" Watermark="ss14://example.com:1212" VerticalAlignment="Center" Margin="0, 0, 4, 0" />
-          <Button Grid.Column="1" Name="PasteButton" Content="📋" Click="PasteClicked" ToolTip.Tip="Вставить из буфера" VerticalAlignment="Center" />
+          <Button Grid.Column="1" Name="PasteButton" Content="📋" Click="PasteClicked" ToolTip.Tip="{loc:Loc dialog-paste-tooltip}" VerticalAlignment="Center" />
         </Grid>
-        <TextBlock Text="💡 Порт по умолчанию: 1212 (ss14://host:port)" Classes="SubText" FontSize="10" />
+        <TextBlock Text="{loc:Loc direct-connect-default-port-hint}" Classes="SubText" FontSize="10" />
       </StackPanel>
     </Border>
   </DockPanel>

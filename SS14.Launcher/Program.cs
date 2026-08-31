@@ -52,7 +52,19 @@ internal static class Program
 
         TaskScheduler.UnobservedTaskException += (sender, eventArgs) =>
         {
-            Log.Error(eventArgs.Exception, "Unobserved task exception");
+            var isDbusHarmless = eventArgs.Exception.Flatten().InnerExceptions.Any(e =>
+                e.GetType().Name.Contains("DBusException", StringComparison.OrdinalIgnoreCase) ||
+                e.Message.Contains("org.freedesktop.DBus", StringComparison.OrdinalIgnoreCase) ||
+                e.Message.Contains("ServiceUnknown", StringComparison.OrdinalIgnoreCase));
+
+            if (isDbusHarmless)
+            {
+                Log.Debug(eventArgs.Exception, "Handled non-critical unobserved DBus platform service exception");
+            }
+            else
+            {
+                Log.Error(eventArgs.Exception, "Unobserved task exception");
+            }
             eventArgs.SetObserved();
         };
 #if DEBUG

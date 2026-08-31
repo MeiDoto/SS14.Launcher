@@ -4,9 +4,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:SS14.Launcher.ViewModels"
         xmlns:loc="clr-namespace:SS14.Launcher.Localization"
-        mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="550"
-        MinWidth="600" MinHeight="450"
-        Width="700" Height="550"
+        mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="480"
+        MinWidth="520" MinHeight="380"
+        Width="620" Height="480"
         x:Class="SS14.Launcher.Views.LocalBuildsDialog"
         x:DataType="vm:LocalBuildsViewModel"
         Icon="/Assets/icon.ico"
@@ -37,13 +37,13 @@
           <StackPanel Spacing="8">
             <TextBlock Text="{loc:Loc local-builds-section-add}" Classes="SectionTitle" />
 
-            <Grid ColumnDefinitions="120, *" Margin="0, 2">
-              <TextBlock Grid.Column="0" Text="{loc:Loc local-builds-name}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
+            <Grid ColumnDefinitions="Auto, *" Margin="0, 2">
+              <TextBlock Grid.Column="0" Text="{loc:Loc local-builds-name}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="0, 0, 16, 0" />
               <TextBox Grid.Column="1" Text="{Binding NewBuildName}" Watermark="{loc:Loc local-builds-name-watermark}" />
             </Grid>
 
-            <Grid ColumnDefinitions="120, *, Auto" Margin="0, 2">
-              <TextBlock Grid.Column="0" Text="{loc:Loc local-builds-path}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
+            <Grid ColumnDefinitions="Auto, *, Auto" Margin="0, 2">
+              <TextBlock Grid.Column="0" Text="{loc:Loc local-builds-path}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="0, 0, 16, 0" />
               <TextBox Grid.Column="1" Text="{Binding NewBuildPath}" Watermark="{loc:Loc local-builds-path-watermark}" Margin="0, 0, 4, 0" />
               <Button Grid.Column="2" Content="{loc:Loc local-builds-browse}" Click="BrowseClicked" />
             </Grid>
@@ -59,7 +59,14 @@
           <StackPanel Spacing="8">
             <TextBlock Text="{loc:Loc local-builds-section-saved}" Classes="SectionTitle" />
 
-            <ItemsControl ItemsSource="{Binding Builds}">
+            <!-- EMPTY PLACEHOLDER STATE -->
+            <StackPanel IsVisible="{Binding HasNoBuilds}" HorizontalAlignment="Center" Margin="0, 12" Spacing="4">
+              <TextBlock Text="{loc:Loc local-builds-empty-title}" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource ThemeSubTextBrush}" HorizontalAlignment="Center" />
+              <TextBlock Text="{loc:Loc local-builds-empty-desc}" FontSize="11" Foreground="{DynamicResource ThemeSubTextBrush}" HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <!-- BUILDS LIST -->
+            <ItemsControl ItemsSource="{Binding Builds}" IsVisible="{Binding HasBuilds}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="vm:LocalBuildItemViewModel">
                   <Border Background="#16181F" BorderBrush="#2F3545" BorderThickness="1"
@@ -83,6 +90,7 @@
                       <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="8, 0, 0, 0">
                         <Button Content="{loc:Loc local-builds-launch}" Click="LaunchClicked"
                                 Foreground="#5BD969" FontWeight="SemiBold" />
+                        <Button Content="{loc:Loc local-builds-open-folder}" Command="{Binding OpenFolder}" />
                         <Button Content="{loc:Loc local-builds-delete}" Command="{Binding Delete}" />
                       </StackPanel>
                     </Grid>

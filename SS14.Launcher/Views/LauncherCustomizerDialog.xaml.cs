@@ -24,8 +24,11 @@ public partial class LauncherCustomizerDialog : Window
         _viewModel.Populate();
     }
 
+    private bool _saved = false;
+
     private void Done(object? sender, RoutedEventArgs args)
     {
+        _saved = true;
         _viewModel.Save();
         if (Owner?.DataContext is MainWindowViewModel mainVm)
         {
@@ -39,7 +42,20 @@ public partial class LauncherCustomizerDialog : Window
         Close();
     }
 
-    private void Cancel(object? sender, RoutedEventArgs args) => Close();
+    private void Cancel(object? sender, RoutedEventArgs args)
+    {
+        _viewModel.RestoreInitialSnapshot();
+        Close();
+    }
+
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        base.OnClosing(e);
+        if (!_saved)
+        {
+            _viewModel.RestoreInitialSnapshot();
+        }
+    }
 
     private void ResetClicked(object? sender, RoutedEventArgs args)
     {

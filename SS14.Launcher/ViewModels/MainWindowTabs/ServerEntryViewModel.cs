@@ -1,10 +1,12 @@
 using System;
 using System.ComponentModel;
+using System.Linq;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Messaging;
 using SS14.Launcher.Localization;
 using SS14.Launcher.Models.Data;
 using SS14.Launcher.Models.ServerStatus;
+using SS14.Launcher.Utility;
 using static SS14.Launcher.Utility.HubUtility;
 
 using System.Windows.Input;
@@ -82,12 +84,23 @@ public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<Favor
         ConnectingViewModel.StartConnect(_windowVm, Address);
     }
 
+    private string _copyAddressButtonText = "";
+    public string CopyAddressButtonText
+    {
+        get => string.IsNullOrEmpty(_copyAddressButtonText) ? _loc.GetString("server-entry-copy-address") : _copyAddressButtonText;
+        set => SetProperty(ref _copyAddressButtonText, value);
+    }
+
     public async void CopyAddress()
     {
         if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop &&
-            desktop.MainWindow?.Clipboard is { } clipboard)
+            (desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow)?.Clipboard is { } clipboard)
         {
             await clipboard.SetTextAsync(Address);
+            CopyAddressButtonText = _loc.GetString("account-info-copied");
+            var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            timer.Tick += (_, _) => { timer.Stop(); CopyAddressButtonText = ""; };
+            timer.Start();
         }
     }
 
@@ -248,21 +261,11 @@ public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<Favor
 
     public long PlaytimeSeconds => _cfg.GetPlaytimeForServer(Address);
 
-    public string PlaytimeString
-    {
-        get
-        {
-            var sec = PlaytimeSeconds;
-            if (sec <= 0) return "";
-            var hours = sec / 3600;
-            var mins = (sec % 3600) / 60;
-            if (hours > 0)
-                return _loc.GetString("server-entry-playtime-hours", ("hours", hours), ("mins", mins));
-            return _loc.GetString("server-entry-playtime-mins", ("mins", Math.Max(1, mins)));
-        }
-    }
+    public string PlaytimeString => PlaytimeFormatter.Format(PlaytimeSeconds);
 
     public string PlaytimeToolTip => _loc.GetString("server-entry-playtime-tooltip", ("time", PlaytimeString));
+
+    public string PlaytimeBottomText => _loc.GetString("server-entry-playtime-bottom", ("time", PlaytimeString));
 
     public string FallbackName
     {

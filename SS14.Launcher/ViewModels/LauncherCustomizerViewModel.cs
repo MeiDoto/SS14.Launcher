@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Avalonia.Media.Imaging;
 using Splat;
 using SS14.Launcher.Localization;
@@ -93,6 +94,53 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
         set => SetProperty(ref _livePreviewEnabled, value);
     }
 
+    public record struct CustomizerSnapshot(
+        string BackgroundPath,
+        float BackgroundOpacity,
+        string LogoPath,
+        string AccentColor,
+        string ButtonColor,
+        string TabSelectedColor,
+        string TextColor,
+        string PopupBackgroundColor,
+        float FontSize,
+        string WindowTitle,
+        bool EnableClickVfx,
+        string UserCode,
+        string HomeTab,
+        string ServersTab,
+        string NewsTab,
+        string ReplaysTab,
+        string OptionsTab,
+        string TabPlacement
+    );
+
+    private CustomizerSnapshot _initialSnapshot;
+
+    public void RestoreInitialSnapshot()
+    {
+        CustomBackgroundImagePath = _initialSnapshot.BackgroundPath;
+        CustomBackgroundOpacity = _initialSnapshot.BackgroundOpacity;
+        CustomLogoImagePath = _initialSnapshot.LogoPath;
+        CustomAccentColor = _initialSnapshot.AccentColor;
+        CustomButtonColor = _initialSnapshot.ButtonColor;
+        CustomTabSelectedColor = _initialSnapshot.TabSelectedColor;
+        CustomTextColor = _initialSnapshot.TextColor;
+        CustomPopupBackgroundColor = _initialSnapshot.PopupBackgroundColor;
+        CustomFontSize = _initialSnapshot.FontSize;
+        CustomWindowTitle = _initialSnapshot.WindowTitle;
+        EnableClickVfx = _initialSnapshot.EnableClickVfx;
+        CustomUserCode = _initialSnapshot.UserCode;
+        CustomHomeTabName = _initialSnapshot.HomeTab;
+        CustomServersTabName = _initialSnapshot.ServersTab;
+        CustomNewsTabName = _initialSnapshot.NewsTab;
+        CustomReplaysTabName = _initialSnapshot.ReplaysTab;
+        CustomOptionsTabName = _initialSnapshot.OptionsTab;
+        CustomTabPlacement = _initialSnapshot.TabPlacement;
+
+        ApplyLivePreview();
+    }
+
     private Avalonia.Threading.DispatcherTimer? _livePreviewTimer;
 
     private void ScheduleLivePreview()
@@ -100,7 +148,7 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
         if (!_livePreviewEnabled) return;
 
         _livePreviewTimer?.Stop();
-        _livePreviewTimer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(150) };
+        _livePreviewTimer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
         _livePreviewTimer.Tick += (_, _) =>
         {
             _livePreviewTimer.Stop();
@@ -109,33 +157,100 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
         _livePreviewTimer.Start();
     }
 
-    private void ApplyLivePreview()
+    public void ApplyLivePreview()
     {
         var app = Avalonia.Application.Current;
-        if (app == null) return;
-
-        TrySetResourceColor(app, "SS14AccentBrush", _customAccentColor);
-        TrySetResourceColor(app, "SS14ButtonBrush", _customButtonColor);
-        TrySetResourceColor(app, "SS14TabSelectedBrush", _customTabSelectedColor);
-        TrySetResourceColor(app, "SS14TextBrush", _customTextColor);
-        TrySetResourceColor(app, "SS14PopupBackgroundBrush", _customPopupBackgroundColor);
-    }
-
-    private static void TrySetResourceColor(Avalonia.Application app, string key, string colorHex)
-    {
-        if (string.IsNullOrWhiteSpace(colorHex)) return;
-        try
+        if (app?.Resources is { } res)
         {
-            if (Avalonia.Media.Color.TryParse(colorHex, out var color))
+            if (!string.IsNullOrWhiteSpace(_customAccentColor) && PaletteUtility.TryParseHexColor(_customAccentColor, out var accentCol))
             {
-                app.Resources[key] = new Avalonia.Media.SolidColorBrush(color);
+                res["ThemeNanoGoldBrush"] = new Avalonia.Media.SolidColorBrush(accentCol);
+                res["ThemeNanoGoldColor"] = accentCol;
+            }
+
+            if (!string.IsNullOrWhiteSpace(_customButtonColor) && PaletteUtility.TryParseHexColor(_customButtonColor, out var btnCol))
+            {
+                res["ThemeControlMidBrush"] = new Avalonia.Media.SolidColorBrush(btnCol);
+                res["ThemeControlMidColor"] = btnCol;
+                var hoverCol = Avalonia.Media.Color.FromArgb(
+                    btnCol.A,
+                    (byte)Math.Min(255, btnCol.R + 25),
+                    (byte)Math.Min(255, btnCol.G + 25),
+                    (byte)Math.Min(255, btnCol.B + 35));
+                res["ThemeButtonHoveredBrush"] = new Avalonia.Media.SolidColorBrush(hoverCol);
+            }
+
+            if (!string.IsNullOrWhiteSpace(_customTabSelectedColor) && PaletteUtility.TryParseHexColor(_customTabSelectedColor, out var tabCol))
+            {
+                res["ThemeTabItemSelectedBrush"] = new Avalonia.Media.SolidColorBrush(tabCol);
+                res["ThemeControlHighBrush"] = new Avalonia.Media.SolidColorBrush(tabCol);
+                res["ThemeControlHighColor"] = tabCol;
+            }
+
+            if (!string.IsNullOrWhiteSpace(_customTextColor) && PaletteUtility.TryParseHexColor(_customTextColor, out var textCol))
+            {
+                res["ThemeForegroundBrush"] = new Avalonia.Media.SolidColorBrush(textCol);
+                res["ThemeForegroundColor"] = textCol;
+            }
+
+            if (!string.IsNullOrWhiteSpace(_customPopupBackgroundColor) && PaletteUtility.TryParseHexColor(_customPopupBackgroundColor, out var popupCol))
+            {
+                res["ThemePopupBackgroundBrush"] = new Avalonia.Media.SolidColorBrush(popupCol);
+                res["ThemePopupBackgroundColor"] = popupCol;
+            }
+
+            if (_customFontSize >= 10 && _customFontSize <= 26)
+            {
+                res["FontSizeNormal"] = (double)_customFontSize;
             }
         }
-        catch
-        {
-            // Ignore invalid color strings during live preview
-        }
+
+        OnPropertyChanged(nameof(LivePreviewAccentBrush));
+        OnPropertyChanged(nameof(LivePreviewButtonBrush));
+        OnPropertyChanged(nameof(LivePreviewTabSelectedBrush));
+        OnPropertyChanged(nameof(LivePreviewTextBrush));
+        OnPropertyChanged(nameof(LivePreviewPopupBrush));
+        OnPropertyChanged(nameof(EffectiveWindowTitle));
+        OnPropertyChanged(nameof(EffectiveHomeTabName));
+        OnPropertyChanged(nameof(EffectiveServersTabName));
+        OnPropertyChanged(nameof(EffectiveNewsTabName));
     }
+
+    public Avalonia.Media.IBrush LivePreviewAccentBrush => PaletteUtility.TryParseHexColor(_customAccentColor, out var col)
+        ? new Avalonia.Media.SolidColorBrush(col)
+        : (Avalonia.Media.IBrush)(Avalonia.Application.Current?.Resources["ThemeNanoGoldBrush"] as Avalonia.Media.IBrush ?? Avalonia.Media.Brushes.Gold);
+
+    public Avalonia.Media.IBrush LivePreviewButtonBrush => PaletteUtility.TryParseHexColor(_customButtonColor, out var col)
+        ? new Avalonia.Media.SolidColorBrush(col)
+        : (Avalonia.Media.IBrush)(Avalonia.Application.Current?.Resources["ThemeControlMidBrush"] as Avalonia.Media.IBrush ?? Avalonia.Media.Brushes.DarkSlateGray);
+
+    public Avalonia.Media.IBrush LivePreviewTabSelectedBrush => PaletteUtility.TryParseHexColor(_customTabSelectedColor, out var col)
+        ? new Avalonia.Media.SolidColorBrush(col)
+        : (Avalonia.Media.IBrush)(Avalonia.Application.Current?.Resources["ThemeTabItemSelectedBrush"] as Avalonia.Media.IBrush ?? Avalonia.Media.Brushes.DarkGreen);
+
+    public Avalonia.Media.IBrush LivePreviewTextBrush => PaletteUtility.TryParseHexColor(_customTextColor, out var col)
+        ? new Avalonia.Media.SolidColorBrush(col)
+        : (Avalonia.Media.IBrush)(Avalonia.Application.Current?.Resources["ThemeForegroundBrush"] as Avalonia.Media.IBrush ?? Avalonia.Media.Brushes.White);
+
+    public Avalonia.Media.IBrush LivePreviewPopupBrush => PaletteUtility.TryParseHexColor(_customPopupBackgroundColor, out var col)
+        ? new Avalonia.Media.SolidColorBrush(col)
+        : (Avalonia.Media.IBrush)(Avalonia.Application.Current?.Resources["ThemePopupBackgroundBrush"] as Avalonia.Media.IBrush ?? new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0x20, 0x20, 0x25)));
+
+    public string EffectiveWindowTitle => string.IsNullOrWhiteSpace(_customWindowTitle)
+        ? "Space Station 14 Launcher"
+        : _customWindowTitle;
+
+    public string EffectiveHomeTabName => string.IsNullOrWhiteSpace(_customHomeTabName)
+        ? LocalizationManager.Instance.GetString("tab-home-title")
+        : _customHomeTabName;
+
+    public string EffectiveServersTabName => string.IsNullOrWhiteSpace(_customServersTabName)
+        ? LocalizationManager.Instance.GetString("tab-servers-title")
+        : _customServersTabName;
+
+    public string EffectiveNewsTabName => string.IsNullOrWhiteSpace(_customNewsTabName)
+        ? LocalizationManager.Instance.GetString("tab-news-title")
+        : _customNewsTabName;
 
     public string CustomAccentColor
     {
@@ -195,6 +310,7 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
             if (SetProperty(ref _customFontSize, value))
             {
                 OnPropertyChanged(nameof(FontSizeText));
+                ScheduleLivePreview();
             }
         }
     }
@@ -204,7 +320,13 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
     public string CustomWindowTitle
     {
         get => _customWindowTitle;
-        set => SetProperty(ref _customWindowTitle, value);
+        set
+        {
+            if (SetProperty(ref _customWindowTitle, value))
+            {
+                OnPropertyChanged(nameof(EffectiveWindowTitle));
+            }
+        }
     }
 
     public bool EnableClickVfx
@@ -323,6 +445,7 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
         CustomTextColor = "#EEEEEE";
         CustomPopupBackgroundColor = "#202025";
         CustomFontSize = 15.0f;
+        ApplyLivePreview();
     }
 
     public void SetPresetCyberpunk()
@@ -333,6 +456,7 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
         CustomTextColor = "#E0F7FA";
         CustomPopupBackgroundColor = "#1A102F";
         CustomFontSize = 15.0f;
+        ApplyLivePreview();
     }
 
     public void SetPresetSyndicate()
@@ -343,6 +467,7 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
         CustomTextColor = "#F5F5F5";
         CustomPopupBackgroundColor = "#1A1A1E";
         CustomFontSize = 15.0f;
+        ApplyLivePreview();
     }
 
     public void SetPresetSolar()
@@ -353,6 +478,7 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
         CustomTextColor = "#FFF8E1";
         CustomPopupBackgroundColor = "#121E36";
         CustomFontSize = 15.0f;
+        ApplyLivePreview();
     }
 
     public void SetPresetDeepSpace()
@@ -363,6 +489,7 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
         CustomTextColor = "#F1F2F6";
         CustomPopupBackgroundColor = "#191933";
         CustomFontSize = 15.0f;
+        ApplyLivePreview();
     }
 
     public void SetPresetMatrix()
@@ -373,6 +500,7 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
         CustomTextColor = "#D8F3DC";
         CustomPopupBackgroundColor = "#081C10";
         CustomFontSize = 15.0f;
+        ApplyLivePreview();
     }
 
     public void SetPresetMonochrome()
@@ -383,6 +511,106 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
         CustomTextColor = "#F0F0F0";
         CustomPopupBackgroundColor = "#181818";
         CustomFontSize = 15.0f;
+        ApplyLivePreview();
+    }
+
+    public void SetPresetCentComm()
+    {
+        CustomAccentColor = "#2ED573";
+        CustomButtonColor = "#1B3D2F";
+        CustomTabSelectedColor = "#10AC84";
+        CustomTextColor = "#E8F8F0";
+        CustomPopupBackgroundColor = "#0B1A14";
+        CustomFontSize = 15.0f;
+        ApplyLivePreview();
+    }
+
+    public void SetPresetPlasma()
+    {
+        CustomAccentColor = "#A55EEA";
+        CustomButtonColor = "#361642";
+        CustomTabSelectedColor = "#FF793F";
+        CustomTextColor = "#F5CD79";
+        CustomPopupBackgroundColor = "#15081E";
+        CustomFontSize = 15.0f;
+        ApplyLivePreview();
+    }
+
+    public void SetPresetSingularity()
+    {
+        CustomAccentColor = "#70A1FF";
+        CustomButtonColor = "#152238";
+        CustomTabSelectedColor = "#1E90FF";
+        CustomTextColor = "#E0EFFF";
+        CustomPopupBackgroundColor = "#060B14";
+        CustomFontSize = 15.0f;
+        ApplyLivePreview();
+    }
+
+    public void SetPresetSec()
+    {
+        CustomAccentColor = "#E84118";
+        CustomButtonColor = "#2C1A1D";
+        CustomTabSelectedColor = "#C23616";
+        CustomTextColor = "#F5F6FA";
+        CustomPopupBackgroundColor = "#120E10";
+        CustomFontSize = 15.0f;
+        ApplyLivePreview();
+    }
+
+    public void SetPresetMed()
+    {
+        CustomAccentColor = "#00D2D3";
+        CustomButtonColor = "#10363B";
+        CustomTabSelectedColor = "#01A3A4";
+        CustomTextColor = "#E8FFFF";
+        CustomPopupBackgroundColor = "#081619";
+        CustomFontSize = 15.0f;
+        ApplyLivePreview();
+    }
+
+    public void SetPresetCyberGoth()
+    {
+        CustomAccentColor = "#7BED9F";
+        CustomButtonColor = "#201B2B";
+        CustomTabSelectedColor = "#8854D0";
+        CustomTextColor = "#F1F2F6";
+        CustomPopupBackgroundColor = "#0F0C16";
+        CustomFontSize = 15.0f;
+        ApplyLivePreview();
+    }
+
+    public void SetPresetClown()
+    {
+        CustomAccentColor = "#FFD32A";
+        CustomButtonColor = "#48161A";
+        CustomTabSelectedColor = "#FF3838";
+        CustomTextColor = "#FFFFFF";
+        CustomPopupBackgroundColor = "#1A1012";
+        CustomFontSize = 15.0f;
+        ApplyLivePreview();
+    }
+
+    public void SetPresetSynthwave()
+    {
+        CustomAccentColor = "#FF7675";
+        CustomButtonColor = "#2D132C";
+        CustomTabSelectedColor = "#E84393";
+        CustomTextColor = "#FEEAA7";
+        CustomPopupBackgroundColor = "#1B001F";
+        CustomFontSize = 15.0f;
+        ApplyLivePreview();
+    }
+
+    public void SetPresetMidnight()
+    {
+        CustomAccentColor = "#4A90E2";
+        CustomButtonColor = "#1B2A47";
+        CustomTabSelectedColor = "#204A87";
+        CustomTextColor = "#F0F4F8";
+        CustomPopupBackgroundColor = "#0D1929";
+        CustomFontSize = 15.0f;
+        ApplyLivePreview();
     }
 
     public void LoadNeonTemplate()
@@ -427,6 +655,65 @@ FontSize = 14
 ";
     }
 
+    public void GenerateRandomPalette()
+    {
+        var rng = new Random();
+        // Generate random harmonious sci-fi palette
+        var hue = rng.NextDouble();
+        var sat = 0.70 + rng.NextDouble() * 0.25;
+        var val = 0.85 + rng.NextDouble() * 0.15;
+
+        var accentRgb = HsvToRgb(hue, sat, val);
+        var buttonHue = (hue + 0.5) % 1.0;
+        var buttonRgb = HsvToRgb(buttonHue, 0.35, 0.22);
+        var tabHue = (hue + 0.08) % 1.0;
+        var tabRgb = HsvToRgb(tabHue, 0.75, 0.70);
+
+        CustomAccentColor = $"#{accentRgb.R:X2}{accentRgb.G:X2}{accentRgb.B:X2}";
+        CustomButtonColor = $"#{buttonRgb.R:X2}{buttonRgb.G:X2}{buttonRgb.B:X2}";
+        CustomTabSelectedColor = $"#{tabRgb.R:X2}{tabRgb.G:X2}{tabRgb.B:X2}";
+        CustomTextColor = "#F5F6FA";
+        CustomPopupBackgroundColor = "#101015";
+        CustomBackgroundOpacity = 0.88f;
+
+        CustomUserCode = $@"# Random Palette Generated
+Accent = {CustomAccentColor}
+Button = {CustomButtonColor}
+TabSelected = {CustomTabSelectedColor}
+TextColor = {CustomTextColor}
+PopupBg = {CustomPopupBackgroundColor}
+Opacity = 0.88
+";
+        ApplyLivePreview();
+        ScriptOutputText = LocalizationManager.Instance.GetString("customizer-script-palette-generated");
+    }
+
+    private static (byte R, byte G, byte B) HsvToRgb(double h, double s, double v)
+    {
+        double r = 0, g = 0, b = 0;
+        int i = (int)Math.Floor(h * 6);
+        double f = h * 6 - i;
+        double p = v * (1 - s);
+        double q = v * (1 - f * s);
+        double t = v * (1 - (1 - f) * s);
+        switch (i % 6)
+        {
+            case 0: r = v; g = t; b = p; break;
+            case 1: r = q; g = v; b = p; break;
+            case 2: r = p; g = v; b = t; break;
+            case 3: r = p; g = q; b = v; break;
+            case 4: r = t; g = p; b = v; break;
+            case 5: r = v; g = p; b = q; break;
+        }
+        return ((byte)(r * 255), (byte)(g * 255), (byte)(b * 255));
+    }
+
+    public void ClearScript()
+    {
+        CustomUserCode = "";
+        ScriptOutputText = LocalizationManager.Instance.GetString("customizer-script-cleared");
+    }
+
     public void ExecuteUserCode()
     {
         if (string.IsNullOrWhiteSpace(_customUserCode))
@@ -444,6 +731,50 @@ FontSize = 14
             var line = rawLine.Trim();
             if (line.StartsWith("//") || line.StartsWith("#") || string.IsNullOrEmpty(line))
                 continue;
+
+            // Check for standalone command keywords
+            var lowerLine = line.ToLowerInvariant();
+            if (lowerLine is "randomize" or "random" or "random palette")
+            {
+                GenerateRandomPalette();
+                appliedCount++;
+                continue;
+            }
+            if (lowerLine.StartsWith("preset ") || lowerLine.StartsWith("load preset "))
+            {
+                var presetName = lowerLine.Replace("load preset ", "").Replace("preset ", "").Trim();
+                switch (presetName)
+                {
+                    case "classic" or "default": SetPresetClassic(); appliedCount++; break;
+                    case "cyberpunk": SetPresetCyberpunk(); appliedCount++; break;
+                    case "syndicate": SetPresetSyndicate(); appliedCount++; break;
+                    case "centcomm": SetPresetCentComm(); appliedCount++; break;
+                    case "plasma": SetPresetPlasma(); appliedCount++; break;
+                    case "singularity": SetPresetSingularity(); appliedCount++; break;
+                    case "sec": SetPresetSec(); appliedCount++; break;
+                    case "med": SetPresetMed(); appliedCount++; break;
+                    case "solar": SetPresetSolar(); appliedCount++; break;
+                    case "deep space" or "deepspace": SetPresetDeepSpace(); appliedCount++; break;
+                    case "matrix": SetPresetMatrix(); appliedCount++; break;
+                    case "cybergoth": SetPresetCyberGoth(); appliedCount++; break;
+                    case "monochrome": SetPresetMonochrome(); appliedCount++; break;
+                    case "synthwave": SetPresetSynthwave(); appliedCount++; break;
+                    case "midnight": SetPresetMidnight(); appliedCount++; break;
+                    case "clown": SetPresetClown(); appliedCount++; break;
+                    default: errorCount++; break;
+                }
+                continue;
+            }
+            if (lowerLine is "reset" or "reset all")
+            {
+                Reset();
+                appliedCount++;
+                continue;
+            }
+
+            // Remove optional 'set ' prefix
+            if (line.StartsWith("set ", StringComparison.OrdinalIgnoreCase))
+                line = line.Substring(4).Trim();
 
             var parts = line.Split(['=', ':'], 2);
             if (parts.Length != 2)
@@ -515,6 +846,16 @@ FontSize = 14
                     CustomOptionsTabName = val;
                     appliedCount++;
                     break;
+                case "tabplacement" or "dock" or "placement":
+                    if (val.Equals("Bottom", StringComparison.OrdinalIgnoreCase) ||
+                        val.Equals("Left", StringComparison.OrdinalIgnoreCase) ||
+                        val.Equals("Right", StringComparison.OrdinalIgnoreCase) ||
+                        val.Equals("Top", StringComparison.OrdinalIgnoreCase))
+                    {
+                        CustomTabPlacement = char.ToUpperInvariant(val[0]) + val.Substring(1).ToLowerInvariant();
+                        appliedCount++;
+                    }
+                    break;
                 case "bgimage" or "background":
                     CustomBackgroundImagePath = val;
                     appliedCount++;
@@ -524,7 +865,7 @@ FontSize = 14
                     appliedCount++;
                     break;
                 case "vfx":
-                    EnableClickVfx = !val.Equals("false", StringComparison.OrdinalIgnoreCase);
+                    EnableClickVfx = !val.Equals("false", StringComparison.OrdinalIgnoreCase) && !val.Equals("off", StringComparison.OrdinalIgnoreCase) && !val.Equals("0", StringComparison.OrdinalIgnoreCase);
                     appliedCount++;
                     break;
                 case "clear":
@@ -549,6 +890,8 @@ FontSize = 14
                     break;
             }
         }
+
+        ApplyLivePreview();
 
         var errorsSuffix = errorCount > 0
             ? LocalizationManager.Instance.GetString("customizer-script-errors-suffix", ("skipped", errorCount.ToString()))
@@ -582,6 +925,30 @@ FontSize = 14
         UpdateLogoPreview();
         OnPropertyChanged(nameof(OpacityPercentageText));
         OnPropertyChanged(nameof(FontSizeText));
+
+        _initialSnapshot = new CustomizerSnapshot(
+            CustomBackgroundImagePath,
+            CustomBackgroundOpacity,
+            CustomLogoImagePath,
+            CustomAccentColor,
+            CustomButtonColor,
+            CustomTabSelectedColor,
+            CustomTextColor,
+            CustomPopupBackgroundColor,
+            CustomFontSize,
+            CustomWindowTitle,
+            EnableClickVfx,
+            CustomUserCode,
+            CustomHomeTabName,
+            CustomServersTabName,
+            CustomNewsTabName,
+            CustomReplaysTabName,
+            CustomOptionsTabName,
+            CustomTabPlacement
+        );
+
+        ApplyLivePreview();
+
         ScriptOutputText = LocalizationManager.Instance.GetString("customizer-script-ready");
     }
 
@@ -638,6 +1005,13 @@ FontSize = 14
         ScriptOutputText = LocalizationManager.Instance.GetString("customizer-script-reset");
     }
 
+    private string _exportThemeButtonText = "";
+    public string ExportThemeButtonText
+    {
+        get => string.IsNullOrEmpty(_exportThemeButtonText) ? LocalizationManager.Instance.GetString("launcher-customizer-export") : _exportThemeButtonText;
+        set => SetProperty(ref _exportThemeButtonText, value);
+    }
+
     public async void ExportThemeToClipboard()
     {
         try
@@ -655,11 +1029,18 @@ FontSize = 14
                 vfx = EnableClickVfx
             };
             var json = System.Text.Json.JsonSerializer.Serialize(theme);
-            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop &&
-                desktop.MainWindow?.Clipboard is { } clipboard)
+            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
             {
-                await clipboard.SetTextAsync(json);
-                ScriptOutputText = LocalizationManager.Instance.GetString("customizer-export-success");
+                var top = desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow;
+                if (top?.Clipboard != null)
+                {
+                    await top.Clipboard.SetTextAsync(json);
+                    ScriptOutputText = LocalizationManager.Instance.GetString("customizer-export-success");
+                    ExportThemeButtonText = LocalizationManager.Instance.GetString("account-info-copied");
+                    var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+                    timer.Tick += (_, _) => { timer.Stop(); ExportThemeButtonText = ""; };
+                    timer.Start();
+                }
             }
         }
         catch (Exception ex)
@@ -711,6 +1092,7 @@ FontSize = 14
         CustomFontSize = 15.0f;
         EnableClickVfx = true;
         ScriptOutputText = "Preset: Cyberpunk Neon";
+        ApplyLivePreview();
     }
 
     public void ApplyPresetRetro()
@@ -724,6 +1106,7 @@ FontSize = 14
         CustomFontSize = 15.0f;
         EnableClickVfx = true;
         ScriptOutputText = "Preset: Retro Terminal";
+        ApplyLivePreview();
     }
 
     public void ApplyPresetDeepSpace()
@@ -737,6 +1120,7 @@ FontSize = 14
         CustomFontSize = 15.0f;
         EnableClickVfx = true;
         ScriptOutputText = "Preset: Deep Space";
+        ApplyLivePreview();
     }
 
     public void ApplyPresetSynthwave()
@@ -750,6 +1134,7 @@ FontSize = 14
         CustomFontSize = 15.0f;
         EnableClickVfx = true;
         ScriptOutputText = "Preset: Synthwave Sunset";
+        ApplyLivePreview();
     }
 
     public void ApplyPresetMidnight()
@@ -763,5 +1148,6 @@ FontSize = 14
         CustomFontSize = 15.0f;
         EnableClickVfx = true;
         ScriptOutputText = "Preset: Midnight Blue";
+        ApplyLivePreview();
     }
 }

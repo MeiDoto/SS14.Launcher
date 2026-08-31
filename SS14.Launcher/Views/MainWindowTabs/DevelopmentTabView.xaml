@@ -25,8 +25,8 @@
           <TextBlock Text="{loc:Loc tab-development-launch-args-desc}"
                      Classes="SubText" FontSize="11" />
 
-          <Grid ColumnDefinitions="160, *, 180" RowDefinitions="Auto, Auto" Margin="0, 4, 0, 0">
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc tab-development-log-level}" VerticalAlignment="Center" Margin="0, 0, 8, 8" />
+          <Grid ColumnDefinitions="Auto, *, Auto" RowDefinitions="Auto, Auto" Margin="0, 4, 0, 0">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc tab-development-log-level}" VerticalAlignment="Center" Margin="0, 0, 16, 8" />
             <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding LogLevels}" SelectedItem="{Binding DevLogLevel}" Margin="0, 0, 8, 8" HorizontalAlignment="Left" MinWidth="140" />
 
             <CheckBox Grid.Row="1" Grid.ColumnSpan="3" IsChecked="{Binding DevUncappedFps}" Content="{loc:Loc tab-development-uncapped-fps}" />
@@ -39,11 +39,11 @@
         <StackPanel Spacing="8">
           <TextBlock Text="{loc:Loc tab-development-graphics-card}" Classes="SectionTitle" />
 
-          <Grid ColumnDefinitions="160, *, 160, *" RowDefinitions="Auto, Auto" Margin="0, 2">
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc tab-development-graphics-backend}" VerticalAlignment="Center" Margin="0, 0, 8, 8" />
-            <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding GraphicsBackends}" SelectedItem="{Binding DevGraphicsBackend}" Margin="0, 0, 8, 8" MinWidth="130" />
+          <Grid ColumnDefinitions="Auto, *, Auto, *" RowDefinitions="Auto, Auto" Margin="0, 2">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc tab-development-graphics-backend}" VerticalAlignment="Center" Margin="0, 0, 12, 8" />
+            <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding GraphicsBackends}" SelectedItem="{Binding DevGraphicsBackend}" Margin="0, 0, 16, 8" MinWidth="130" />
 
-            <TextBlock Grid.Row="0" Grid.Column="2" Text="{loc:Loc tab-development-display-mode}" VerticalAlignment="Center" Margin="0, 0, 8, 8" />
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="{loc:Loc tab-development-display-mode}" VerticalAlignment="Center" Margin="0, 0, 12, 8" />
             <ComboBox Grid.Row="0" Grid.Column="3" ItemsSource="{Binding DisplayModes}" SelectedItem="{Binding DevDisplayMode}" Margin="0, 0, 0, 8" MinWidth="130" />
           </Grid>
 

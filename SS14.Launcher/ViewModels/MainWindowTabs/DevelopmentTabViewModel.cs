@@ -636,11 +636,11 @@ public sealed class DevelopmentTabViewModel : MainWindowTabViewModel
         {
             _cfg.SetCVar(CVars.ServerPlaytime, "{}");
             _cfg.CommitConfig();
-            ActionStatus = "✓ История наигранного времени очищена.";
+            ActionStatus = _loc.GetString("tab-dev-cleared-playtime");
         }
         catch (Exception e)
         {
-            ActionStatus = $"⚠ Ошибка: {e.Message}";
+            ActionStatus = _loc.GetString("tab-dev-error-action", ("error", e.Message));
         }
     }
 
@@ -650,11 +650,11 @@ public sealed class DevelopmentTabViewModel : MainWindowTabViewModel
         {
             _cfg.SetCVar(CVars.WatchedSlotServers, "[]");
             _cfg.CommitConfig();
-            ActionStatus = "✓ Список отслеживания слотов очищен.";
+            ActionStatus = _loc.GetString("tab-dev-cleared-slots");
         }
         catch (Exception e)
         {
-            ActionStatus = $"⚠ Ошибка: {e.Message}";
+            ActionStatus = _loc.GetString("tab-dev-error-action", ("error", e.Message));
         }
     }
 
@@ -665,11 +665,11 @@ public sealed class DevelopmentTabViewModel : MainWindowTabViewModel
             var file = Path.Combine(LauncherPaths.DirLocalData, "news_cache.json");
             if (File.Exists(file))
                 File.Delete(file);
-            ActionStatus = "✓ Офлайн-кэш новостей удален.";
+            ActionStatus = _loc.GetString("tab-dev-cleared-news-cache");
         }
         catch (Exception e)
         {
-            ActionStatus = $"⚠ Ошибка: {e.Message}";
+            ActionStatus = _loc.GetString("tab-dev-error-action", ("error", e.Message));
         }
     }
 
@@ -678,11 +678,11 @@ public sealed class DevelopmentTabViewModel : MainWindowTabViewModel
         try
         {
             _cfg.ResetAllCVarsToDefault();
-            ActionStatus = "✓ Все настройки CVars сброшены к значениям по умолчанию.";
+            ActionStatus = _loc.GetString("tab-dev-cleared-cvars");
         }
         catch (Exception e)
         {
-            ActionStatus = $"⚠ Ошибка: {e.Message}";
+            ActionStatus = _loc.GetString("tab-dev-error-action", ("error", e.Message));
         }
     }
 }

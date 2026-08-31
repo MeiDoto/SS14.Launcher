@@ -37,36 +37,46 @@
             <TextBlock Text="{loc:Loc account-info-section-profile}" Classes="SectionTitle" />
 
             <!-- Username -->
-            <Grid ColumnDefinitions="140, *" Margin="0, 2">
-              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-username}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
+            <Grid ColumnDefinitions="Auto, *" Margin="0, 2">
+              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-username}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="0, 0, 16, 0" />
               <TextBlock Grid.Column="1" Text="{Binding Username}" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource ThemeNanoGoldBrush}" VerticalAlignment="Center" />
             </Grid>
 
-            <!-- User ID / GUID -->
-            <Grid ColumnDefinitions="140, *, Auto" Margin="0, 2">
-              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-user-id}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
-              <TextBox Grid.Column="1" Text="{Binding UserId}" IsReadOnly="True" VerticalAlignment="Center" Margin="0, 0, 4, 0" />
-              <Button Grid.Column="2" Content="{loc:Loc account-info-copy}" Command="{Binding CopyUserId}" ToolTip.Tip="{loc:Loc account-info-copy-id-tooltip}" />
+            <!-- User ID / GUID with Spoiler Masking -->
+            <Grid ColumnDefinitions="Auto, *, Auto, Auto" Margin="0, 2">
+              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-user-id}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="0, 0, 16, 0" />
+              <TextBox Grid.Column="1" Text="{Binding UserId}" PasswordChar="●" RevealPassword="{Binding IsUserIdRevealed}" IsReadOnly="True" VerticalAlignment="Center" Margin="0, 0, 4, 0" />
+              <Button Grid.Column="2" Content="{Binding UserIdToggleIcon}" Command="{Binding ToggleUserIdVisibility}" Margin="0, 0, 4, 0" ToolTip.Tip="{loc:Loc account-info-toggle-id-tooltip}" />
+              <Button Grid.Column="3" Content="{Binding CopyUserIdText}" Command="{Binding CopyUserId}" ToolTip.Tip="{loc:Loc account-info-copy-id-tooltip}" />
             </Grid>
 
             <!-- Email -->
-            <Grid ColumnDefinitions="140, *" Margin="0, 2">
-              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-email}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
+            <Grid ColumnDefinitions="Auto, *" Margin="0, 2">
+              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-email}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="0, 0, 16, 0" />
               <TextBlock Grid.Column="1" Text="{Binding Email}" VerticalAlignment="Center" />
             </Grid>
 
             <!-- Status -->
-            <Grid ColumnDefinitions="140, *" Margin="0, 2">
-              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-session-status}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
+            <Grid ColumnDefinitions="Auto, *" Margin="0, 2">
+              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-session-status}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="0, 0, 16, 0" />
               <TextBlock Grid.Column="1" Text="{Binding StatusText}" Foreground="#5BD969" VerticalAlignment="Center" />
             </Grid>
 
             <!-- Total Playtime -->
-            <Grid ColumnDefinitions="140, *" Margin="0, 2">
-              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-total-playtime}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
+            <Grid ColumnDefinitions="Auto, *" Margin="0, 2">
+              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-total-playtime}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="0, 0, 16, 0" />
               <TextBlock Grid.Column="1" Text="{Binding TotalPlaytimeText}" Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" VerticalAlignment="Center" />
             </Grid>
           </StackPanel>
+        </Border>
+
+        <!-- SENSITIVE DATA WARNING BANNER (MATCHES OVERALL THEME) -->
+        <Border Classes="Card" Padding="10, 8">
+          <TextBlock Text="{loc:Loc account-info-sensitive-warning}"
+                     FontSize="11"
+                     Classes="SubText"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center" />
         </Border>
 
         <!-- CARD 2: SECURITY & PASSWORD -->
@@ -74,13 +84,13 @@
           <StackPanel Spacing="8">
             <TextBlock Text="{loc:Loc account-info-section-security}" Classes="SectionTitle" />
 
-            <Grid ColumnDefinitions="140, *" Margin="0, 2">
-              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-password-storage}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
+            <Grid ColumnDefinitions="Auto, *" Margin="0, 2">
+              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-password-storage}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="0, 0, 16, 0" />
               <TextBlock Grid.Column="1" Text="{Binding PasswordStatusText}" VerticalAlignment="Center" />
             </Grid>
 
-            <Grid ColumnDefinitions="140, *" Margin="0, 2">
-              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-token-expires}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
+            <Grid ColumnDefinitions="Auto, *" Margin="0, 2">
+              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-token-expires}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="0, 0, 16, 0" />
               <TextBlock Grid.Column="1" Text="{Binding TokenExpiresText}" VerticalAlignment="Center" />
             </Grid>
 
@@ -96,18 +106,19 @@
           <StackPanel Spacing="8">
             <TextBlock Text="{loc:Loc account-info-section-device}" Classes="SectionTitle" />
 
-            <Grid ColumnDefinitions="140, *, Auto" Margin="0, 2">
-              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-hwid}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
-              <TextBox Grid.Column="1" Text="{Binding Hwid}" IsReadOnly="True" VerticalAlignment="Center" Margin="0, 0, 4, 0" />
-              <Button Grid.Column="2" Content="{loc:Loc account-info-copy}" Command="{Binding CopyHwid}" ToolTip.Tip="{loc:Loc account-info-copy-hwid-tooltip}" />
+            <Grid ColumnDefinitions="Auto, *, Auto, Auto" Margin="0, 2">
+              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-hwid}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="0, 0, 16, 0" />
+              <TextBox Grid.Column="1" Text="{Binding Hwid}" PasswordChar="●" RevealPassword="{Binding IsHwidRevealed}" IsReadOnly="True" VerticalAlignment="Center" Margin="0, 0, 4, 0" />
+              <Button Grid.Column="2" Content="{Binding HwidToggleIcon}" Command="{Binding ToggleHwidVisibility}" Margin="0, 0, 4, 0" ToolTip.Tip="{loc:Loc account-info-toggle-hwid-tooltip}" />
+              <Button Grid.Column="3" Content="{Binding CopyHwidText}" Command="{Binding CopyHwid}" ToolTip.Tip="{loc:Loc account-info-copy-hwid-tooltip}" />
             </Grid>
 
-            <Grid ColumnDefinitions="140, *" Margin="0, 2">
-              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-system}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" />
+            <Grid ColumnDefinitions="Auto, *" Margin="0, 2">
+              <TextBlock Grid.Column="0" Text="{loc:Loc account-info-system}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="0, 0, 16, 0" />
               <TextBlock Grid.Column="1" Text="{Binding SystemInfo}" VerticalAlignment="Center" />
             </Grid>
 
-            <Button Content="{loc:Loc account-info-copy-all-diag}" Command="{Binding CopyAllDiagnostics}" Margin="0, 6, 0, 0" HorizontalAlignment="Left" />
+            <Button Content="{Binding CopyAllDiagText}" Command="{Binding CopyAllDiagnostics}" Margin="0, 6, 0, 0" HorizontalAlignment="Left" />
           </StackPanel>
         </Border>
 

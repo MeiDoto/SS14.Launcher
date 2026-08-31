@@ -23,7 +23,7 @@
   <DockPanel>
     <!-- Bottom Action Buttons -->
     <DockPanel Height="36" Margin="0 10 0 0" DockPanel.Dock="Bottom" LastChildFill="False">
-      <Button DockPanel.Dock="Left" Command="{Binding ExportThemeToClipboard}" Content="{loc:Loc launcher-customizer-export}" Margin="0,0,6,0" />
+      <Button DockPanel.Dock="Left" Command="{Binding ExportThemeToClipboard}" Content="{Binding ExportThemeButtonText}" Margin="0,0,6,0" />
       <Button DockPanel.Dock="Left" Command="{Binding ImportThemeFromClipboard}" Content="{loc:Loc launcher-customizer-import}" Margin="0,0,6,0" />
       <Button DockPanel.Dock="Right" Name="DoneButton" Click="Done" Content="{loc:Loc hub-settings-button-done}" Classes="OpenLeft" />
       <Button DockPanel.Dock="Right" Click="Cancel" Content="{loc:Loc hub-settings-button-cancel}" Classes="OpenBoth" />
@@ -39,19 +39,62 @@
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" Margin="0, 6, 0, 0">
           <StackPanel Spacing="10" Margin="4">
 
-            <!-- PRESETS BAR -->
+            <!-- PRESETS BAR WITH COMPACT PALETTE SWATCHES -->
             <Border Classes="Card">
-              <StackPanel Spacing="6">
+              <StackPanel Spacing="8">
                 <TextBlock Text="{loc:Loc launcher-customizer-presets-title}" Classes="SectionTitle" />
                 <WrapPanel Orientation="Horizontal">
                   <Button Content="{loc:Loc launcher-customizer-preset-classic}" Command="{Binding SetPresetClassic}" Margin="0, 0, 6, 4" />
                   <Button Content="{loc:Loc launcher-customizer-preset-cyberpunk}" Command="{Binding SetPresetCyberpunk}" Margin="0, 0, 6, 4" />
                   <Button Content="{loc:Loc launcher-customizer-preset-syndicate}" Command="{Binding SetPresetSyndicate}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-centcomm}" Command="{Binding SetPresetCentComm}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-plasma}" Command="{Binding SetPresetPlasma}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-singularity}" Command="{Binding SetPresetSingularity}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-sec}" Command="{Binding SetPresetSec}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-med}" Command="{Binding SetPresetMed}" Margin="0, 0, 6, 4" />
                   <Button Content="{loc:Loc launcher-customizer-preset-solar}" Command="{Binding SetPresetSolar}" Margin="0, 0, 6, 4" />
                   <Button Content="{loc:Loc launcher-customizer-preset-deep-space}" Command="{Binding SetPresetDeepSpace}" Margin="0, 0, 6, 4" />
                   <Button Content="{loc:Loc launcher-customizer-preset-matrix}" Command="{Binding SetPresetMatrix}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-cybergoth}" Command="{Binding SetPresetCyberGoth}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-synthwave}" Command="{Binding SetPresetSynthwave}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-midnight}" Command="{Binding SetPresetMidnight}" Margin="0, 0, 6, 4" />
+                  <Button Content="{loc:Loc launcher-customizer-preset-clown}" Command="{Binding SetPresetClown}" Margin="0, 0, 6, 4" />
                   <Button Content="{loc:Loc launcher-customizer-preset-monochrome}" Command="{Binding SetPresetMonochrome}" Margin="0, 0, 6, 4" />
                 </WrapPanel>
+
+                <!-- Compact Live Palette Swatches -->
+                <Border Background="#16161B" CornerRadius="4" Padding="8, 6" Margin="0, 4, 0, 0">
+                  <DockPanel LastChildFill="False">
+                    <TextBlock DockPanel.Dock="Left" Text="{loc:Loc launcher-customizer-palette-heading}" FontSize="11" Foreground="{DynamicResource ThemeSubTextBrush}" VerticalAlignment="Center" Margin="0, 0, 10, 0" />
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                      <!-- Accent Swatch -->
+                      <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <Border Background="{DynamicResource ThemeNanoGoldBrush}" Width="14" Height="14" CornerRadius="3" BorderBrush="#555555" BorderThickness="1" />
+                        <TextBlock Text="{loc:Loc launcher-customizer-palette-accent}" FontSize="11" Foreground="{DynamicResource ThemeForegroundBrush}" />
+                      </StackPanel>
+                      <!-- Button Swatch -->
+                      <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <Border Background="{DynamicResource ThemeControlMidBrush}" Width="14" Height="14" CornerRadius="3" BorderBrush="#555555" BorderThickness="1" />
+                        <TextBlock Text="{loc:Loc launcher-customizer-palette-buttons}" FontSize="11" Foreground="{DynamicResource ThemeForegroundBrush}" />
+                      </StackPanel>
+                      <!-- Tab Selected Swatch -->
+                      <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <Border Background="{DynamicResource ThemeTabItemSelectedBrush}" Width="14" Height="14" CornerRadius="3" BorderBrush="#555555" BorderThickness="1" />
+                        <TextBlock Text="{loc:Loc launcher-customizer-palette-tabs}" FontSize="11" Foreground="{DynamicResource ThemeForegroundBrush}" />
+                      </StackPanel>
+                      <!-- Text Swatch -->
+                      <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <Border Background="{DynamicResource ThemeForegroundBrush}" Width="14" Height="14" CornerRadius="3" BorderBrush="#555555" BorderThickness="1" />
+                        <TextBlock Text="{loc:Loc launcher-customizer-palette-text}" FontSize="11" Foreground="{DynamicResource ThemeForegroundBrush}" />
+                      </StackPanel>
+                      <!-- Popup/Card Swatch -->
+                      <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <Border Background="{DynamicResource ThemePopupBackgroundBrush}" Width="14" Height="14" CornerRadius="3" BorderBrush="#555555" BorderThickness="1" />
+                        <TextBlock Text="{loc:Loc launcher-customizer-palette-windows}" FontSize="11" Foreground="{DynamicResource ThemeForegroundBrush}" />
+                      </StackPanel>
+                    </StackPanel>
+                  </DockPanel>
+                </Border>
               </StackPanel>
             </Border>
 
@@ -200,12 +243,12 @@
           <!-- Top Sandbox Toolbar / Templates -->
           <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0, 0, 0, 8">
             <TextBlock Text="{loc:Loc launcher-customizer-sandbox-title}" Classes="SectionTitle" />
-            <DockPanel LastChildFill="False">
-              <TextBlock DockPanel.Dock="Left" Text="{loc:Loc launcher-customizer-sandbox-templates}" VerticalAlignment="Center" Foreground="{DynamicResource ThemeSubTextBrush}" Margin="0, 0, 8, 0" />
-              <Button DockPanel.Dock="Left" Content="{loc:Loc launcher-customizer-template-neon}" Command="{Binding LoadNeonTemplate}" Margin="0, 0, 6, 0" />
-              <Button DockPanel.Dock="Left" Content="{loc:Loc launcher-customizer-template-matrix}" Command="{Binding LoadMatrixTemplate}" Margin="0, 0, 6, 0" />
-              <Button DockPanel.Dock="Left" Content="{loc:Loc launcher-customizer-template-minimalist}" Command="{Binding LoadMinimalistTemplate}" Margin="0, 0, 6, 0" />
-            </DockPanel>
+            <WrapPanel Orientation="Horizontal">
+              <Button Content="{loc:Loc launcher-customizer-template-neon}" Command="{Binding LoadNeonTemplate}" Margin="0, 0, 6, 4" />
+              <Button Content="{loc:Loc launcher-customizer-template-matrix}" Command="{Binding LoadMatrixTemplate}" Margin="0, 0, 6, 4" />
+              <Button Content="{loc:Loc launcher-customizer-random-palette}" Command="{Binding GenerateRandomPalette}" Margin="0, 0, 6, 4" />
+              <Button Content="{loc:Loc launcher-customizer-clear-script}" Command="{Binding ClearScript}" Margin="0, 0, 6, 4" />
+            </WrapPanel>
           </StackPanel>
 
           <!-- Bottom Execution Status & Action -->
@@ -230,6 +273,8 @@
               <ScrollViewer>
                 <StackPanel Spacing="4">
                   <TextBlock Text="{loc:Loc launcher-customizer-sandbox-cheatsheet-title}" FontWeight="Bold" Foreground="{DynamicResource ThemeNanoGoldBrush}" />
+                  <TextBlock Text="preset [cyberpunk/...]" FontSize="11" />
+                  <TextBlock Text="randomize" FontSize="11" />
                   <TextBlock Text="Accent = #HEX" FontSize="11" />
                   <TextBlock Text="Button = #HEX" FontSize="11" />
                   <TextBlock Text="TabSelected = #HEX" FontSize="11" />
@@ -237,6 +282,7 @@
                   <TextBlock Text="PopupBg = #HEX" FontSize="11" />
                   <TextBlock Text="Opacity = 0.1..1.0" FontSize="11" />
                   <TextBlock Text="FontSize = 12..20" FontSize="11" />
+                  <TextBlock Text="Dock = Top/Bottom" FontSize="11" />
                   <TextBlock Text="Title = Text" FontSize="11" />
                   <TextBlock Text="Home = Text" FontSize="11" />
                   <TextBlock Text="Servers = Text" FontSize="11" />
@@ -244,8 +290,8 @@
                   <TextBlock Text="Options = Text" FontSize="11" />
                   <TextBlock Text="BgImage = path" FontSize="11" />
                   <TextBlock Text="LogoImage = path" FontSize="11" />
-                  <TextBlock Text="Vfx = true/false" FontSize="11" />
-                  <TextBlock Text="Clear = bg/logo/all" FontSize="11" />
+                  <TextBlock Text="Vfx = on/off" FontSize="11" />
+                  <TextBlock Text="reset" FontSize="11" />
                 </StackPanel>
               </ScrollViewer>
             </Border>

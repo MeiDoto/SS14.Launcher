@@ -75,6 +75,9 @@ public class LocalBuildsViewModel : ViewModelBase
         Builds = new ObservableCollection<LocalBuildItemViewModel>();
     }
 
+    public bool HasBuilds => Builds.Count > 0;
+    public bool HasNoBuilds => Builds.Count == 0;
+
     public void SaveBuilds()
     {
         try
@@ -83,6 +86,8 @@ public class LocalBuildsViewModel : ViewModelBase
             var json = JsonSerializer.Serialize(list);
             _cfg.SetCVar(CVars.LocalBuilds, json);
             _cfg.CommitConfig();
+            OnPropertyChanged(nameof(HasBuilds));
+            OnPropertyChanged(nameof(HasNoBuilds));
         }
         catch (Exception ex)
         {
@@ -228,6 +233,23 @@ public class LocalBuildItemViewModel : ViewModelBase
     {
         Entry = entry;
         _parent = parent;
+    }
+
+    public void OpenFolder()
+    {
+        try
+        {
+            var dir = Directory.Exists(Entry.Path) ? Entry.Path : System.IO.Path.GetDirectoryName(Entry.Path);
+            if (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = dir,
+                    UseShellExecute = true
+                });
+            }
+        }
+        catch { }
     }
 
     public void Delete()

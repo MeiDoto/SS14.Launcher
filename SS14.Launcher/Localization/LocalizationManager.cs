@@ -33,6 +33,7 @@ public sealed class LocalizationManager
     private FluentBundle _bundle = default!;
 
     public CultureInfo SystemCulture { get; private set; } = CultureInfo.InvariantCulture;
+    public CultureInfo CurrentCulture { get; private set; } = CultureInfo.InvariantCulture;
 
     public event Action? LanguageSwitched;
 
@@ -107,6 +108,7 @@ public sealed class LocalizationManager
         AddLanguageFiles(bundle, culture);
 
         _bundle = bundle;
+        CurrentCulture = culture;
 
         CultureInfo.CurrentUICulture = culture;
     }

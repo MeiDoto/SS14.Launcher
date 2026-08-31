@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Splat;
@@ -61,15 +62,11 @@ public sealed class AccountInfoViewModel : ViewModelBase
             {
                 totalSec += sec;
             }
-            var hours = totalSec / 3600;
-            var mins = (totalSec % 3600) / 60;
-            TotalPlaytimeText = hours > 0
-                ? _loc.GetString("server-entry-playtime-hours", ("hours", hours), ("mins", mins))
-                : _loc.GetString("server-entry-playtime-mins", ("mins", Math.Max(0, mins)));
+            TotalPlaytimeText = PlaytimeFormatter.Format(totalSec);
         }
         catch
         {
-            TotalPlaytimeText = "0 мин";
+            TotalPlaytimeText = PlaytimeFormatter.Format(0);
         }
 
         try
@@ -96,40 +93,126 @@ public sealed class AccountInfoViewModel : ViewModelBase
         OnPropertyChanged(nameof(TotalPlaytimeText));
     }
 
+    private bool _isUserIdRevealed;
+    public bool IsUserIdRevealed
+    {
+        get => _isUserIdRevealed;
+        set
+        {
+            if (SetProperty(ref _isUserIdRevealed, value))
+            {
+                OnPropertyChanged(nameof(UserIdToggleIcon));
+            }
+        }
+    }
+
+    private bool _isHwidRevealed;
+    public bool IsHwidRevealed
+    {
+        get => _isHwidRevealed;
+        set
+        {
+            if (SetProperty(ref _isHwidRevealed, value))
+            {
+                OnPropertyChanged(nameof(HwidToggleIcon));
+            }
+        }
+    }
+
+    public string UserIdToggleIcon => _isUserIdRevealed ? "🔒" : "👁";
+    public string HwidToggleIcon => _isHwidRevealed ? "🔒" : "👁";
+
+    private string _copyUserIdText = "";
+    public string CopyUserIdText
+    {
+        get => string.IsNullOrEmpty(_copyUserIdText) ? _loc.GetString("account-info-copy") : _copyUserIdText;
+        private set => SetProperty(ref _copyUserIdText, value);
+    }
+
+    private string _copyHwidText = "";
+    public string CopyHwidText
+    {
+        get => string.IsNullOrEmpty(_copyHwidText) ? _loc.GetString("account-info-copy") : _copyHwidText;
+        private set => SetProperty(ref _copyHwidText, value);
+    }
+
+    private string _copyAllDiagText = "";
+    public string CopyAllDiagText
+    {
+        get => string.IsNullOrEmpty(_copyAllDiagText) ? _loc.GetString("account-info-copy-all-diag") : _copyAllDiagText;
+        private set => SetProperty(ref _copyAllDiagText, value);
+    }
+
+    public void ToggleUserIdVisibility() => IsUserIdRevealed = !IsUserIdRevealed;
+    public void ToggleHwidVisibility() => IsHwidRevealed = !IsHwidRevealed;
+
     public async void CopyUserId()
     {
-        if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop &&
-            desktop.MainWindow?.Clipboard is { } clipboard)
+        try
         {
-            await clipboard.SetTextAsync(UserId);
+            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var top = desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow;
+                if (top?.Clipboard != null)
+                {
+                    await top.Clipboard.SetTextAsync(UserId);
+                    CopyUserIdText = _loc.GetString("account-info-copied");
+                    var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+                    timer.Tick += (_, _) => { timer.Stop(); CopyUserIdText = ""; };
+                    timer.Start();
+                }
+            }
         }
+        catch { }
     }
 
     public async void CopyHwid()
     {
-        if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop &&
-            desktop.MainWindow?.Clipboard is { } clipboard)
+        try
         {
-            await clipboard.SetTextAsync(Hwid);
+            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var top = desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow;
+                if (top?.Clipboard != null)
+                {
+                    await top.Clipboard.SetTextAsync(Hwid);
+                    CopyHwidText = _loc.GetString("account-info-copied");
+                    var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+                    timer.Tick += (_, _) => { timer.Stop(); CopyHwidText = ""; };
+                    timer.Start();
+                }
+            }
         }
+        catch { }
     }
 
     public async void CopyAllDiagnostics()
     {
-        var text = $"### 🛰️ SS14 Account Diagnostics\n" +
-                   $"- **User**: `{Username}`\n" +
-                   $"- **UserID**: `{UserId}`\n" +
-                   $"- **HWID**: `{Hwid}`\n" +
-                   $"- **OS**: `{SystemInfo}`\n" +
-                   $"- **Total Playtime**: `{TotalPlaytimeText}`\n" +
-                   $"- **Token Status**: `{StatusText}`\n" +
-                   $"- **Launcher**: `v{ConfigConstants.LauncherCustomVersion}` (.NET 10.0)";
-
-        if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop &&
-            desktop.MainWindow?.Clipboard is { } clipboard)
+        try
         {
-            await clipboard.SetTextAsync(text);
+            var text = $"### SS14 Account Diagnostics\n" +
+                       $"- **User**: `{Username}`\n" +
+                       $"- **UserID**: `{UserId}`\n" +
+                       $"- **HWID**: `{Hwid}`\n" +
+                       $"- **OS**: `{SystemInfo}`\n" +
+                       $"- **Total Playtime**: `{TotalPlaytimeText}`\n" +
+                       $"- **Token Status**: `{StatusText}`\n" +
+                       $"- **Launcher**: `v{ConfigConstants.LauncherCustomVersion}` (.NET 10.0)";
+
+            if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var top = desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow;
+                if (top?.Clipboard != null)
+                {
+                    await top.Clipboard.SetTextAsync(text);
+                    CopyAllDiagText = _loc.GetString("account-info-copied");
+                    var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+                    timer.Tick += (_, _) => { timer.Stop(); CopyAllDiagText = ""; };
+                    timer.Start();
+                }
+            }
         }
+        catch { }
     }
 
     public void OpenAccountWebsite()

@@ -123,6 +123,44 @@ public class LogViewerViewModel : ViewModelBase
         }
     }
 
+    public enum LogFilterMode { All, Errors, Warnings, Info, Debug }
+    private LogFilterMode _currentFilterMode = LogFilterMode.All;
+    public LogFilterMode CurrentFilterMode
+    {
+        get => _currentFilterMode;
+        set
+        {
+            if (SetProperty(ref _currentFilterMode, value))
+            {
+                ApplyFilter();
+                OnPropertyChanged(nameof(IsFilterAll));
+                OnPropertyChanged(nameof(IsFilterErrors));
+                OnPropertyChanged(nameof(IsFilterWarnings));
+                OnPropertyChanged(nameof(IsFilterInfo));
+                OnPropertyChanged(nameof(IsFilterDebug));
+            }
+        }
+    }
+
+    public bool IsFilterAll => _currentFilterMode == LogFilterMode.All;
+    public bool IsFilterErrors => _currentFilterMode == LogFilterMode.Errors;
+    public bool IsFilterWarnings => _currentFilterMode == LogFilterMode.Warnings;
+    public bool IsFilterInfo => _currentFilterMode == LogFilterMode.Info;
+    public bool IsFilterDebug => _currentFilterMode == LogFilterMode.Debug;
+
+    public void SetFilterAll() => CurrentFilterMode = LogFilterMode.All;
+    public void SetFilterErrors() => CurrentFilterMode = LogFilterMode.Errors;
+    public void SetFilterWarnings() => CurrentFilterMode = LogFilterMode.Warnings;
+    public void SetFilterInfo() => CurrentFilterMode = LogFilterMode.Info;
+    public void SetFilterDebug() => CurrentFilterMode = LogFilterMode.Debug;
+
+    private string _copyButtonText = "";
+    public string CopyButtonText
+    {
+        get => string.IsNullOrEmpty(_copyButtonText) ? LocalizationManager.Instance.GetString("log-viewer-copy") : _copyButtonText;
+        set => SetProperty(ref _copyButtonText, value);
+    }
+
     private void ApplyFilter()
     {
         var filter = SearchFilter?.Trim();
@@ -131,6 +169,25 @@ public class LogViewerViewModel : ViewModelBase
         foreach (var line in _allLines)
         {
             if (string.IsNullOrEmpty(line))
+                continue;
+
+            var lower = line.ToLowerInvariant();
+
+            // Apply Level Filter
+            if (_currentFilterMode == LogFilterMode.Errors &&
+                !lower.Contains("[err]") && !lower.Contains("[fatal]") && !lower.Contains("exception:") && !lower.Contains("error:") && !lower.Contains("crash"))
+                continue;
+
+            if (_currentFilterMode == LogFilterMode.Warnings &&
+                !lower.Contains("[wrn]") && !lower.Contains("[warn]") && !lower.Contains("warning:"))
+                continue;
+
+            if (_currentFilterMode == LogFilterMode.Info &&
+                !lower.Contains("[inf]") && !lower.Contains("[info]"))
+                continue;
+
+            if (_currentFilterMode == LogFilterMode.Debug &&
+                !lower.Contains("[dbg]") && !lower.Contains("[debug]") && !lower.Contains("[vrb]"))
                 continue;
 
             if (!string.IsNullOrEmpty(filter) && !line.Contains(filter, StringComparison.OrdinalIgnoreCase))
@@ -148,17 +205,21 @@ public class LogViewerViewModel : ViewModelBase
         var lower = line.ToLowerInvariant();
         if (lower.Contains("[err]") || lower.Contains("[fatal]") || lower.Contains("exception:") || lower.Contains("error:") || lower.Contains("crash"))
         {
-            return SolidColorBrush.Parse("#FF5555");
+            return SolidColorBrush.Parse("#FF6B6B");
         }
         if (lower.Contains("[wrn]") || lower.Contains("[warn]") || lower.Contains("warning:"))
         {
-            return SolidColorBrush.Parse("#FFB86C");
+            return SolidColorBrush.Parse("#F1C40F");
         }
         if (lower.Contains("[dbg]") || lower.Contains("[debug]") || lower.Contains("[vrb]"))
         {
-            return SolidColorBrush.Parse("#6272A4");
+            return SolidColorBrush.Parse("#7F8C8D");
         }
-        return SolidColorBrush.Parse("#F8F8F2");
+        if (lower.Contains("[inf]") || lower.Contains("[info]"))
+        {
+            return SolidColorBrush.Parse("#E0E6ED");
+        }
+        return SolidColorBrush.Parse("#BDC3C7");
     }
 
     public async void CopyLogToClipboard()
@@ -172,7 +233,10 @@ public class LogViewerViewModel : ViewModelBase
                 if (top?.Clipboard != null)
                 {
                     await top.Clipboard.SetTextAsync(text);
-                    StatusText = LocalizationManager.Instance.GetString("log-viewer-copied");
+                    CopyButtonText = LocalizationManager.Instance.GetString("account-info-copied");
+                    var timer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+                    timer.Tick += (_, _) => { timer.Stop(); CopyButtonText = ""; };
+                    timer.Start();
                 }
             }
         }

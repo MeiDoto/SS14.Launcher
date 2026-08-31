@@ -70,7 +70,7 @@
                     <Button Content="{loc:Loc server-history-connect}" Command="{Binding Connect}"
                             Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
                     <Button Content="{loc:Loc server-history-add-favorite}" Command="{Binding AddFavorite}" />
-                    <Button Content="{loc:Loc server-history-copy}" Command="{Binding CopyAddress}" />
+                    <Button Content="{Binding CopyButtonText}" Command="{Binding CopyAddress}" />
                     <Button Content="✕" Command="{Binding Remove}" ToolTip.Tip="{loc:Loc server-history-remove}" />
                   </StackPanel>
                 </Grid>

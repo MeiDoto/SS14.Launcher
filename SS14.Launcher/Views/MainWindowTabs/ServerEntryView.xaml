@@ -45,16 +45,6 @@
                          ToolTip.Tip="{Binding PanicBunkerToolTip}"
                          VerticalAlignment="Center" />
 
-              <!-- Playtime tag -->
-              <TextBlock DockPanel.Dock="Right"
-                         Text="{Binding PlaytimeString}"
-                         FontSize="11"
-                         Foreground="{DynamicResource ThemeSubTextBrush}"
-                         Margin="6,0,4,0"
-                         IsVisible="{Binding HasPlaytime}"
-                         ToolTip.Tip="{Binding PlaytimeToolTip}"
-                         VerticalAlignment="Center" />
-
               <TextBlock VerticalAlignment="Center"
                 Text="{Binding Name}" TextTrimming="CharacterEllipsis"
                 HorizontalAlignment="Left" />
@@ -117,6 +107,14 @@
           Text="{Binding FetchedFrom}"
           IsVisible="{Binding ShowFetchedFrom}" />
 
+        <!-- Server Playtime badge at bottom of description -->
+        <TextBlock DockPanel.Dock="Top"
+          Margin="4,2,4,4"
+          FontSize="12"
+          Foreground="{DynamicResource ThemeSubTextBrush}"
+          Text="{Binding PlaytimeBottomText}"
+          IsVisible="{Binding HasPlaytime}" />
+
         <Control DockPanel.Dock="Top" Height="8" />
 
         <views:RowSideAlignedPanel>
@@ -137,7 +135,7 @@
           <DockPanel Dock="Right">
             <!-- Copy address button -->
             <Button Command="{Binding CopyAddress}" Margin="0, 0, 4, 0"
-                    Content="{loc:Loc server-entry-copy-address}" />
+                    Content="{Binding CopyAddressButtonText}" />
 
             <!-- Favorite add/remove button -->
             <Button Name="FavoriteButton"

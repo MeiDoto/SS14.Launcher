@@ -23,27 +23,43 @@
 
   <DockPanel>
     <!-- TOP TOOLBAR -->
-    <Border DockPanel.Dock="Top" Classes="Card" Margin="0, 0, 0, 8" Padding="8">
-      <Grid ColumnDefinitions="Auto, 180, *, Auto, Auto" RowDefinitions="Auto">
-        <!-- LOG FILE SELECTOR -->
-        <TextBlock Grid.Column="0" Text="{loc:Loc log-viewer-file}" VerticalAlignment="Center" Margin="0, 0, 8, 0"
-                   Foreground="{DynamicResource ThemeSubTextBrush}" />
-        <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableFiles}"
-                  SelectedItem="{Binding SelectedLogFile}" VerticalAlignment="Center" Margin="0, 0, 8, 0" />
+    <Border DockPanel.Dock="Top" Classes="Card" Margin="0, 0, 0, 8" Padding="10">
+      <StackPanel Spacing="8">
+        <!-- Row 1: File selector + Action buttons -->
+        <Grid ColumnDefinitions="Auto, *, Auto, Auto">
+          <TextBlock Grid.Column="0" Text="{loc:Loc log-viewer-file}" VerticalAlignment="Center" Margin="0, 0, 10, 0"
+                     Foreground="{DynamicResource ThemeSubTextBrush}" />
+          <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableFiles}"
+                    SelectedItem="{Binding SelectedLogFile}" VerticalAlignment="Center" Margin="0, 0, 8, 0"
+                    HorizontalAlignment="Stretch" />
 
-        <!-- SEARCH / FILTER -->
-        <TextBox Grid.Column="2" Text="{Binding SearchFilter}"
-                 Watermark="{loc:Loc log-viewer-search-watermark}"
-                 VerticalAlignment="Center" Margin="0, 0, 8, 0" />
+          <Button Grid.Column="2" Content="{loc:Loc log-viewer-refresh}" Command="{Binding RefreshFiles}"
+                  VerticalAlignment="Center" Margin="0, 0, 8, 0" />
 
-        <!-- REFRESH BUTTON -->
-        <Button Grid.Column="3" Content="{loc:Loc log-viewer-refresh}" Command="{Binding RefreshFiles}"
-                VerticalAlignment="Center" Margin="0, 0, 8, 0" />
+          <Button Grid.Column="3" Content="{loc:Loc log-viewer-open-folder}" Command="{Binding OpenLogsDirectory}"
+                  VerticalAlignment="Center" />
+        </Grid>
 
-        <!-- OPEN LOG DIR -->
-        <Button Grid.Column="4" Content="{loc:Loc log-viewer-open-folder}" Command="{Binding OpenLogsDirectory}"
-                VerticalAlignment="Center" />
-      </Grid>
+        <!-- Row 2: Search & Level Filter Chips -->
+        <Grid ColumnDefinitions="*, Auto">
+          <TextBox Grid.Column="0" Text="{Binding SearchFilter}"
+                   Watermark="{loc:Loc log-viewer-search-watermark}"
+                   VerticalAlignment="Center" Margin="0, 0, 10, 0" />
+
+          <WrapPanel Grid.Column="1" Orientation="Horizontal">
+            <Button Content="{loc:Loc log-viewer-filter-all}" Command="{Binding SetFilterAll}"
+                    Classes.OpenBoth="{Binding IsFilterAll}" Margin="0, 0, 4, 0" />
+            <Button Content="{loc:Loc log-viewer-filter-errors}" Command="{Binding SetFilterErrors}"
+                    Foreground="#FF6B6B" Margin="0, 0, 4, 0" />
+            <Button Content="{loc:Loc log-viewer-filter-warnings}" Command="{Binding SetFilterWarnings}"
+                    Foreground="#F1C40F" Margin="0, 0, 4, 0" />
+            <Button Content="{loc:Loc log-viewer-filter-info}" Command="{Binding SetFilterInfo}"
+                    Foreground="#E0E6ED" Margin="0, 0, 4, 0" />
+            <Button Content="{loc:Loc log-viewer-filter-debug}" Command="{Binding SetFilterDebug}"
+                    Foreground="#7F8C8D" />
+          </WrapPanel>
+        </Grid>
+      </StackPanel>
     </Border>
 
     <!-- BOTTOM ACTION BAR -->
@@ -52,7 +68,7 @@
                  Foreground="{DynamicResource ThemeSubTextBrush}" FontSize="12" />
 
       <Button DockPanel.Dock="Right" Click="CloseClicked" Content="{loc:Loc log-viewer-close}" Classes="OpenLeft" />
-      <Button DockPanel.Dock="Right" Content="{loc:Loc log-viewer-copy}" Command="{Binding CopyLogToClipboard}"
+      <Button DockPanel.Dock="Right" Content="{Binding CopyButtonText}" Command="{Binding CopyLogToClipboard}"
               Classes="OpenRight" Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
     </DockPanel>
 
