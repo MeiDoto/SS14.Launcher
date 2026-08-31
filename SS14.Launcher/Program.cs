@@ -52,14 +52,20 @@ internal static class Program
 
         TaskScheduler.UnobservedTaskException += (sender, eventArgs) =>
         {
-            var isDbusHarmless = eventArgs.Exception.Flatten().InnerExceptions.Any(e =>
+            var isHarmless = eventArgs.Exception.Flatten().InnerExceptions.Any(e =>
+                e is System.Net.Sockets.SocketException ||
+                e is System.Net.Http.HttpRequestException ||
+                e is System.IO.IOException ||
                 e.GetType().Name.Contains("DBusException", StringComparison.OrdinalIgnoreCase) ||
+                e.Message.Contains("Network is unreachable", StringComparison.OrdinalIgnoreCase) ||
+                e.Message.Contains("Connection refused", StringComparison.OrdinalIgnoreCase) ||
+                e.Message.Contains("No route to host", StringComparison.OrdinalIgnoreCase) ||
                 e.Message.Contains("org.freedesktop.DBus", StringComparison.OrdinalIgnoreCase) ||
                 e.Message.Contains("ServiceUnknown", StringComparison.OrdinalIgnoreCase));
 
-            if (isDbusHarmless)
+            if (isHarmless)
             {
-                Log.Debug(eventArgs.Exception, "Handled non-critical unobserved DBus platform service exception");
+                Log.Debug(eventArgs.Exception, "Handled non-critical unobserved background task exception");
             }
             else
             {

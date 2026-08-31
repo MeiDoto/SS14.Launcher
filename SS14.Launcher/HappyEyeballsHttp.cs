@@ -284,6 +284,7 @@ public static class HappyEyeballsHttp
             {
                 // We have to queue another task this iteration.
                 var newTask = taskBuilder(allTasks.Count, successCts.Token);
+                _ = newTask.ContinueWith(t => _ = t.Exception, TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
                 tasks.Add(newTask);
                 allTasks.Add(newTask);
             }
