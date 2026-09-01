@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
@@ -97,13 +97,13 @@ public sealed class LanguageSelectorViewModel : ObservableRecipient
     }
 }
 
-public sealed class LanguageSelectorLanguageViewModel(
-    LocalizationManager loc,
-    LanguageSelectorViewModel parent,
-    CultureInfo? culture) : ObservableObject
+public sealed class LanguageSelectorLanguageViewModel : ObservableObject
 {
+    private readonly LocalizationManager _loc;
+    private readonly LanguageSelectorViewModel _parent;
     private bool _isChecked;
-    public CultureInfo? Culture { get; } = culture;
+
+    public CultureInfo? Culture { get; }
 
     public bool IsChecked
     {
@@ -111,8 +111,20 @@ public sealed class LanguageSelectorLanguageViewModel(
         set
         {
             SetProperty(ref _isChecked, value);
-            parent.UpdateLanguageChecked();
+            _parent.UpdateLanguageChecked();
         }
+    }
+
+    public LanguageSelectorLanguageViewModel(
+        LocalizationManager loc,
+        LanguageSelectorViewModel parent,
+        CultureInfo? culture)
+    {
+        _loc = loc;
+        _parent = parent;
+        Culture = culture;
+
+        _loc.LanguageSwitched += () => OnPropertyChanged(nameof(Text));
     }
 
     public string Text
@@ -121,14 +133,69 @@ public sealed class LanguageSelectorLanguageViewModel(
         {
             if (Culture == null)
             {
-                return loc.GetString("language-selector-system-language",
-                    ("languageName", loc.SystemCulture.NativeName));
+                var sysLangName = GetFormattedLanguageName(_loc.SystemCulture, _loc.CurrentCulture);
+                return _loc.GetString("language-selector-system-language",
+                    ("languageName", sysLangName));
             }
 
-            return loc.GetString(
-                "language-selector-language",
-                ("languageName", Culture.NativeName),
-                ("englishName", Culture.EnglishName));
+            return GetFormattedDisplay(Culture, _loc.CurrentCulture, _loc);
         }
+    }
+
+    internal static string CapitalizeFirst(string s)
+    {
+        if (string.IsNullOrEmpty(s))
+            return s;
+        return char.ToUpper(s[0], CultureInfo.CurrentCulture) + s[1..];
+    }
+
+    internal static string GetFormattedLanguageName(CultureInfo culture, CultureInfo currentUiCulture)
+    {
+        var twoLetter = culture.TwoLetterISOLanguageName.ToLowerInvariant();
+        var isRussianUi = currentUiCulture.TwoLetterISOLanguageName.Equals("ru", StringComparison.OrdinalIgnoreCase);
+
+        if (isRussianUi)
+        {
+            return twoLetter switch
+            {
+                "ru" => "Русский",
+                "en" => "Английский",
+                _ => CapitalizeFirst(culture.NativeName)
+            };
+        }
+
+        return twoLetter switch
+        {
+            "ru" => "Russian",
+            "en" => "English",
+            _ => CapitalizeFirst(culture.EnglishName)
+        };
+    }
+
+    internal static string GetFormattedDisplay(CultureInfo culture, CultureInfo currentUiCulture, LocalizationManager loc)
+    {
+        var twoLetter = culture.TwoLetterISOLanguageName.ToLowerInvariant();
+        var isRussianUi = currentUiCulture.TwoLetterISOLanguageName.Equals("ru", StringComparison.OrdinalIgnoreCase);
+
+        if (isRussianUi)
+        {
+            return twoLetter switch
+            {
+                "en" => "Английский (English)",
+                "ru" => "Русский (Russian)",
+                _ => loc.GetString("language-selector-language",
+                    ("languageName", CapitalizeFirst(culture.NativeName)),
+                    ("englishName", culture.EnglishName))
+            };
+        }
+
+        return twoLetter switch
+        {
+            "ru" => "Russian (Russian Federation)",
+            "en" => "English (English)",
+            _ => loc.GetString("language-selector-language",
+                ("languageName", culture.EnglishName),
+                ("englishName", CapitalizeFirst(culture.NativeName)))
+        };
     }
 }
