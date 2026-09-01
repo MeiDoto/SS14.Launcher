@@ -19,10 +19,39 @@ public static class Helpers
 
     public delegate void DownloadProgressCallback(long downloaded, long total);
 
-    public static void ExtractZipToDirectory(string directory, Stream zipStream)
+    /// <summary>
+    /// Safely extracts a zip stream to the destination directory, actively validating every entry
+    /// against Zip Slip directory traversal vulnerabilities (e.g. "../" path exploitation).
+    /// </summary>
+    public static void ExtractZipToDirectory(string directory, Stream zipStream, bool overwrite = true)
     {
-        using var zipArchive = new ZipArchive(zipStream);
-        zipArchive.ExtractToDirectory(directory);
+        var fullDestinationDirectory = Path.GetFullPath(directory);
+        if (!fullDestinationDirectory.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
+            fullDestinationDirectory += Path.DirectorySeparatorChar;
+
+        using var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: false);
+        foreach (var entry in zipArchive.Entries)
+        {
+            var destinationPath = Path.GetFullPath(Path.Combine(fullDestinationDirectory, entry.FullName));
+
+            if (!destinationPath.StartsWith(fullDestinationDirectory, StringComparison.Ordinal))
+            {
+                throw new InvalidDataException($"Zip Slip vulnerability detected! Entry '{entry.FullName}' attempts directory traversal outside destination.");
+            }
+
+            if (Path.GetFileName(destinationPath).Length == 0 || entry.FullName.EndsWith('/') || entry.FullName.EndsWith('\\'))
+            {
+                Directory.CreateDirectory(destinationPath);
+            }
+            else
+            {
+                var parentDir = Path.GetDirectoryName(destinationPath);
+                if (!string.IsNullOrEmpty(parentDir))
+                    Directory.CreateDirectory(parentDir);
+
+                entry.ExtractToFile(destinationPath, overwrite);
+            }
+        }
     }
 
     public static void ClearDirectory(string directory)

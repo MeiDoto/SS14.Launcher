@@ -303,103 +303,10 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
         OnPropertyChanged(nameof(CustomBackgroundOverlayOpacity));
 
         var logoPath = _cfg.GetCVar(CVars.CustomLogoImagePath);
-        if (!string.IsNullOrEmpty(logoPath) && File.Exists(logoPath))
-        {
-            try
-            {
-                _customLogoImage = new Avalonia.Media.Imaging.Bitmap(logoPath);
-            }
-            catch (Exception ex)
-            {
-                Log.Warning("Failed to load custom logo: {Message}", ex.Message);
-                _customLogoImage = null;
-            }
-        }
-        else
-        {
-            _customLogoImage = null;
-        }
+        _customLogoImage = ThemeService.Instance.LoadBitmapSafely(logoPath);
+        OnPropertyChanged(nameof(CustomLogoImage));
 
-        if (Avalonia.Application.Current?.Resources is { } res)
-        {
-            var accent = _cfg.GetCVar(CVars.CustomAccentColor);
-            if (!string.IsNullOrWhiteSpace(accent) && PaletteUtility.TryParseHexColor(accent, out var accentCol))
-            {
-                res["ThemeNanoGoldBrush"] = new Avalonia.Media.SolidColorBrush(accentCol);
-                res["ThemeNanoGoldColor"] = accentCol;
-            }
-
-            var btnColHex = _cfg.GetCVar(CVars.CustomButtonColor);
-            if (!string.IsNullOrWhiteSpace(btnColHex) && PaletteUtility.TryParseHexColor(btnColHex, out var btnCol))
-            {
-                res["ThemeControlMidBrush"] = new Avalonia.Media.SolidColorBrush(btnCol);
-                res["ThemeControlMidColor"] = btnCol;
-            }
-
-            var tabColHex = _cfg.GetCVar(CVars.CustomTabSelectedColor);
-            if (!string.IsNullOrWhiteSpace(tabColHex) && PaletteUtility.TryParseHexColor(tabColHex, out var tabCol))
-            {
-                res["ThemeTabItemSelectedBrush"] = new Avalonia.Media.SolidColorBrush(tabCol);
-                res["ThemeControlHighBrush"] = new Avalonia.Media.SolidColorBrush(tabCol);
-                res["ThemeControlHighColor"] = tabCol;
-            }
-
-            var textColHex = _cfg.GetCVar(CVars.CustomTextColor);
-            if (!string.IsNullOrWhiteSpace(textColHex) && PaletteUtility.TryParseHexColor(textColHex, out var textCol))
-            {
-                res["ThemeForegroundBrush"] = new Avalonia.Media.SolidColorBrush(textCol);
-                res["ThemeForegroundColor"] = textCol;
-            }
-
-            var popupBgHex = _cfg.GetCVar(CVars.CustomPopupBackgroundColor);
-            if (!string.IsNullOrWhiteSpace(popupBgHex) && PaletteUtility.TryParseHexColor(popupBgHex, out var popupCol))
-            {
-                res["ThemePopupBackgroundBrush"] = new Avalonia.Media.SolidColorBrush(popupCol);
-                res["ThemePopupBackgroundColor"] = popupCol;
-            }
-
-            var fontSize = _cfg.GetCVar(CVars.CustomFontSize);
-            if (fontSize >= 10 && fontSize <= 26)
-            {
-                res["FontSizeNormal"] = (double)fontSize;
-            }
-
-            if (HasCustomBackgroundImage)
-            {
-                res["ThemeBackgroundBrush"] = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0x25, 0x25, 0x2A));
-                res["ThemeServerListBackgroundBrush"] = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0x28, 0x10, 0x10, 0x18));
-                res["ThemeServerListRowAltBrush"] = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0x18, 0xFF, 0xFF, 0xFF));
-                res["ThemeHeaderBackgroundBrush"] = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0x45, 0x15, 0x15, 0x1C));
-                res["ThemeStripeBackBrush"] = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(0x35, 0x10, 0x10, 0x18));
-            }
-            else
-            {
-                res["ThemeBackgroundBrush"] = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0x25, 0x25, 0x2A));
-                res["ThemeServerListBackgroundBrush"] = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0x1e, 0x1e, 0x22));
-                res["ThemeServerListRowAltBrush"] = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0x26, 0x26, 0x26));
-                res["ThemeHeaderBackgroundBrush"] = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0x21, 0x21, 0x26));
-
-                var vb = new Avalonia.Media.VisualBrush
-                {
-                    TileMode = Avalonia.Media.TileMode.Tile,
-                    Stretch = Avalonia.Media.Stretch.Fill,
-                    SourceRect = new Avalonia.RelativeRect(0, 0, 32, 32, Avalonia.RelativeUnit.Absolute),
-                    DestinationRect = new Avalonia.RelativeRect(0, 0, 32, 32, Avalonia.RelativeUnit.Absolute),
-                    Visual = new Avalonia.Controls.Panel
-                    {
-                        Height = 32,
-                        Width = 32,
-                        Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0x1e, 0x1e, 0x22)),
-                        Children =
-                        {
-                            new Avalonia.Controls.Shapes.Path { Data = Avalonia.Media.Geometry.Parse("M 0 8 L 24 32 L 8 32 L 0 24 Z"), Fill = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0x26, 0x26, 0x26)) },
-                            new Avalonia.Controls.Shapes.Path { Data = Avalonia.Media.Geometry.Parse("M 8 0 L 24 0 L 32 8 L 32 24 Z"), Fill = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromRgb(0x26, 0x26, 0x26)) }
-                        }
-                    }
-                };
-                res["ThemeStripeBackBrush"] = vb;
-            }
-        }
+        ThemeService.Instance.ApplyTheme(_cfg, HasCustomBackgroundImage);
 
         if (Control != null)
         {

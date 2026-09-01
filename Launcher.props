@@ -13,7 +13,8 @@
         CET breaks for people on older, but still supported Windows versions:
         https://github.com/space-wizards/SS14.Launcher/issues/198
         -->
-        <CETCompat>false</CETCompat>
-        <NoWarn>$(NoWarn);NU1903;NU1902;NETSDK1206;IL2104</NoWarn>
+        <AnalysisLevel>latest-recommended</AnalysisLevel>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <NoWarn>$(NoWarn);NU1903;NU1902;NETSDK1206;IL2104;CA1416;CA1707</NoWarn>
     </PropertyGroup>
 </Project>

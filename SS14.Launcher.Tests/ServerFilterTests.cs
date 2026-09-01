@@ -37,12 +37,12 @@ public sealed class ServerFilterTests
     [Test]
     public void TestServerFilter_CategoriesExist()
     {
-        Assert.That(Enum.IsDefined(typeof(ServerFilterCategory), ServerFilterCategory.Language), Is.True);
-        Assert.That(Enum.IsDefined(typeof(ServerFilterCategory), ServerFilterCategory.Region), Is.True);
-        Assert.That(Enum.IsDefined(typeof(ServerFilterCategory), ServerFilterCategory.RolePlay), Is.True);
-        Assert.That(Enum.IsDefined(typeof(ServerFilterCategory), ServerFilterCategory.EighteenPlus), Is.True);
-        Assert.That(Enum.IsDefined(typeof(ServerFilterCategory), ServerFilterCategory.PlayerCount), Is.True);
-        Assert.That(Enum.IsDefined(typeof(ServerFilterCategory), ServerFilterCategory.Hub), Is.True);
-        Assert.That(Enum.IsDefined(typeof(ServerFilterCategory), ServerFilterCategory.Recommended), Is.True);
+        Assert.That(Enum.IsDefined(ServerFilterCategory.Language), Is.True);
+        Assert.That(Enum.IsDefined(ServerFilterCategory.Region), Is.True);
+        Assert.That(Enum.IsDefined(ServerFilterCategory.RolePlay), Is.True);
+        Assert.That(Enum.IsDefined(ServerFilterCategory.EighteenPlus), Is.True);
+        Assert.That(Enum.IsDefined(ServerFilterCategory.PlayerCount), Is.True);
+        Assert.That(Enum.IsDefined(ServerFilterCategory.Hub), Is.True);
+        Assert.That(Enum.IsDefined(ServerFilterCategory.Recommended), Is.True);
     }
 }
