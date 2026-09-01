@@ -157,14 +157,14 @@ public sealed class DiscordRpcClient : IDisposable
 
                     // Read handshake response
                     var respHeader = new byte[8];
-                    var read = await _stream.ReadAsync(respHeader);
+                    var read = await _stream.ReadAtLeastAsync(respHeader, 8, throwOnEndOfStream: false);
                     if (read == 8)
                     {
                         var len = BitConverter.ToInt32(respHeader, 4);
                         if (len > 0 && len < 65536)
                         {
                             var buf = new byte[len];
-                            await _stream.ReadAsync(buf);
+                            await _stream.ReadAtLeastAsync(buf, len, throwOnEndOfStream: false);
                         }
                     }
 

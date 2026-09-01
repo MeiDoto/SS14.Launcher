@@ -11,7 +11,7 @@ using Robust.LoaderApi;
 
 namespace SS14.Loader;
 
-internal class Program
+internal sealed class Program
 {
     private readonly string[] _engineArgs;
     private const string RobustAssemblyName = "Robust.Client";

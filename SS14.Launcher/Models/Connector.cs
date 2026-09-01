@@ -876,7 +876,7 @@ public partial class Connector : ObservableObject
             PipeOutput(process, fileStdout, fileStderr);
         }
 
-        if (_cfg.GetCVar(CVars.DiscordRpcEnabled))
+        if (process != null && _cfg.GetCVar(CVars.DiscordRpcEnabled))
         {
             _ = DiscordRpcClient.Instance.UpdatePresenceAsync("В игре", isReplay ? "Просмотр реплея" : "Играет на сервере");
             try
