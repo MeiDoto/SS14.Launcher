@@ -67,6 +67,7 @@
     <PackageReference Include="JetBrains.Annotations" />
     <PackageReference Include="Microsoft.NET.ILLink.Tasks" />
     <PackageReference Include="System.Net.Http.WinHttpHandler" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
     <PackageReference Include="Linguini.Bundle" />
   </ItemGroup>
   <ItemGroup>

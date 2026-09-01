@@ -34,6 +34,7 @@
     <PackageVersion Include="SpaceWizards.Sodium" Version="0.2.1"/>
     <PackageVersion Include="libsodium" Version="1.0.20.1" />
     <PackageVersion Include="System.Net.Http.WinHttpHandler" Version="8.0.2" />
+    <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
     <PackageVersion Include="Linguini.Bundle" Version="0.8.1" />
     <!-- Test stuff -->
     <PackageVersion Include="nunit" Version="3.14.0"/>

@@ -32,6 +32,24 @@ def main():
     if "osx" in platforms:
         publish_osx()
 
+    generate_checksums()
+
+def generate_checksums():
+    import hashlib
+    sums = []
+    for archive in ["SS14.Launcher_Windows.zip", "SS14.Launcher_Linux.tar.gz", "SS14.Launcher_macOS.zip"]:
+        if os.path.isfile(archive):
+            with open(archive, "rb") as f:
+                digest = hashlib.sha256(f.read()).hexdigest()
+            sums.append(f"{digest}  {archive}")
+    if sums:
+        with open("SHA256SUMS.txt", "w") as f:
+            f.write("\n".join(sums) + "\n")
+        print("\nGenerated SHA256SUMS.txt:")
+        for line in sums:
+            print("  " + line)
+
+
 
 def publish_windows(x64_only: bool):
     update_netcore_runtime([PLATFORM_WINDOWS])

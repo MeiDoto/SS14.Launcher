@@ -321,7 +321,7 @@ public sealed class DataManager : ObservableObject
 
     private void LoadSqliteConfig(SqliteConnection sqliteConnection)
     {
-        // Load logins.
+        // Load logins with secure token decryption.
         _logins.AddOrUpdate(
             sqliteConnection.Query<(Guid id, string name, string token, DateTimeOffset expires)>(
                     "SELECT UserId, UserName, Token, Expires FROM Login")
@@ -329,7 +329,7 @@ public sealed class DataManager : ObservableObject
                 {
                     UserId = l.id,
                     Username = l.name,
-                    Token = new LoginToken(l.token, l.expires)
+                    Token = new LoginToken(SecureTokenStorage.Unprotect(l.token), l.expires)
                 }));
 
         // Favorites
@@ -505,12 +505,12 @@ public sealed class DataManager : ObservableObject
 
     private void ChangeLogin(ChangeReason reason, LoginInfo login)
     {
-        // Make immutable copy to avoid race condition bugs.
+        // Make immutable copy to avoid race condition bugs, protecting token with DPAPI / AES.
         var data = new
         {
             login.UserId,
             UserName = login.Username,
-            login.Token.Token,
+            Token = SecureTokenStorage.Protect(login.Token.Token),
             Expires = login.Token.ExpireTime
         };
         AddDbCommand(con =>

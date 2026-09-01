@@ -123,8 +123,10 @@ public sealed class LauncherUpdateManager
             var title = root.TryGetProperty("name", out var nameElem) ? nameElem.GetString() ?? tagName : tagName;
             var body = root.TryGetProperty("body", out var bodyElem) ? bodyElem.GetString() ?? "" : "";
 
-            string? assetUrl = null;
-            long assetSize = 0;
+            string? targetAssetUrl = null;
+            string targetAssetName = "";
+            long targetAssetSize = 0;
+            string? checksumsUrl = null;
 
             if (root.TryGetProperty("assets", out var assetsElem) && assetsElem.ValueKind == JsonValueKind.Array)
             {
@@ -137,29 +139,47 @@ public sealed class LauncherUpdateManager
                     if (string.IsNullOrEmpty(downloadUrl))
                         continue;
 
-                    if (OperatingSystem.IsWindows() && assetName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) && assetName.Contains("Windows", StringComparison.OrdinalIgnoreCase))
+                    if (assetName.Equals("SHA256SUMS.txt", StringComparison.OrdinalIgnoreCase) ||
+                        assetName.Equals("SHA256SUMS", StringComparison.OrdinalIgnoreCase) ||
+                        assetName.Equals("hashes.txt", StringComparison.OrdinalIgnoreCase))
                     {
-                        assetUrl = downloadUrl;
-                        assetSize = size;
-                        break;
+                        checksumsUrl = downloadUrl;
+                        continue;
                     }
 
-                    if (OperatingSystem.IsLinux() && (assetName.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase) || assetName.EndsWith(".tgz", StringComparison.OrdinalIgnoreCase)) && assetName.Contains("Linux", StringComparison.OrdinalIgnoreCase))
+                    if (OperatingSystem.IsWindows() && assetName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) && assetName.Contains("Windows", StringComparison.OrdinalIgnoreCase))
                     {
-                        assetUrl = downloadUrl;
-                        assetSize = size;
-                        break;
+                        targetAssetUrl = downloadUrl;
+                        targetAssetName = assetName;
+                        targetAssetSize = size;
+                    }
+                    else if (OperatingSystem.IsLinux() && (assetName.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase) || assetName.EndsWith(".tgz", StringComparison.OrdinalIgnoreCase)) && assetName.Contains("Linux", StringComparison.OrdinalIgnoreCase))
+                    {
+                        targetAssetUrl = downloadUrl;
+                        targetAssetName = assetName;
+                        targetAssetSize = size;
                     }
                 }
             }
 
-            if (string.IsNullOrEmpty(assetUrl))
+            if (string.IsNullOrEmpty(targetAssetUrl))
             {
                 Log.Warning("New launcher release {Version} found, but matching asset for current OS was not found.", tagName);
                 return null;
             }
 
-            CachedUpdate = new LauncherUpdateInfo(cleanRemoteVer, tagName, title, body, assetUrl, assetSize);
+            var expectedSha256 = ExtractSha256FromBody(body, targetAssetName);
+
+            CachedUpdate = new LauncherUpdateInfo(
+                cleanRemoteVer,
+                tagName,
+                title,
+                body,
+                targetAssetUrl,
+                targetAssetSize,
+                targetAssetName,
+                expectedSha256,
+                checksumsUrl);
             return CachedUpdate;
         }
         catch (Exception ex)
@@ -256,6 +276,36 @@ public sealed class LauncherUpdateManager
             // верификация SHA256
             var fileHash = await ComputeSha256Async(tempFile, cancel);
             Log.Information("Downloaded update archive SHA256: {Hash}", fileHash);
+
+            var expectedSha = info.ExpectedSha256;
+            if (string.IsNullOrEmpty(expectedSha) && !string.IsNullOrEmpty(info.ChecksumsUrl))
+            {
+                try
+                {
+                    using var checksumsReq = new HttpRequestMessage(HttpMethod.Get, info.ChecksumsUrl);
+                    using var checksumsResp = await HttpClient.SendAsync(checksumsReq, cancel);
+                    if (checksumsResp.IsSuccessStatusCode)
+                    {
+                        var sumsText = await checksumsResp.Content.ReadAsStringAsync(cancel);
+                        expectedSha = ParseChecksumFromSha256Sums(sumsText, info.TargetFileName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(ex, "Could not retrieve SHA256 checksums file from {Url}", info.ChecksumsUrl);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(expectedSha))
+            {
+                if (!string.Equals(fileHash, expectedSha, StringComparison.OrdinalIgnoreCase))
+                {
+                    try { File.Delete(tempFile); } catch { }
+                    Log.Error("SHA256 checksum mismatch! Expected: {Expected}, Computed: {Actual}. Aborting update.", expectedSha, fileHash);
+                    throw new InvalidDataException($"SHA256 verification failed! Downloaded archive appears corrupted or modified. Expected {expectedSha}, but got {fileHash}.");
+                }
+                Log.Information("SHA256 checksum verified successfully: {Hash}", fileHash);
+            }
 
             // распаковка
             Directory.CreateDirectory(extractDir);
@@ -568,6 +618,51 @@ rm -f ""$0""
 
         return Version.TryParse(versionStr, out version!);
     }
+
+    /// <summary>
+    /// Extracts a 64-character hex SHA-256 hash for the given filename from release notes or body text.
+    /// </summary>
+    public static string? ExtractSha256FromBody(string body, string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(body) || string.IsNullOrWhiteSpace(fileName))
+            return null;
+
+        var lines = body.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        foreach (var line in lines)
+        {
+            if (line.Contains(fileName, StringComparison.OrdinalIgnoreCase))
+            {
+                var match = System.Text.RegularExpressions.Regex.Match(line, @"\b([a-fA-F0-9]{64})\b");
+                if (match.Success)
+                    return match.Groups[1].Value;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Parses a standard SHA256SUMS format file (hash  filename) to locate the hash for a specific file.
+    /// </summary>
+    public static string? ParseChecksumFromSha256Sums(string sumsContent, string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(sumsContent) || string.IsNullOrWhiteSpace(fileName))
+            return null;
+
+        var lines = sumsContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        foreach (var line in lines)
+        {
+            var trimmed = line.Trim();
+            if (trimmed.EndsWith(fileName, StringComparison.OrdinalIgnoreCase))
+            {
+                var match = System.Text.RegularExpressions.Regex.Match(trimmed, @"^([a-fA-F0-9]{64})");
+                if (match.Success)
+                    return match.Groups[1].Value;
+            }
+        }
+
+        return null;
+    }
 }
 
 public sealed record LauncherUpdateInfo(
@@ -576,4 +671,8 @@ public sealed record LauncherUpdateInfo(
     string Title,
     string ReleaseNotes,
     string DownloadUrl,
-    long SizeBytes);
+    long SizeBytes,
+    string TargetFileName = "",
+    string? ExpectedSha256 = null,
+    string? ChecksumsUrl = null);
+
