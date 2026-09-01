@@ -187,11 +187,6 @@
               <Button Click="OpenHubSettings" Content="{loc:Loc tab-options-hub-settings}" Margin="0, 0, 6, 6" />
             </WrapPanel>
 
-            <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding DiscordRpcEnabled}" Content="{loc:Loc tab-options-discord-rpc}" />
-            <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
-                       Text="{loc:Loc tab-options-discord-rpc-desc}"
-                       Margin="8, 0, 8, 8" />
-
             <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding LogLauncherVerbose}" Content="{loc:Loc tab-options-verbose-launcher-logging}" />
             <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
                        Text="{loc:Loc tab-options-verbose-launcher-logging-desc}"

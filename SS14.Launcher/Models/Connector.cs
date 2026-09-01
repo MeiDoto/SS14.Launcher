@@ -679,8 +679,7 @@ public partial class Connector : ObservableObject
             }
             else
             {
-                startInfo.ArgumentList.Add("--cvar");
-                startInfo.ArgumentList.Add($"display.renderer={graphicsBackend}");
+                SetGameCVar("display.renderer", graphicsBackend);
             }
         }
 
@@ -693,54 +692,60 @@ public partial class Connector : ObservableObject
                 "Borderless" => "1",
                 _ => "0"
             };
-            startInfo.ArgumentList.Add("--cvar");
-            startInfo.ArgumentList.Add($"display.window_mode={modeVal}");
+            SetGameCVar("display.window_mode", modeVal);
         }
 
         if (_cfg.GetCVar(CVars.DevDebugFpsOverlay))
         {
-            startInfo.ArgumentList.Add("--cvar");
-            startInfo.ArgumentList.Add("display.fps_counter=true");
+            SetGameCVar("hud.fps_counter", "true");
+            SetGameCVar("display.fps_counter", "true");
+            SetGameCVar("debug.fps", "true");
             startInfo.ArgumentList.Add("+showtime");
         }
 
         if (_cfg.GetCVar(CVars.DevDebugNetGraph))
         {
+            SetGameCVar("net.netgraph", "true");
+            SetGameCVar("hud.net_graph", "true");
             startInfo.ArgumentList.Add("+netgraph");
         }
 
         if (_cfg.GetCVar(CVars.DevOpenConsoleOnStart))
         {
             startInfo.ArgumentList.Add("+toggleconsole");
+            startInfo.ArgumentList.Add("+openconsole");
         }
 
         if (_cfg.GetCVar(CVars.DevPhysicsDebug))
         {
+            SetGameCVar("physics.debug_draw", "true");
+            SetGameCVar("physics.overlay", "true");
             startInfo.ArgumentList.Add("+physics");
             startInfo.ArgumentList.Add("overlay");
         }
 
         if (_cfg.GetCVar(CVars.DevShowLightMap))
         {
+            SetGameCVar("debug.show_light", "true");
+            SetGameCVar("light.draw_lighting", "false");
             startInfo.ArgumentList.Add("+showlight");
         }
 
         if (_cfg.GetCVar(CVars.DevShowEntityBounds))
         {
+            SetGameCVar("debug.entity_bounds", "true");
             startInfo.ArgumentList.Add("+entitybounds");
         }
 
         if (_cfg.GetCVar(CVars.DevMuteAudio))
         {
-            startInfo.ArgumentList.Add("--cvar");
-            startInfo.ArgumentList.Add("audio.master_volume=0");
+            SetGameCVar("audio.master_volume", "0");
         }
 
         var audioBuf = _cfg.GetCVar(CVars.DevAudioBufferSize);
         if (audioBuf > 0)
         {
-            startInfo.ArgumentList.Add("--cvar");
-            startInfo.ArgumentList.Add($"audio.buffer_size={audioBuf}");
+            SetGameCVar("audio.buffer_size", audioBuf.ToString());
         }
 
         var customEnv = _cfg.GetCVar(CVars.DevCustomEnvVars);
@@ -779,37 +784,32 @@ public partial class Connector : ObservableObject
 
         if (_cfg.GetCVar(CVars.DevUncappedFps))
         {
-            startInfo.ArgumentList.Add("--cvar");
-            startInfo.ArgumentList.Add("display.vsync=false");
-            startInfo.ArgumentList.Add("--cvar");
-            startInfo.ArgumentList.Add("display.max_fps=0");
+            SetGameCVar("display.vsync", "false");
+            SetGameCVar("display.max_fps", "0");
         }
 
         var simulatedPing = _cfg.GetCVar(CVars.DevSimulatedPingMs);
         if (simulatedPing > 0)
         {
-            startInfo.ArgumentList.Add("--cvar");
-            startInfo.ArgumentList.Add($"net.fake_lag={simulatedPing}");
+            SetGameCVar("net.fake_lag", simulatedPing.ToString());
         }
 
         var simulatedJitter = _cfg.GetCVar(CVars.DevSimulatedJitterMs);
         if (simulatedJitter > 0)
         {
-            startInfo.ArgumentList.Add("--cvar");
-            startInfo.ArgumentList.Add($"net.fake_jitter={simulatedJitter}");
+            SetGameCVar("net.fake_jitter", simulatedJitter.ToString());
         }
 
         var simulatedLoss = _cfg.GetCVar(CVars.DevSimulatedPacketLoss);
         if (simulatedLoss > 0)
         {
-            startInfo.ArgumentList.Add("--cvar");
-            startInfo.ArgumentList.Add($"net.fake_loss={simulatedLoss}");
+            var lossRatio = (simulatedLoss / 100.0f).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            SetGameCVar("net.fake_loss", lossRatio);
         }
 
         if (_cfg.GetCVar(CVars.DevDisableNetCompression))
         {
-            startInfo.ArgumentList.Add("--cvar");
-            startInfo.ArgumentList.Add("net.compression=false");
+            SetGameCVar("net.compression", "false");
         }
 
         var customArgs = _cfg.GetCVar(CVars.DevCustomLaunchArguments);
@@ -841,27 +841,16 @@ public partial class Connector : ObservableObject
         var highPriority = isReplay || _cfg.GetCVar(CVars.HighProcessPriority);
         var process = GameProcessRunner.StartGameProcess(startInfo, highPriority);
 
-        if (process != null && _cfg.GetCVar(CVars.DiscordRpcEnabled))
-        {
-            _ = DiscordRpcClient.Instance.UpdatePresenceAsync("В игре", isReplay ? "Просмотр реплея" : "Играет на сервере");
-            try
-            {
-                process.EnableRaisingEvents = true;
-                process.Exited += (_, _) =>
-                {
-                    if (_cfg.GetCVar(CVars.DiscordRpcEnabled))
-                    {
-                        _ = DiscordRpcClient.Instance.UpdatePresenceAsync("В лаунчере", "Выбирает сервер");
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                Log.Verbose("Failed to bind Discord RPC exit listener: {Message}", ex.Message);
-            }
-        }
-
         return process;
+
+        void SetGameCVar(string name, string value)
+        {
+            startInfo.ArgumentList.Add("--cvar");
+            startInfo.ArgumentList.Add($"{name}={value}");
+
+            var envKey = "ROBUST_CVAR_" + name.ToUpperInvariant().Replace('.', '_');
+            EnvVar(envKey, value);
+        }
 
         void EnvVar(string envVar, string? value)
         {

@@ -232,22 +232,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
         {
             if (e.PropertyName is nameof(LoggedIn) && LoggedIn)
                 RunSelectedOnTab();
-
-            if (e.PropertyName is nameof(SelectedIndex) && _cfg.GetCVar(CVars.DiscordRpcEnabled))
-            {
-                var tab = (SelectedIndex >= 0 && SelectedIndex < Tabs.Count) ? Tabs[SelectedIndex] : null;
-                var tabDetail = tab switch
-                {
-                    HomePageViewModel => "Главное меню",
-                    ServerListTabViewModel => "Выбирает сервер",
-                    NewsTabViewModel => "Читает новости",
-                    ReplaysTabViewModel => "Смотрит реплеи",
-                    OptionsTabViewModel => "В настройках",
-                    DevelopmentTabViewModel => "В меню разработчика",
-                    _ => "В лаунчере"
-                };
-                _ = DiscordRpcClient.Instance.UpdatePresenceAsync("В лаунчере", tabDetail);
-            }
         };
 
         _loginMgr.PropertyChanged += (_, e) =>
@@ -287,15 +271,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
         };
 
         ReloadCustomVisuals();
-
-        if (_cfg.GetCVar(CVars.DiscordRpcEnabled))
-        {
-            Task.Run(async () =>
-            {
-                await DiscordRpcClient.Instance.InitializeAsync();
-                await DiscordRpcClient.Instance.UpdatePresenceAsync("В лаунчере", "Выбирает сервер");
-            });
-        }
     }
 
     public MainWindow? Control { get; set; }
@@ -430,11 +405,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
         finally
         {
             BusyTask = null;
-        }
-
-        if (_cfg.GetCVar(CVars.DiscordRpcEnabled))
-        {
-            _ = DiscordRpcClient.Instance.UpdatePresenceAsync("В лаунчере", "Выбирает сервер");
         }
 
         _ = Task.Run(async () =>

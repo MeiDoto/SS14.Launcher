@@ -333,11 +333,6 @@ public static class CVars
     public static readonly CVarDef<bool> EnableHttpCompression = CVarDef.Create("EnableHttpCompression", true);
 
     /// <summary>
-    /// Enable Discord Rich Presence (RPC) activity status. Default is true.
-    /// </summary>
-    public static readonly CVarDef<bool> DiscordRpcEnabled = CVarDef.Create("DiscordRpcEnabled", true);
-
-    /// <summary>
     /// Force IPv4 only DNS resolution and socket connections (bypasses broken IPv6 routes/blocks). Default is false.
     /// </summary>
     public static readonly CVarDef<bool> ForceIPv4 = CVarDef.Create("ForceIPv4", false);
