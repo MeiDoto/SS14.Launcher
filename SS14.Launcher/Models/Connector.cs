@@ -661,7 +661,14 @@ public partial class Connector : ObservableObject
             }
         }
 
-        EnvVar("DOTNET_TieredPGO", _cfg.GetCVar(CVars.DevTieredPgo) ? "1" : "0");
+        if (_cfg.GetCVar(CVars.DevTieredPgo) || _cfg.GetCVar(CVars.EnableTieredPGO) || isReplay)
+        {
+            EnvVar("DOTNET_TieredPGO", "1");
+            EnvVar("DOTNET_ReadyToRun", "0");
+            EnvVar("DOTNET_TC_QuickJitForLoops", "1");
+            EnvVar("DOTNET_ThreadPool_UnfairSemaphore", "1");
+            EnvVar("DOTNET_EnableWriteXorExecute", "0");
+        }
 
         var gcLimit = _cfg.GetCVar(CVars.DevGcHeapLimitMb);
         if (gcLimit > 0)
@@ -778,8 +785,10 @@ public partial class Connector : ObservableObject
         var devLogLevel = _cfg.GetCVar(CVars.DevLogLevel);
         if (!string.IsNullOrWhiteSpace(devLogLevel) && !devLogLevel.Equals("Default", StringComparison.OrdinalIgnoreCase))
         {
+            var lvl = devLogLevel.ToLowerInvariant();
             startInfo.ArgumentList.Add("--loglevel");
-            startInfo.ArgumentList.Add(devLogLevel.ToLowerInvariant());
+            startInfo.ArgumentList.Add(lvl);
+            SetGameCVar("log.level", lvl);
         }
 
         if (_cfg.GetCVar(CVars.DevUncappedFps))

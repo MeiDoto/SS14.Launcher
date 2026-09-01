@@ -36,12 +36,10 @@ public sealed partial class EngineManagerDynamic : IEngineManager
 
     public string GetEnginePath(string engineVersion)
     {
-#if DEVELOPMENT
         if (_cfg.GetCVar(CVars.EngineOverrideEnabled))
         {
             return FindOverrideZip("Robust.Client", _cfg.GetCVar(CVars.EngineOverridePath));
         }
-#endif
 
         if (!_cfg.EngineInstallations.Lookup(engineVersion).HasValue)
         {
@@ -53,20 +51,16 @@ public sealed partial class EngineManagerDynamic : IEngineManager
 
     public string GetEngineModule(string moduleName, string moduleVersion)
     {
-#if DEVELOPMENT
         if (_cfg.GetCVar(CVars.EngineOverrideEnabled))
             moduleVersion = OverrideVersionName;
-#endif
 
         return Path.Combine(LauncherPaths.DirModuleInstallations, moduleName, moduleVersion);
     }
 
     public string GetEngineSignature(string engineVersion)
     {
-#if DEVELOPMENT
         if (_cfg.GetCVar(CVars.EngineOverrideEnabled))
             return "DEADBEEF";
-#endif
 
         return _cfg.EngineInstallations.Lookup(engineVersion).Value.Signature;
     }
@@ -76,14 +70,11 @@ public sealed partial class EngineManagerDynamic : IEngineManager
         Helpers.DownloadProgressCallback? progress = null,
         CancellationToken cancel = default)
     {
-#if DEVELOPMENT
         if (_cfg.GetCVar(CVars.EngineOverrideEnabled))
         {
             // Engine override means we don't need to download anything, we have it locally!
-            // At least, if we don't, we'll just blame the developer that enabled it.
             return new EngineInstallationResult(engineVersion, false);
         }
-#endif
         // Fast-path: If the engine is already installed locally in SQLite/disk, don't fail even if CDN is unreachable
         if (_cfg.EngineInstallations.Lookup(engineVersion).HasValue)
         {

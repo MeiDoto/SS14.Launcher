@@ -28,9 +28,10 @@ public static class HappyEyeballsHttp
     public static HttpClient CreateHttpClient(bool autoRedirect = true)
     {
         var cfg = Locator.Current.GetService<DataManager>();
+        var compressionEnabled = cfg == null || cfg.GetCVar(CVars.EnableHttpCompression);
         var handler = new SocketsHttpHandler
         {
-            AutomaticDecompression = DecompressionMethods.All,
+            AutomaticDecompression = compressionEnabled ? DecompressionMethods.All : DecompressionMethods.None,
             AllowAutoRedirect = autoRedirect,
             PooledConnectionLifetime = TimeSpan.FromMinutes(10),
             PooledConnectionIdleTimeout = TimeSpan.FromMinutes(2),

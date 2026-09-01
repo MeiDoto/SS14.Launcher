@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Serilog;
 using Splat;
 using SS14.Launcher.Api;
+using SS14.Launcher.Models.Data;
 using SS14.Launcher.Utility;
 
 namespace SS14.Launcher.Models.ServerStatus;
@@ -288,8 +289,12 @@ public sealed class ServerStatusCache : IServerSource
             };
 
             var sw = System.Diagnostics.Stopwatch.StartNew();
+            var cfg = Locator.Current.GetService<DataManager>();
+            var fastPing = cfg == null || cfg.GetCVar(CVars.EnableFastPing);
+            var timeoutMs = fastPing ? 600 : 1500;
+
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancel);
-            cts.CancelAfter(1500);
+            cts.CancelAfter(timeoutMs);
 
             await client.ConnectAsync(new System.Net.IPEndPoint(ips[0], port), cts.Token);
             sw.Stop();

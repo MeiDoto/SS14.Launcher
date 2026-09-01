@@ -1167,7 +1167,7 @@ public static class AdvancedAlgorithms
     /// </summary>
     public static class SimdStringHelper
     {
-        public static void ToLowerAsciiSimd(ReadOnlySpan<char> source, Span<char> destination)
+        public static void ToLowerAsciiSimd(ReadOnlySpan<char> source, Span<char> destination, bool forceScalar = false)
         {
             if (destination.Length < source.Length)
                 throw new ArgumentException("Destination span is too short");
@@ -1177,7 +1177,7 @@ public static class AdvancedAlgorithms
             var srcSpanUshort = System.Runtime.InteropServices.MemoryMarshal.Cast<char, ushort>(source);
             var dstSpanUshort = System.Runtime.InteropServices.MemoryMarshal.Cast<char, ushort>(destination);
 
-            if (System.Runtime.Intrinsics.Vector256.IsHardwareAccelerated && length >= 16)
+            if (!forceScalar && System.Runtime.Intrinsics.Vector256.IsHardwareAccelerated && length >= 16)
             {
                 var lowerA = System.Runtime.Intrinsics.Vector256.Create((ushort)'A');
                 var upperZ = System.Runtime.Intrinsics.Vector256.Create((ushort)'Z');
@@ -1196,7 +1196,7 @@ public static class AdvancedAlgorithms
                     i += 16;
                 }
             }
-            else if (System.Runtime.Intrinsics.Vector128.IsHardwareAccelerated && length >= 8)
+            else if (!forceScalar && System.Runtime.Intrinsics.Vector128.IsHardwareAccelerated && length >= 8)
             {
                 var lowerA = System.Runtime.Intrinsics.Vector128.Create((ushort)'A');
                 var upperZ = System.Runtime.Intrinsics.Vector128.Create((ushort)'Z');
