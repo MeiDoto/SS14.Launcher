@@ -72,7 +72,10 @@ def download_platform_runtime(dir: str, platform: str) -> None:
     if download_url.endswith(".tar.gz"):
         # this is a tar gz.
         with tarfile.open(download_file, "r:gz") as tar:
-            tar.extractall(dir)
+            if hasattr(tarfile, 'data_filter'):
+                tar.extractall(dir, filter='data')
+            else:
+                tar.extractall(dir)
     elif download_url.endswith(".zip"):
         with zipfile.ZipFile(download_file) as zipF:
             zipF.extractall(dir)

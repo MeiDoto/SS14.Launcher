@@ -93,14 +93,14 @@ public static class DesktopNotificationManager
     {
         try
         {
-            var escapedTitle = title.Replace("'", "''").Replace("`", "``").Replace("$", "`$");
-            var escapedMsg = message.Replace("'", "''").Replace("`", "``").Replace("$", "`$");
+            var cleanTitle = title.Replace("\r", " ").Replace("\n", " ").Replace("'", "''").Replace("`", "``").Replace("$", "`$");
+            var cleanMsg = message.Replace("\r", " ").Replace("\n", " ").Replace("'", "''").Replace("`", "``").Replace("$", "`$");
 
             var script = $@"[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null;
 $template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02);
 $textNodes = $template.GetElementsByTagName('text');
-$textNodes.Item(0).AppendChild($template.CreateTextNode('{escapedTitle}')) > $null;
-$textNodes.Item(1).AppendChild($template.CreateTextNode('{escapedMsg}')) > $null;
+$textNodes.Item(0).AppendChild($template.CreateTextNode('{cleanTitle}')) > $null;
+$textNodes.Item(1).AppendChild($template.CreateTextNode('{cleanMsg}')) > $null;
 $toast = [Windows.UI.Notifications.ToastNotification]::new($template);
 [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('SS14.Launcher').Show($toast);";
 
@@ -124,7 +124,10 @@ $toast = [Windows.UI.Notifications.ToastNotification]::new($template);
     {
         try
         {
-            var script = $"display notification \"{message.Replace("\"", "\\\"")}\" with title \"{title.Replace("\"", "\\\"")}\"";
+            var cleanTitle = title.Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\"");
+            var cleanMsg = message.Replace("\r", " ").Replace("\n", " ").Replace("\\", "\\\\").Replace("\"", "\\\"");
+
+            var script = $"display notification \"{cleanMsg}\" with title \"{cleanTitle}\"";
             var psi = new ProcessStartInfo
             {
                 FileName = "osascript",

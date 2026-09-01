@@ -43,12 +43,15 @@ public class LauncherCommands
         // Sanity-check the connection.
 
         LoggedInAccount? activeAccount = null;
-        while (true)
+        var attempts = 0;
+        const int maxAttempts = 6;
+        while (attempts < maxAttempts)
         {
             activeAccount = _loginMgr.ActiveAccount;
 
             if ((activeAccount == null) || (activeAccount.Status == AccountLoginStatus.Unsure))
             {
+                attempts++;
                 await Task.Delay(ConfigConstants.LauncherCommandsRedialWaitTimeout);
             }
             else
@@ -63,7 +66,7 @@ public class LauncherCommands
             return;
         }
 
-        if (activeAccount!.Status != AccountLoginStatus.Available)
+        if (activeAccount == null || activeAccount.Status != AccountLoginStatus.Available)
         {
             Log.Warning($"Dropping connect command: Account not available");
             return;
