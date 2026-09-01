@@ -1,0 +1,42 @@
+"area: UI / Avalonia":
+- changed-files:
+  - any-glob-to-any-file:
+    - 'SS14.Launcher/Views/**'
+    - 'SS14.Launcher/ViewModels/**'
+    - 'SS14.Launcher/**/*.xaml'
+    - 'SS14.Launcher/Assets/**'
+
+"area: Core / Logic":
+- changed-files:
+  - any-glob-to-any-file:
+    - 'SS14.Launcher/Models/**'
+    - 'SS14.Launcher/Api/**'
+    - 'SS14.Launcher/Utility/**'
+    - 'SS14.Launcher/Helpers.cs'
+    - 'SS14.Launcher/UriHelper.cs'
+    - 'SS14.Launcher/Program.cs'
+
+"area: Localization":
+- changed-files:
+  - any-glob-to-any-file:
+    - 'SS14.Launcher/Assets/Locale/**'
+
+"area: CI/CD & Build":
+- changed-files:
+  - any-glob-to-any-file:
+    - '.github/**'
+    - 'publish.py'
+    - 'download_net_runtime.py'
+    - 'Launcher.props'
+    - '**/*.csproj'
+
+"area: Tests":
+- changed-files:
+  - any-glob-to-any-file:
+    - 'SS14.Launcher.Tests/**'
+
+"area: Documentation":
+- changed-files:
+  - any-glob-to-any-file:
+    - '**/*.md'
+    - 'LICENSE.txt'
