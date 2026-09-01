@@ -143,6 +143,26 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         }
     }
 
+    public bool ForceIPv4
+    {
+        get => Cfg.GetCVar(CVars.ForceIPv4);
+        set
+        {
+            Cfg.SetCVar(CVars.ForceIPv4, value);
+            Cfg.CommitConfig();
+        }
+    }
+
+    public bool FastHubFallback
+    {
+        get => Cfg.GetCVar(CVars.FastHubFallback);
+        set
+        {
+            Cfg.SetCVar(CVars.FastHubFallback, value);
+            Cfg.CommitConfig();
+        }
+    }
+
     public bool HighProcessPriority
     {
         get => Cfg.GetCVar(CVars.HighProcessPriority);

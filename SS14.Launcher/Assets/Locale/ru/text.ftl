@@ -584,6 +584,10 @@ tab-options-section-system = Система и хабы
 
 tab-options-doh = DNS-over-HTTPS (DoH Резолвер)
 tab-options-doh-desc = Использует безопасный шифрованный DNS (Cloudflare / Google 1.1.1.1) для стабильного подключения к хабу в обход сбоев провайдеров.
+tab-options-force-ipv4 = Принудительно использовать IPv4
+tab-options-force-ipv4-desc = Отключает IPv6-маршрутизацию для устранения сбоев и зависаний на заблокированных или проблемных маршрутах Cloudflare.
+tab-options-fast-fallback = Быстрое переключение хабов (Fast Failover)
+tab-options-fast-fallback-desc = Мгновенно переключается на резервные зеркала (1 сек вместо 3 сек), если основной хаб недоступен.
 tab-options-proxy-settings = Настройки прокси
 tab-options-proxy-settings-desc = Настройка SOCKS5 или HTTP/HTTPS прокси для маршрутизации трафика игры и лаунчера.
 tab-options-proxy-button = Настройки прокси (SOCKS5 / HTTP)

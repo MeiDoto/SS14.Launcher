@@ -336,6 +336,21 @@ public static class CVars
     /// Enable Discord Rich Presence (RPC) activity status. Default is true.
     /// </summary>
     public static readonly CVarDef<bool> DiscordRpcEnabled = CVarDef.Create("DiscordRpcEnabled", true);
+
+    /// <summary>
+    /// Force IPv4 only DNS resolution and socket connections (bypasses broken IPv6 routes/blocks). Default is false.
+    /// </summary>
+    public static readonly CVarDef<bool> ForceIPv4 = CVarDef.Create("ForceIPv4", false);
+
+    /// <summary>
+    /// Fast aggressive fallback between primary and fallback CDN/Hub endpoints (1s instead of 3s). Default is true.
+    /// </summary>
+    public static readonly CVarDef<bool> FastHubFallback = CVarDef.Create("FastHubFallback", true);
+
+    /// <summary>
+    /// Network connection timeout in seconds per attempt. Default is 6 seconds.
+    /// </summary>
+    public static readonly CVarDef<int> NetworkTimeout = CVarDef.Create("NetworkTimeout", 6);
 }
 
 /// <summary>

@@ -6,6 +6,8 @@ using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
+using Splat;
+using SS14.Launcher.Models.Data;
 
 namespace SS14.Launcher.Utility;
 
@@ -74,6 +76,15 @@ public sealed class UrlFallbackSet
         }, cancel);
     }
 
+    private static TimeSpan GetAttemptDelay()
+    {
+        var cfg = Splat.Locator.Current.GetService<DataManager>();
+        if (cfg != null && cfg.GetCVar(CVars.FastHubFallback))
+            return TimeSpan.FromSeconds(1);
+
+        return TimeSpan.FromSeconds(3);
+    }
+
     public async Task<HttpResponseMessage> SendAsync(
         HttpClient httpClient,
         Func<string, HttpRequestMessage> builder,
@@ -82,7 +93,7 @@ public sealed class UrlFallbackSet
         var (response, index) = await HappyEyeballsHttp.ParallelTask(
             Urls.Length,
             (i, token) => AttemptConnection(httpClient, builder(Urls[i]), token),
-            AttemptDelay,
+            GetAttemptDelay(),
             cancel).ConfigureAwait(false);
 
         Stats.AddSuccessfulRequest(index);
@@ -99,7 +110,11 @@ public sealed class UrlFallbackSet
     {
         message.ApplyCompressionHeaders();
 
-        using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(6));
+        var cfg = Splat.Locator.Current.GetService<DataManager>();
+        var timeoutSeconds = cfg != null ? cfg.GetCVar(CVars.NetworkTimeout) : 6;
+        if (timeoutSeconds <= 0) timeoutSeconds = 6;
+
+        using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds));
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancel, timeoutCts.Token);
 
         var response = await httpClient.SendAsync(

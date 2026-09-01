@@ -163,19 +163,28 @@ public static class HappyEyeballsHttp
 
     private static async Task<IPAddress[]> GetIpsForHost(DnsEndPoint endPoint, CancellationToken cancel)
     {
+        var cfg = Locator.Current.GetService<DataManager>();
+        var forceIpv4 = cfg != null && cfg.GetCVar(CVars.ForceIPv4);
+
         if (IPAddress.TryParse(endPoint.Host, out var ip))
             return [ip];
 
-        var cfg = Locator.Current.GetService<DataManager>();
         if (cfg != null && cfg.GetCVar(CVars.DnsOverHttps))
         {
             var dohIps = await ResolveDohAsync(endPoint.Host, cancel).ConfigureAwait(false);
             if (dohIps is { Length: > 0 })
-                return dohIps;
+                return forceIpv4 ? FilterIpv4(dohIps) : dohIps;
         }
 
         var entry = await Dns.GetHostEntryAsync(endPoint.Host, cancel).ConfigureAwait(false);
-        return entry.AddressList;
+        var addresses = entry.AddressList;
+        return forceIpv4 ? FilterIpv4(addresses) : addresses;
+    }
+
+    private static IPAddress[] FilterIpv4(IPAddress[] ips)
+    {
+        var v4 = ips.Where(a => a.AddressFamily == AddressFamily.InterNetwork).ToArray();
+        return v4.Length > 0 ? v4 : ips;
     }
 
     private static async Task<IPAddress[]?> ResolveDohAsync(string host, CancellationToken cancel)

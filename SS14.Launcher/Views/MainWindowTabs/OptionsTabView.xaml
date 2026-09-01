@@ -68,6 +68,16 @@
                        Text="{loc:Loc tab-options-doh-desc}"
                        Margin="8, 0, 8, 8" />
 
+            <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding ForceIPv4}" Content="{loc:Loc tab-options-force-ipv4}" />
+            <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
+                       Text="{loc:Loc tab-options-force-ipv4-desc}"
+                       Margin="8, 0, 8, 8" />
+
+            <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding FastHubFallback}" Content="{loc:Loc tab-options-fast-fallback}" />
+            <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
+                       Text="{loc:Loc tab-options-fast-fallback-desc}"
+                       Margin="8, 0, 8, 8" />
+
             <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding EnableHttpCompression}" Content="{loc:Loc tab-options-http-compression}" />
             <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
                        Text="{loc:Loc tab-options-http-compression-desc}"
@@ -151,11 +161,6 @@
                        Text="{loc:Loc tab-options-fast-launch-desc}"
                        Margin="8, 0, 8, 8" />
 
-            <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding DiscordRpcEnabled}" Content="{loc:Loc tab-options-discord-rpc}" />
-            <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
-                       Text="{loc:Loc tab-options-discord-rpc-desc}"
-                       Margin="8, 0, 8, 8" />
-
             <CheckBox VerticalAlignment="Center" IsVisible="{Binding !DisableIncompatibleMacOS}"
                       Margin="4" IsChecked="{Binding CompatMode}" Content="{loc:Loc tab-options-compatibility-mode}" />
             <CheckBox VerticalAlignment="Center" IsVisible="{Binding DisableIncompatibleMacOS}"
@@ -181,6 +186,11 @@
                       Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
               <Button Click="OpenHubSettings" Content="{loc:Loc tab-options-hub-settings}" Margin="0, 0, 6, 6" />
             </WrapPanel>
+
+            <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding DiscordRpcEnabled}" Content="{loc:Loc tab-options-discord-rpc}" />
+            <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
+                       Text="{loc:Loc tab-options-discord-rpc-desc}"
+                       Margin="8, 0, 8, 8" />
 
             <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding LogLauncherVerbose}" Content="{loc:Loc tab-options-verbose-launcher-logging}" />
             <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"

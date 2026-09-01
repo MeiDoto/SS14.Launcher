@@ -421,6 +421,10 @@ tab-options-section-system = System & Hubs
 
 tab-options-doh = DNS-over-HTTPS (DoH Resolver)
 tab-options-doh-desc = Uses secure encrypted DNS (Cloudflare / Google 1.1.1.1) for reliable hub connectivity bypassing ISP outages.
+tab-options-force-ipv4 = Force IPv4 Only
+tab-options-force-ipv4-desc = Disables IPv6 routing to bypass broken or blocked IPv6 routes and Cloudflare connection drops.
+tab-options-fast-fallback = Fast Hub Failover
+tab-options-fast-fallback-desc = Aggressively switches to fallback mirrors in 1 second instead of waiting 3 seconds when primary hub fails.
 tab-options-proxy-settings = Proxy Settings
 tab-options-proxy-settings-desc = Configure SOCKS5 or HTTP/HTTPS proxy to route game and launcher traffic.
 tab-options-proxy-button = Proxy Settings (SOCKS5 / HTTP)
