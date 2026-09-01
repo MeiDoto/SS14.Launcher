@@ -234,7 +234,7 @@ public static class HappyEyeballsHttp
         return null;
     }
 
-    private static IPAddress[] SortInterleaved(IPAddress[] addresses)
+    internal static IPAddress[] SortInterleaved(IPAddress[] addresses)
     {
         // Interleave returned addresses so that they are IPv6 -> IPv4 -> IPv6 -> IPv4.
         // Assuming we have multiple addresses of the same type that is.

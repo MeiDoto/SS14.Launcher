@@ -838,43 +838,8 @@ public partial class Connector : ObservableObject
 
         Log.Debug("Launch command: {LaunchCommand}", commandBuilder.ToString());
 
-        var process = Process.Start(startInfo);
-
-        if (process != null)
-        {
-            if (isReplay || _cfg.GetCVar(CVars.HighProcessPriority))
-            {
-                try
-                {
-                    process.PriorityClass = isReplay ? ProcessPriorityClass.High : ProcessPriorityClass.AboveNormal;
-                    Log.Debug("Elevated game process priority to {Priority}.", process.PriorityClass);
-                }
-                catch (Exception e)
-                {
-                    Log.Debug("Could not elevate process priority: {e}", e);
-                }
-            }
-
-            Log.Debug("Setting up manual-pipe logging for new client with PID {pid}.", process.Id);
-
-            var fileStdout = new FileStream(
-                LauncherPaths.PathClientStdoutLog,
-                FileMode.Create,
-                FileAccess.Write,
-                FileShare.Delete | FileShare.ReadWrite,
-                0,
-                FileOptions.Asynchronous);
-
-            var fileStderr = new FileStream(
-                LauncherPaths.PathClientStderrLog,
-                FileMode.Create,
-                FileAccess.Write,
-                FileShare.Delete | FileShare.ReadWrite,
-                0,
-                FileOptions.Asynchronous);
-
-            PipeOutput(process, fileStdout, fileStderr);
-        }
+        var highPriority = isReplay || _cfg.GetCVar(CVars.HighProcessPriority);
+        var process = GameProcessRunner.StartGameProcess(startInfo, highPriority);
 
         if (process != null && _cfg.GetCVar(CVars.DiscordRpcEnabled))
         {
@@ -908,57 +873,6 @@ public partial class Connector : ObservableObject
     private static void ConfigureMultiWindow(ContentLaunchInfo launchInfo, ProcessStartInfo startInfo)
     {
         // Implemented in private repo for Steam.
-    }
-
-    private static async void PipeOutput(Process process, Stream targetStdout, Stream targetStderr)
-    {
-        int pid = 0;
-        try { pid = process.Id; } catch { /* ignore */ }
-
-        async Task DoPipe(StreamReader reader, Stream writer)
-        {
-            var buf = System.Buffers.ArrayPool<byte>.Shared.Rent(8192);
-            try
-            {
-                var readStream = reader.BaseStream;
-                while (true)
-                {
-                    var read = await readStream.ReadAsync(buf.AsMemory(0, buf.Length));
-                    if (read == 0)
-                    {
-                        Log.Debug("EOF, ending pipe logging for {pid}.", pid);
-                        return;
-                    }
-
-                    await writer.WriteAsync(buf.AsMemory(0, read));
-                    await writer.FlushAsync();
-                }
-            }
-            catch (Exception ex) when (ex is IOException or ObjectDisposedException or InvalidOperationException)
-            {
-                Log.Debug("Pipe ended with {Exception} for {pid}.", ex.GetType().Name, pid);
-            }
-            finally
-            {
-                System.Buffers.ArrayPool<byte>.Shared.Return(buf);
-            }
-        }
-
-        try
-        {
-            await Task.WhenAll(
-                DoPipe(process.StandardOutput, targetStdout),
-                DoPipe(process.StandardError, targetStderr));
-        }
-        catch (Exception ex)
-        {
-            Log.Debug(ex, "Exception in output pipe for {pid}", pid);
-        }
-        finally
-        {
-            try { await targetStdout.DisposeAsync(); } catch { /* ignore */ }
-            try { await targetStderr.DisposeAsync(); } catch { /* ignore */ }
-        }
     }
 
     private static void PipeLogOutput(Process process)
