@@ -271,6 +271,15 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
         };
 
         ReloadCustomVisuals();
+
+        if (_cfg.GetCVar(CVars.DiscordRpcEnabled))
+        {
+            Task.Run(async () =>
+            {
+                await DiscordRpcClient.Instance.InitializeAsync();
+                await DiscordRpcClient.Instance.UpdatePresenceAsync("В лаунчере", "Выбирает сервер");
+            });
+        }
     }
 
     public MainWindow? Control { get; set; }
@@ -382,15 +391,29 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
 
     public async void OnWindowInitialized()
     {
-        BusyTask = _loc.GetString("main-window-busy-checking-update");
-        await CheckLauncherUpdate();
-        BusyTask = _loc.GetString("main-window-busy-checking-login-status");
-        await CheckAccounts();
-        BusyTask = null;
-
+        // Immediately restore selected account from local cache so UI is responsive and logged in instantly!
         if (_cfg.SelectedLoginId is { } g && _loginMgr.Logins.TryLookup(g, out var login))
         {
             TrySwitchToAccount(login);
+        }
+
+        try
+        {
+            using var timeoutCts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(3));
+
+            BusyTask = _loc.GetString("main-window-busy-checking-update");
+            await Task.WhenAny(CheckLauncherUpdate(), Task.Delay(1500, timeoutCts.Token));
+
+            BusyTask = _loc.GetString("main-window-busy-checking-login-status");
+            await Task.WhenAny(CheckAccounts(), Task.Delay(1500, timeoutCts.Token));
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Initial startup checks encountered a timeout or error, continuing into launcher.");
+        }
+        finally
+        {
+            BusyTask = null;
         }
 
         _ = Task.Run(async () =>

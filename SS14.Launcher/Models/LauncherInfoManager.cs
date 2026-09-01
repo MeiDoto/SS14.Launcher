@@ -40,7 +40,8 @@ public sealed class LauncherInfoManager(HttpClient httpClient)
         try
         {
             Log.Debug("Loading launcher info... {Url}", ConfigConstants.UrlLauncherInfo);
-            info = await ConfigConstants.UrlLauncherInfo.GetFromJsonAsync<LauncherInfoModel>(httpClient);
+            using var timeoutCts = new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(5));
+            info = await ConfigConstants.UrlLauncherInfo.GetFromJsonAsync<LauncherInfoModel>(httpClient, timeoutCts.Token);
             if (info == null)
             {
                 Log.Warning("Launcher info response was null.");

@@ -326,6 +326,16 @@ public static class CVars
     /// Serialized JSON list of server addresses being monitored for available player slots.
     /// </summary>
     public static readonly CVarDef<string> WatchedSlotServers = CVarDef.Create("WatchedSlotServers", "[]");
+
+    /// <summary>
+    /// Enable high performance HTTP response compression (Zstd, Brotli, GZip) for hub requests and game assets. Default is true.
+    /// </summary>
+    public static readonly CVarDef<bool> EnableHttpCompression = CVarDef.Create("EnableHttpCompression", true);
+
+    /// <summary>
+    /// Enable Discord Rich Presence (RPC) activity status. Default is true.
+    /// </summary>
+    public static readonly CVarDef<bool> DiscordRpcEnabled = CVarDef.Create("DiscordRpcEnabled", true);
 }
 
 /// <summary>

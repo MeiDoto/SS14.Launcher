@@ -68,6 +68,11 @@
                        Text="{loc:Loc tab-options-doh-desc}"
                        Margin="8, 0, 8, 8" />
 
+            <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding EnableHttpCompression}" Content="{loc:Loc tab-options-http-compression}" />
+            <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
+                       Text="{loc:Loc tab-options-http-compression-desc}"
+                       Margin="8, 0, 8, 8" />
+
             <Button Click="OpenProxySettings" Content="{loc:Loc tab-options-proxy-button}" Margin="4" HorizontalAlignment="Left"
                     Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
             <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
@@ -144,6 +149,11 @@
             <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding FastLaunchPreload}" Content="{loc:Loc tab-options-fast-launch}" />
             <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
                        Text="{loc:Loc tab-options-fast-launch-desc}"
+                       Margin="8, 0, 8, 8" />
+
+            <CheckBox VerticalAlignment="Center" Margin="4" IsChecked="{Binding DiscordRpcEnabled}" Content="{loc:Loc tab-options-discord-rpc}" />
+            <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
+                       Text="{loc:Loc tab-options-discord-rpc-desc}"
                        Margin="8, 0, 8, 8" />
 
             <CheckBox VerticalAlignment="Center" IsVisible="{Binding !DisableIncompatibleMacOS}"

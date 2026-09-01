@@ -190,9 +190,25 @@ public sealed class LoginManager : ObservableObject
         }
         else if (data.Status == AccountLoginStatus.Unsure)
         {
-            var valid = await _authApi.CheckTokenAsync(data.LoginInfo.Token.Token);
-            Log.Debug("Token for {login} still valid? {valid}", data.LoginInfo, valid);
-            data.SetStatus(valid ? AccountLoginStatus.Available : AccountLoginStatus.Expired);
+            try
+            {
+                var valid = await _authApi.CheckTokenAsync(data.LoginInfo.Token.Token);
+                Log.Debug("Token for {login} still valid? {valid}", data.LoginInfo, valid);
+                data.SetStatus(valid ? AccountLoginStatus.Available : AccountLoginStatus.Expired);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Could not verify token with auth server for {login}. Checking local time expiry.", data.LoginInfo);
+                // If local token has not expired by time, assume Available for offline/degraded network mode
+                if (!data.LoginInfo.Token.IsTimeExpired())
+                {
+                    data.SetStatus(AccountLoginStatus.Available);
+                }
+                else
+                {
+                    data.SetStatus(AccountLoginStatus.Expired);
+                }
+            }
         }
     }
 

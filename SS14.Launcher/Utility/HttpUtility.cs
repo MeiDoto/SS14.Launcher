@@ -15,33 +15,66 @@ namespace SS14.Launcher.Utility;
 /// </summary>
 public static class HttpUtility
 {
-    private static readonly StringWithQualityHeaderValue ZStdHeader = new StringWithQualityHeaderValue("zstd", 1);
+    private static readonly StringWithQualityHeaderValue ZStdHeader = new("zstd", 1.0);
+    private static readonly StringWithQualityHeaderValue BrHeader = new("br", 0.9);
+    private static readonly StringWithQualityHeaderValue GzipHeader = new("gzip", 0.8);
+    private static readonly StringWithQualityHeaderValue DeflateHeader = new("deflate", 0.7);
+
+    /// <summary>
+    /// Injects standard compression headers (zstd, br, gzip, deflate) into the request.
+    /// </summary>
+    public static void ApplyCompressionHeaders(this HttpRequestMessage message)
+    {
+        message.Headers.AcceptEncoding.Add(ZStdHeader);
+        message.Headers.AcceptEncoding.Add(BrHeader);
+        message.Headers.AcceptEncoding.Add(GzipHeader);
+        message.Headers.AcceptEncoding.Add(DeflateHeader);
+    }
+
+    /// <summary>
+    /// Wraps the response content in an automatic decompressor if encoded with zstd, br, gzip, or deflate.
+    /// </summary>
+    public static HttpResponseMessage WrapDecompressedContent(this HttpResponseMessage response)
+    {
+        var encoding = response.Content.Headers.ContentEncoding.LastOrDefault()?.ToLowerInvariant();
+        response.Content = encoding switch
+        {
+            "zstd" => new ZStdHttpContent(response.Content),
+            "br" => new BrotliHttpContent(response.Content),
+            "gzip" => new GZipHttpContent(response.Content),
+            "deflate" => new DeflateHttpContent(response.Content),
+            _ => response.Content
+        };
+
+        return response;
+    }
+
+    /// <summary>
+    /// Sends an HTTP request with ZStd, Brotli, GZip and Deflate compression accepted,
+    /// automatically decompressing the response stream.
+    /// </summary>
+    public static async Task<HttpResponseMessage> SendCompressedAsync(
+        this HttpClient client,
+        HttpRequestMessage message,
+        HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead,
+        CancellationToken cancel = default)
+    {
+        message.ApplyCompressionHeaders();
+        var response = await client.SendAsync(message, completionOption, cancel);
+        return response.WrapDecompressedContent();
+    }
 
     /// <summary>
     /// Sends an HTTP request with ZStandard (<c>zstd</c>) compression accepted,
     /// automatically wrapping the response stream in a transparent decompressor if encoded with zstd.
     /// </summary>
-    /// <param name="client">The HTTP client instance.</param>
-    /// <param name="message">The HTTP request message.</param>
-    /// <param name="completionOption">HTTP response completion option.</param>
-    /// <param name="cancel">Cancellation token.</param>
-    /// <returns>HTTP response message with decompressed content if applicable.</returns>
     public static async Task<HttpResponseMessage> SendZStdAsync(
         this HttpClient client,
         HttpRequestMessage message,
         HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead,
         CancellationToken cancel = default)
     {
-        message.Headers.AcceptEncoding.Add(ZStdHeader);
-
-        var response = await client.SendAsync(message, completionOption, cancel);
-
-        if (response.Content.Headers.ContentEncoding.LastOrDefault() == "zstd")
-        {
-            response.Content = new ZStdHttpContent(response.Content);
-        }
-
-        return response;
+        return await client.SendCompressedAsync(message, completionOption, cancel);
     }
 
     // Taken from https://github.com/dotnet/runtime/blob/f89fbb96cabe95db5869e3d44c6b48c1c0f8fc1a/src/libraries/System.Net.Http/src/System/Net/Http/SocketsHttpHandler/DecompressionHandler.cs
@@ -159,6 +192,42 @@ public static class HttpUtility
         protected override Stream GetDecompressedStream(Stream originalStream)
         {
             return new ZStdDecompressStream(originalStream);
+        }
+    }
+
+    public sealed class BrotliHttpContent : DecompressedContent
+    {
+        public BrotliHttpContent(HttpContent originalContent) : base(originalContent)
+        {
+        }
+
+        protected override Stream GetDecompressedStream(Stream originalStream)
+        {
+            return new System.IO.Compression.BrotliStream(originalStream, System.IO.Compression.CompressionMode.Decompress);
+        }
+    }
+
+    public sealed class GZipHttpContent : DecompressedContent
+    {
+        public GZipHttpContent(HttpContent originalContent) : base(originalContent)
+        {
+        }
+
+        protected override Stream GetDecompressedStream(Stream originalStream)
+        {
+            return new System.IO.Compression.GZipStream(originalStream, System.IO.Compression.CompressionMode.Decompress);
+        }
+    }
+
+    public sealed class DeflateHttpContent : DecompressedContent
+    {
+        public DeflateHttpContent(HttpContent originalContent) : base(originalContent)
+        {
+        }
+
+        protected override Stream GetDecompressedStream(Stream originalStream)
+        {
+            return new System.IO.Compression.DeflateStream(originalStream, System.IO.Compression.CompressionMode.Decompress);
         }
     }
 }

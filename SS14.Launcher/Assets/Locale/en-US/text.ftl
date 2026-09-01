@@ -440,6 +440,11 @@ tab-options-log-viewer = Log & Crash Inspector
 tab-options-local-builds = Local Builds Manager
 tab-options-smart-clean = Smart Cache Cleanup
 
+tab-options-discord-rpc = Discord Rich Presence (Activity Status)
+tab-options-discord-rpc-desc = Displays your current launcher and server activity in your Discord profile.
+tab-options-http-compression = High-Speed Network Compression (Zstd / Brotli)
+tab-options-http-compression-desc = Enables Zstandard and Brotli HTTP compression for hub queries and manifest downloads, reducing bandwidth by up to 80%.
+
 tab-options-show-news-tab = Show News Tab
 tab-options-show-news-tab-desc = Displays official news feed and updates for Space Station 14.
 tab-options-show-replays-tab = Show Replays Tab

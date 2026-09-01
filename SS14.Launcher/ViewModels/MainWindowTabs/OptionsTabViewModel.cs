@@ -115,6 +115,34 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         }
     }
 
+    public bool DiscordRpcEnabled
+    {
+        get => Cfg.GetCVar(CVars.DiscordRpcEnabled);
+        set
+        {
+            Cfg.SetCVar(CVars.DiscordRpcEnabled, value);
+            Cfg.CommitConfig();
+            if (value)
+            {
+                _ = DiscordRpcClient.Instance.UpdatePresenceAsync("В лаунчере", "Выбирает сервер");
+            }
+            else
+            {
+                _ = DiscordRpcClient.Instance.ClearPresenceAsync();
+            }
+        }
+    }
+
+    public bool EnableHttpCompression
+    {
+        get => Cfg.GetCVar(CVars.EnableHttpCompression);
+        set
+        {
+            Cfg.SetCVar(CVars.EnableHttpCompression, value);
+            Cfg.CommitConfig();
+        }
+    }
+
     public bool HighProcessPriority
     {
         get => Cfg.GetCVar(CVars.HighProcessPriority);

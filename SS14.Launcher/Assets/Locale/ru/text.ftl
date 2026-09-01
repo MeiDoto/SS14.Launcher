@@ -641,6 +641,10 @@ tab-options-dedicated-gpu = Запуск на дискретной видеок�
 tab-options-dedicated-gpu-desc = Принудительно запускает игру на мощной видеокарте (NVIDIA PRIME / AMD DRI) на ноутбуках и гибридных ПК.
 tab-options-max-jit = Аппаратная SIMD-векторизация и Deep JIT
 tab-options-max-jit-desc = Активирует расширенные инструкции процессора (AVX2/FMA), оптимизацию циклов и быструю сборку мусора.
+tab-options-discord-rpc = Отображать статус в Discord (Rich Presence)
+tab-options-discord-rpc-desc = Показывает ваш текущий статус и активность в профиле Discord (в лаунчере, на каком сервере играете).
+tab-options-http-compression = Высокоскоростное сжатие сети (Zstd / Brotli)
+tab-options-http-compression-desc = Использовать алгоритмы сжатия Zstd и Brotli для запросов к хабам и загрузки списков серверов, экономя до 80% сетевого трафика.
 tab-options-storage-usage = 💾 Диск: Всего { $total } (Контент: { $content }, Движки: { $engines }, Реплеи: { $replays }, Логи: { $logs })
 tab-options-notify-test-msg = Оповещения на рабочем столе работают исправно!
 

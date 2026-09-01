@@ -876,6 +876,26 @@ public partial class Connector : ObservableObject
             PipeOutput(process, fileStdout, fileStderr);
         }
 
+        if (_cfg.GetCVar(CVars.DiscordRpcEnabled))
+        {
+            _ = DiscordRpcClient.Instance.UpdatePresenceAsync("В игре", isReplay ? "Просмотр реплея" : "Играет на сервере");
+            try
+            {
+                process.EnableRaisingEvents = true;
+                process.Exited += (_, _) =>
+                {
+                    if (_cfg.GetCVar(CVars.DiscordRpcEnabled))
+                    {
+                        _ = DiscordRpcClient.Instance.UpdatePresenceAsync("В лаунчере", "Выбирает сервер");
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                Log.Verbose("Failed to bind Discord RPC exit listener: {Message}", ex.Message);
+            }
+        }
+
         return process;
 
         void EnvVar(string envVar, string? value)

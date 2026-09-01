@@ -97,16 +97,15 @@ public sealed class UrlFallbackSet
         HttpRequestMessage message,
         CancellationToken cancel)
     {
-        // if (new Random().Next(2) == 0)
-        // {
-        //     Log.Error("Dropped the URL: {Message}", message);
-        //     throw new InvalidOperationException("OOPS");
-        // }
+        message.ApplyCompressionHeaders();
+
+        using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(6));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancel, timeoutCts.Token);
 
         var response = await httpClient.SendAsync(
             message,
             HttpCompletionOption.ResponseHeadersRead,
-            cancel
+            linkedCts.Token
         ).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
@@ -115,7 +114,7 @@ public sealed class UrlFallbackSet
             throw new HttpRequestException($"Server returned HTTP {(int)response.StatusCode} {response.StatusCode}", null, response.StatusCode);
         }
 
-        return response;
+        return response.WrapDecompressedContent();
     }
 
     public string GetMostSuccessfulUrl()
