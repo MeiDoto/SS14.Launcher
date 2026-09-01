@@ -84,6 +84,12 @@ public sealed partial class EngineManagerDynamic : IEngineManager
             return new EngineInstallationResult(engineVersion, false);
         }
 #endif
+        // Fast-path: If the engine is already installed locally in SQLite/disk, don't fail even if CDN is unreachable
+        if (_cfg.EngineInstallations.Lookup(engineVersion).HasValue)
+        {
+            Log.Debug("Engine version {version} is already installed locally, fast-path bypass.", engineVersion);
+            return new EngineInstallationResult(engineVersion, false);
+        }
 
         var foundVersion = await GetVersionInfo(engineVersion, cancel: cancel);
         if (foundVersion == null)

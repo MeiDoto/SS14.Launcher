@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http.Json;
@@ -59,7 +59,26 @@ public sealed partial class EngineManagerDynamic
                 return foundVersionInfo;
         }
 
-        await UpdateBuildManifest(cancel);
+        try
+        {
+            await UpdateBuildManifest(cancel);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to update Robust build manifest from CDN. Checking local fallback...");
+            if (_cachedRobustVersionInfo != null && FindVersionInfoInCached(version, followRedirects) is { } fallbackFound)
+            {
+                return fallbackFound;
+            }
+
+            if (_cfg.EngineInstallations.Lookup(version).HasValue)
+            {
+                Log.Information("Engine version {version} is already installed locally, bypassing manifest error.", version);
+                return new FoundVersionInfo(version, new VersionInfo(false, null, new()));
+            }
+
+            throw;
+        }
 
         return FindVersionInfoInCached(version, followRedirects);
     }
