@@ -61,7 +61,7 @@ public sealed class AnimatedBackgroundManager : IDisposable
                 IsAnimated = false;
                 FrameUpdated?.Invoke(CurrentFrame);
             }
-            catch
+            catch (Exception bgEx)
             {
                 CurrentFrame = null;
                 IsAnimated = false;
@@ -291,7 +291,7 @@ public sealed class AnimatedBackgroundManager : IDisposable
                     _ffmpegProcess?.Dispose();
                     _ffmpegProcess = null;
                 }
-                catch
+                catch (Exception ex)
                 {
                 }
             }
@@ -317,7 +317,7 @@ public sealed class AnimatedBackgroundManager : IDisposable
             _videoFrameA = null;
             _videoFrameB = null;
         }
-        catch
+        catch (Exception ex)
         {
         }
     }

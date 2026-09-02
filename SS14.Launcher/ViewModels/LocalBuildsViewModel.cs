@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Serilog;
 using System.Text.Json;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
@@ -249,7 +250,10 @@ public class LocalBuildItemViewModel : ViewModelBase
                 });
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Failed to open folder for local build {Path}", Entry.Path);
+        }
     }
 
     public void Delete()

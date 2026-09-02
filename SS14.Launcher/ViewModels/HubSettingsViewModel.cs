@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
 using Splat;
 using SS14.Launcher.Models.Data;
 using SS14.Launcher.Utility;
@@ -51,7 +52,7 @@ public class HubSettingsViewModel : ViewModelBase
         HubList.Clear();
     }
 
-    public async void TestAllHubsAsync()
+    public async Task TestAllHubsAsync()
     {
         var tasks = HubList.Select(h => h.TestLatencyAsync()).ToList();
         await System.Threading.Tasks.Task.WhenAll(tasks);
@@ -128,7 +129,7 @@ public class HubViewModel : ViewModelBase
             sw.Stop();
             LatencyText = $"🟢 {sw.ElapsedMilliseconds} ms";
         }
-        catch
+        catch (Exception ex)
         {
             LatencyText = "🔴 Timeout";
         }

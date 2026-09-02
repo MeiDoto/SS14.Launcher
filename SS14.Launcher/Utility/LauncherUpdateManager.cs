@@ -205,8 +205,9 @@ public sealed class LauncherUpdateManager
 
             return string.Equals(skipped, tagName, StringComparison.OrdinalIgnoreCase);
         }
-        catch
+        catch (Exception ex)
         {
+            Log.Debug(ex, "Update check failed gracefully");
             return false;
         }
     }
@@ -222,7 +223,7 @@ public sealed class LauncherUpdateManager
             if (cfg == null) return;
 
             cfg.SetCVar(CVars.SkippedUpdateVersion, tagName);
-            cfg.CommitConfig();
+            _ = cfg.CommitConfig();
         }
         catch (Exception ex)
         {
@@ -241,9 +242,12 @@ public sealed class LauncherUpdateManager
             if (cfg == null) return;
 
             cfg.SetCVar(CVars.SkippedUpdateVersion, "");
-            cfg.CommitConfig();
+            _ = cfg.CommitConfig();
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Failed to clear SkippedUpdateVersion in config.");
+        }
     }
 
     /// <summary>
@@ -300,7 +304,14 @@ public sealed class LauncherUpdateManager
             {
                 if (!string.Equals(fileHash, expectedSha, StringComparison.OrdinalIgnoreCase))
                 {
-                    try { File.Delete(tempFile); } catch { }
+                    try
+                    {
+                        File.Delete(tempFile);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Debug(ex, "Failed to delete corrupted temp file {Path}", tempFile);
+                    }
                     Log.Error("SHA256 checksum mismatch! Expected: {Expected}, Computed: {Actual}. Aborting update.", expectedSha, fileHash);
                     throw new InvalidDataException($"SHA256 verification failed! Downloaded archive appears corrupted or modified. Expected {expectedSha}, but got {fileHash}.");
                 }
@@ -337,10 +348,25 @@ public sealed class LauncherUpdateManager
             LaunchSelfUpdaterScript(extractDir, installDir, tempFile, backupDir);
             Environment.Exit(0);
         }
-        catch
+        catch (Exception ex)
         {
-            try { if (File.Exists(tempFile)) File.Delete(tempFile); } catch { }
-            try { if (Directory.Exists(extractDir)) Directory.Delete(extractDir, true); } catch { }
+            try
+            {
+                if (File.Exists(tempFile)) File.Delete(tempFile);
+            }
+            catch (Exception innerEx)
+            {
+                Log.Debug(ex, "Failed to delete temp file on error {Path}", tempFile);
+            }
+
+            try
+            {
+                if (Directory.Exists(extractDir)) Directory.Delete(extractDir, true);
+            }
+            catch (Exception fallbackEx)
+            {
+                Log.Debug(ex, "Failed to delete extract directory on error {Path}", extractDir);
+            }
             throw;
         }
     }
@@ -585,7 +611,7 @@ rm -f ""$0""
             {
                 File.SetUnixFileMode(scriptPath, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
             }
-            catch
+            catch (Exception ex)
             {
                 // fallback
             }

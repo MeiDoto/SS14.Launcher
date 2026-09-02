@@ -58,10 +58,10 @@ public sealed class ServerStatusCache : IServerSource
         if (reg.DidInitialStatusUpdate)
             return;
 
-        UpdateStatusFor(reg);
+        _ = UpdateStatusFor(reg);
     }
 
-    private async void UpdateStatusFor(CacheReg reg)
+    private async Task UpdateStatusFor(CacheReg reg)
     {
         reg.DidInitialStatusUpdate = true;
         await reg.Semaphore.WaitAsync();
@@ -79,6 +79,8 @@ public sealed class ServerStatusCache : IServerSource
 
     public static async Task UpdateStatusFor(ServerStatusData data, HttpClient http, CancellationToken cancel)
     {
+        data.Status = ServerStatusCode.FetchingStatus;
+
         try
         {
             if (!UriHelper.TryParseSs14Uri(data.Address, out var parsedAddress))
@@ -89,8 +91,6 @@ public sealed class ServerStatusCache : IServerSource
             }
 
             var statusAddr = UriHelper.GetServerStatusAddress(parsedAddress);
-            if (data.Status != ServerStatusCode.Online)
-                data.Status = ServerStatusCode.FetchingStatus;
 
             ServerApi.ServerStatus status;
             try
@@ -163,14 +163,14 @@ public sealed class ServerStatusCache : IServerSource
             data.PanicBunkerMinAccountAge = status.PanicBunkerMinAccountAge;
             data.PanicBunkerMinOverallHours = status.PanicBunkerMinOverallHours;
         }
-        catch
+        catch (Exception ex)
         {
             // Fallback to basic online status if complex metadata fails
             data.Status = ServerStatusCode.Online;
         }
     }
 
-    public static async void UpdateInfoForCore(ServerStatusData data, Func<CancellationToken, Task<ServerInfo?>> fetch)
+    public static async Task UpdateInfoForCore(ServerStatusData data, Func<CancellationToken, Task<ServerInfo?>> fetch)
     {
         if (data.StatusInfo == ServerStatusInfoCode.Fetching)
             return;
@@ -233,7 +233,7 @@ public sealed class ServerStatusCache : IServerSource
             datum.Data.Links = null;
             datum.Data.Description = null;
 
-            UpdateStatusFor(datum);
+            _ = UpdateStatusFor(datum);
         }
     }
 
@@ -275,7 +275,7 @@ public sealed class ServerStatusCache : IServerSource
                     if (ips.Length > 0)
                         _dnsCache[host] = (ips, nowTicks + 300000);
                 }
-                catch
+                catch (Exception ex)
                 {
                     return;
                 }
@@ -304,14 +304,14 @@ public sealed class ServerStatusCache : IServerSource
             var (smoothedMs, _) = tracker.Update((float)current.TotalMilliseconds);
             data.Ping = TimeSpan.FromMilliseconds(smoothedMs);
         }
-        catch
+        catch (Exception ex)
         {
         }
     }
 
     void IServerSource.UpdateInfoFor(ServerStatusData statusData)
     {
-        UpdateInfoForCore(statusData, async cancel =>
+        _ = UpdateInfoForCore(statusData, async cancel =>
         {
             var uriBuilder = new UriBuilder(UriHelper.GetServerInfoAddress(statusData.Address));
             uriBuilder.Query = "?can_skip_build=1";

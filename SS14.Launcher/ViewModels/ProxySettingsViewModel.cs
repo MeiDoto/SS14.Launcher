@@ -121,7 +121,7 @@ public sealed class ProxySettingsViewModel : ViewModelBase
         _cfg.SetCVar(CVars.ProxyPassword, ProxyPassword);
         _cfg.SetCVar(CVars.ProxyApplyToGameClient, ProxyApplyToGameClient);
         _cfg.SetCVar(CVars.ProxyApplyToLauncher, ProxyApplyToLauncher);
-        _cfg.CommitConfig();
+        _ = _cfg.CommitConfig();
     }
 
     public async Task TestConnectionAsync()

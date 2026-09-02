@@ -83,7 +83,7 @@ internal static class Program
             {
                 SetCurrentProcessExplicitAppUserModelID("SpaceWizards.SpaceStation14.Launcher");
             }
-            catch
+            catch (Exception ex)
             {
                 // Ignore if Shell32 call fails on older OS
             }
@@ -327,7 +327,7 @@ internal static class Program
 
         engineManager.ClearAllEngines();
         cfg.SetCVar(CVars.CurrentArchitecture, (int) curArchitecture);
-        cfg.CommitConfig();
+        _ = cfg.CommitConfig();
     }
 
     [DllImport("shell32.dll", SetLastError = true, CharSet = CharSet.Unicode)]

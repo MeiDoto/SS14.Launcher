@@ -1,197 +1,94 @@
-# Space Station 14 Launcher (Custom Edition)
+# 🚀 SS14.Launcher
 
-[![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
-[![Avalonia UI](https://img.shields.io/badge/UI-Avalonia_11-7F52FF)](https://avaloniaui.net/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.txt)
-[![Latest Release](https://img.shields.io/github/v/release/MeiDoto/SS14.Launcher?color=brightgreen)](https://github.com/MeiDoto/SS14.Launcher/releases/latest)
+[![Build & Test](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/build-test.yml/badge.svg)](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/build-test.yml)
+[![Publish Release](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/publish-release.yml/badge.svg)](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/publish-release.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Кастомная сборка лаунчера Space Station 14 на платформе **.NET 10** и **Avalonia UI** с расширенным функционалом, продвинутой кастомизацией интерфейса, оптимизацией сетевого стека и встроенными инструментами разработчика.
-
-A custom fork of the Space Station 14 launcher powered by **.NET 10** and **Avalonia UI**, featuring deep UI theming, smart search, network optimizations, and developer utilities.
+**SS14.Launcher** is the official modern cross-platform game launcher for [Space Station 14](https://spacestation14.com/), engineered with **Avalonia UI** and **.NET 10.0**.
 
 ---
 
-## Навигация / Navigation
+## ✨ Features
 
-- [Русский](#-русский)
-  - [Быстрый старт и установка](#быстрый-старт-и-установка)
-  - [Основные возможности](#основные-возможности)
-  - [Песочница скриптов оформления](#песочница-скриптов-оформления)
-  - [Сборка из исходников](#сборка-из-исходников)
-- [English](#-english)
-  - [Installation & Quick Start](#installation--quick-start)
-  - [Key Features](#key-features)
-  - [Theming Script Sandbox](#theming-script-sandbox)
-  - [Building from Source](#building-from-source)
+- 🎮 **Seamless Game Connection**: Direct connect via `ss14://` / `ss14s://` links, server browser with filtering, favorite lists, and ping telemetry.
+- ⚡ **High Performance Core**:
+  - Hardware-accelerated SIMD text searching with `Vector256` / `Vector128`.
+  - 1D Kalman Filter with Chi-squared gating for jitter estimation and latency spike suppression.
+  - Hybrid LRU + TTL memory caching for instantaneous hub list navigation.
+  - Zero-allocation `ValueResult<T>` operation pipelines and `ArrayPool<byte>` streaming.
+- 🎨 **Visual Customizer**: Custom themes, animated backgrounds, UI scaling, and live accent color customization.
+- 🎬 **Integrated Replay Player**: One-click Space Station 14 round replay loading from `.zip` archives.
+- 🛠️ **Developer Suite**: In-game DEV overlays, physics/lighting debug toggles, benchmark suite, and local build runner.
+- 🌐 **Full Internationalization (i18n)**: English and Russian localizations with dynamic live switching.
+- 🔒 **Security Hardening**: Strict ZipSlip traversal defenses, token encryption, and isolated process priority control.
 
 ---
 
-## 🇷🇺 Русский
+## 💻 System Requirements
 
-### Быстрый старт и установка
-
-Готовые релизные архивы доступны на странице [Releases](https://github.com/MeiDoto/SS14.Launcher/releases/latest):
-
-| Платформа | Файл | Инструкция по запуску |
+| OS | Minimum Architecture | Runtime |
 |---|---|---|
-| **Windows x64** | `SS14.Launcher_Windows.zip` | Распаковать архив и запустить `Space Station 14 Launcher.exe` |
-| **Linux x64** | `SS14.Launcher_Linux.tar.gz` | Распаковать архив, дать права на запуск (`chmod +x SS14.Launcher`) и запустить `./SS14.Launcher` |
-
-*Интеграция с системой*: в окне **Опции** доступна кнопка создания ярлыков на рабочем столе и в меню приложений для Windows и Linux (XDG Desktop).
-
----
-
-### Основные возможности
-
-- **Умный многоступенчатый поиск серверов**:
-  - Комбинированный алгоритм (префиксы, подстроки, расстояние Дамерау-Левенштейна, сходство Джаро-Винклера и триграмм).
-  - Сглаживание пинга с помощью фильтра Калмана с отсечением сетевых всплесков (3.5σ).
-  - Категория «Рекомендованные» на основе комплексной оценки заполненности, стабильности и сетевой задержки.
-
-- **Кастомизация и оформление**:
-  - Выбор встроенных тем (*Classic, Cyberpunk, Syndicate, Solar, Deep Space, Matrix, Monochrome*).
-  - Настройка цветов интерфейса, акцентов, шрифта, прозрачности и фоновых изображений.
-  - Изменение расположения вкладок (Сверху, Снизу, Слева, Справа).
-  - Генератор процедурных Sci-Fi палитр и экспорт/импорт конфигураций.
-
-- **Безопасность и аккаунт**:
-  - Спойлерная защита `User ID` и `HWID` (скрыты по умолчанию с возможностью показа).
-  - Безопасное копирование данных в буфер обмена с визуальной индикацией (`Скопировано ✓`).
-  - Отображение полного суммарного времени в игре с грамматическим склонением числительных.
-
-- **Сетевой стек и производительность**:
-  - Поддержка SOCKS5 и HTTP прокси для лаунчера и игрового процесса.
-  - Настройки оптимизации: Dynamic Tiered PGO, Server GC, Low-Pause GC, Low-Latency Sockets (`TCP_NODELAY`), запуск на дискретной видеокарте.
-  - Happy Eyeballs параллельное подключение к IPv4/IPv6.
-
-- **Инструменты разработчика и логи**:
-  - Вкладка **DEV**: запуск с кастомными аргументами, переключение графических бекендов (OpenGL/Vulkan), встроенные оверлеи (FPS, Network Graph, Physics Debug), симуляция пинга и потерь пакетов.
-  - Просмотрщик логов с разделением по уровням (*Все, Ошибки, Предупреждения, Инфо, Дебаг*) и поиском.
-  - Просмотр и запуск локальных реплеев (`.zip`) и тестовых сборок.
+| **Linux** | x86_64, arm64 (glibc 2.31+) | Bundled self-contained |
+| **Windows** | Windows 10/11 x64 | Bundled self-contained |
+| **macOS** | macOS 12+ (x64 / Apple Silicon) | Bundled self-contained |
 
 ---
 
-### Песочница скриптов оформления
+## 🛠️ Building from Source
 
-В окне кастомизации доступна текстовая консоль/песочница для быстрой настройки внешнего вида:
+### Prerequisites
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download)
+- Git
 
-```text
-accent #00FFCC         # Установить акцентный цвет
-button #1E293B         # Установить цвет кнопок
-font 16                # Изменить размер шрифта (12-22)
-opacity 0.85           # Прозрачность фона (0.1-1.0)
-tabs left              # Перенести вкладки (top, bottom, left, right)
-preset cyberpunk       # Применить готовый пресет (classic, syndicate, solar...)
-random                 # Сгенерировать случайную гармоничную Sci-Fi тему
-clear                  # Сбросить настройки к значениям по умолчанию
-```
-
----
-
-### Сборка из исходников
-
-**Требования**: [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0), Python 3.
+### Build Steps
 
 ```bash
-# Клонирование репозитория
+# Clone repository with submodules
 git clone --recursive https://github.com/MeiDoto/SS14.Launcher.git
 cd SS14.Launcher
 
-# Запуск лаунчера в режиме разработки
-dotnet run --project SS14.Launcher/SS14.Launcher.csproj
+# Restore dependencies
+dotnet restore
 
-# Запуск тестов
-dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj
+# Build Release binary
+dotnet build --configuration Release
 
-# Сборка готовых пакетов под Windows и Linux
-python3 publish.py windows linux --x64-only
+# Run automated tests
+dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj -v normal
 ```
 
 ---
 
-## 🇬🇧 English
+## 🏛️ Architecture Overview
 
-### Installation & Quick Start
-
-Pre-built binaries are available on the [Releases](https://github.com/MeiDoto/SS14.Launcher/releases/latest) page:
-
-| Platform | Archive | Run Instructions |
-|---|---|---|
-| **Windows x64** | `SS14.Launcher_Windows.zip` | Extract archive and launch `Space Station 14 Launcher.exe` |
-| **Linux x64** | `SS14.Launcher_Linux.tar.gz` | Extract archive, grant execute permissions (`chmod +x SS14.Launcher`), and run `./SS14.Launcher` |
-
-*System Integration*: Desktop and application menu shortcuts can be created directly from the **Options** tab on both Windows and Linux.
-
----
-
-### Key Features
-
-- **Multi-Stage Fuzzy Server Search**:
-  - Combined scoring algorithm using prefix matching, word boundary heuristics, Damerau-Levenshtein distance, Jaro-Winkler, and trigram cosine similarity.
-  - Adaptive 1D Kalman latency filter with outlier rejection (3.5σ) to eliminate ping jitter.
-  - "Recommended" smart filter ranking servers based on capacity, uptime stability, and connection latency.
-
-- **Deep UI Theming & Customization**:
-  - Built-in theme presets (*Classic, Cyberpunk, Syndicate, Solar, Deep Space, Matrix, Monochrome*).
-  - Fine-grained controls for accent colors, buttons, fonts, opacity, and custom background/logo images.
-  - Flexible tab strip placement (*Top, Bottom, Left, Right*).
-  - Procedural Sci-Fi palette generator and theme export/import via JSON.
-
-- **Account & Security Enhancements**:
-  - Spoiler-masked `User ID` and `HWID` fields with copy confirmation indicators.
-  - Account diagnostics summary and session status overview.
-  - Natural playtime formatting with proper language pluralization.
-
-- **Performance & Networking**:
-  - Configurable SOCKS5 and HTTP proxy support.
-  - Runtime optimizations: Dynamic Tiered PGO, Server GC, Low-Pause GC, Low-Latency Sockets (`TCP_NODELAY`), discrete GPU enforcement.
-  - Happy Eyeballs IPv4/IPv6 parallel connection resolution.
-
-- **Developer Utilities & Logs**:
-  - **DEV Tab**: custom command-line arguments, graphics backend selector (OpenGL/Vulkan), debug overlays (FPS, Net Graph, Physics), simulated latency and packet loss.
-  - Filterable Log Viewer with level chips (*All, Errors, Warnings, Info, Debug*) and search.
-  - Replay manager for local `.zip` recordings and local client build launcher.
-
----
-
-### Theming Script Sandbox
-
-The customization dialog includes a lightweight command sandbox for styling:
-
-```text
-accent #00FFCC         # Set accent color (hex)
-button #1E293B         # Set button background color
-font 16                # Set font size (12-22)
-opacity 0.85           # Background opacity (0.1-1.0)
-tabs left              # Tab strip placement (top, bottom, left, right)
-preset cyberpunk       # Load a preset (classic, syndicate, solar...)
-random                 # Generate procedural sci-fi palette
-clear                  # Reset visuals to defaults
+```mermaid
+graph TD
+    UI[Avalonia UI MVVM Layer] --> VM[ViewModels]
+    VM --> Models[Models & Cache Layer]
+    Models --> Net[HappyEyeballs HTTP / Sockets]
+    Models --> Storage[SQLite WAL & AppData]
+    Models --> Runner[GameProcessRunner & OS Isolation]
+    VM --> Algo[Utility.Algorithms: SIMD / Kalman / P-Square]
 ```
 
 ---
 
-### Building from Source
+## 🤝 Contributing
 
-**Prerequisites**: [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0), Python 3.
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for code style guidelines, test conventions, and architecture decision records.
 
-```bash
-# Clone the repository
-git clone --recursive https://github.com/MeiDoto/SS14.Launcher.git
-cd SS14.Launcher
+## 🔒 Security
 
-# Run the launcher in debug mode
-dotnet run --project SS14.Launcher/SS14.Launcher.csproj
+See [SECURITY.md](SECURITY.md) for our security policy, vulnerability reporting process, and security measures.
 
-# Run test suite
-dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj
+## 📖 Architecture Decision Records
 
-# Build release packages for Windows and Linux
-python3 publish.py windows linux --x64-only
-```
+- [ADR-0001: Core Architecture & Performance Design](docs/adr/0001-architecture-decisions.md)
+- [ADR-0002: Async Safety & Error Handling Policy](docs/adr/0002-async-safety-error-handling.md)
+- [ADR-0003: CI/CD Pipeline Design](docs/adr/0003-cicd-pipeline-design.md)
 
 ---
 
-## License / Лицензия
+## 📜 License
 
-MIT License — see [LICENSE.txt](LICENSE.txt).
+This project is licensed under the [MIT License](LICENSE.txt).

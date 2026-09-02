@@ -353,7 +353,14 @@ public static class HappyEyeballsHttp
             {
                 if (task.IsCompletedSuccessfully)
                 {
-                    try { task.Result.Dispose(); } catch { }
+                    try
+                    {
+                        task.Result.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Debug(ex, "Failed to dispose losing HappyEyeballs connection socket.");
+                    }
                 }
                 else if (task.IsFaulted)
                 {
@@ -366,7 +373,14 @@ public static class HappyEyeballsHttp
                         _ = t.Exception;
                         if (t.IsCompletedSuccessfully && t.Result != null)
                         {
-                            try { t.Result.Dispose(); } catch { }
+                            try
+                            {
+                                t.Result.Dispose();
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Debug(ex, "Failed to dispose trailing HappyEyeballs connection socket.");
+                            }
                         }
                     }, TaskContinuationOptions.ExecuteSynchronously);
                 }

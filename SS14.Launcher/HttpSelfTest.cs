@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -50,8 +50,10 @@ internal static class HttpSelfTest
         }
     }
 
-    private static async void RunTests(int id, string url)
+    private static async Task RunTests(int id, string url)
     {
+        try
+        {
         Log.Information("SELF TEST [{Id}]: testing URL {Url}", id, url);
 
         await RunSingleTest("HappyEyeballsHttp", TestHappyEyeballsHttp);
@@ -75,6 +77,11 @@ internal static class HttpSelfTest
             {
                 Log.Error(e, "SELF TEST [{Id}]: {TestName} FAILED", id, name);
             }
+        }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "SELF TEST [{Id}]: Unhandled exception in test runner", id);
         }
     }
 

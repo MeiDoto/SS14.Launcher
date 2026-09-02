@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Serilog;
 using Splat;
 using SS14.Launcher.Localization;
 using SS14.Launcher.Models.ContentManagement;
@@ -33,7 +34,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
     public override void Selected()
     {
         base.Selected();
-        RefreshStorageUsageAsync();
+        _ = RefreshStorageUsageAsync();
     }
 
     public override string Name
@@ -341,7 +342,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set => SetProperty(ref _storageUsageText, value);
     }
 
-    public async void RefreshStorageUsageAsync()
+    public async Task RefreshStorageUsageAsync()
     {
         StorageUsageText = "...";
         var report = await Task.Run(() =>
@@ -354,7 +355,14 @@ public class OptionsTabViewModel : MainWindowTabViewModel
                     long size = 0;
                     foreach (var f in Directory.GetFiles(dir, "*", SearchOption.AllDirectories))
                     {
-                        try { size += new FileInfo(f).Length; } catch { }
+                        try
+                        {
+                            size += new FileInfo(f).Length;
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Debug(ex, "Failed to get size of {Path}", f);
+                        }
                     }
                     return size;
                 }
@@ -376,7 +384,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
                     ("replays", Fmt(replays)),
                     ("logs", Fmt(logs)));
             }
-            catch
+            catch (Exception ex)
             {
                 return "";
             }

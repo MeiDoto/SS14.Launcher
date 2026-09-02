@@ -133,7 +133,7 @@ public sealed class ReplayItemViewModel : ViewModelBase
                     });
                 }
             }
-            catch
+            catch (Exception ex)
             {
             }
         });
@@ -141,7 +141,7 @@ public sealed class ReplayItemViewModel : ViewModelBase
 
     public void Play()
     {
-        _parent.LaunchReplay(FilePath);
+        _ = _parent.LaunchReplay(FilePath);
     }
 
     public void Delete()
@@ -152,7 +152,7 @@ public sealed class ReplayItemViewModel : ViewModelBase
             {
                 File.Delete(FilePath);
             }
-            _parent.RefreshReplays();
+            _ = _parent.RefreshReplays();
         }
         catch (Exception e)
         {
@@ -238,7 +238,7 @@ public sealed class ReplaysTabViewModel : MainWindowTabViewModel
         };
 
         SetupDirectoryWatcher();
-        RefreshReplays();
+        _ = RefreshReplays();
     }
 
     private void SetupDirectoryWatcher()
@@ -254,7 +254,7 @@ public sealed class ReplaysTabViewModel : MainWindowTabViewModel
             _watcherDebounce.Tick += (_, _) =>
             {
                 _watcherDebounce.Stop();
-                RefreshReplays();
+                _ = RefreshReplays();
             };
 
             _replaysWatcher = new FileSystemWatcher(ReplaysDirectory, "*.zip")
@@ -281,7 +281,7 @@ public sealed class ReplaysTabViewModel : MainWindowTabViewModel
         {
             _replaysWatcher.EnableRaisingEvents = true;
         }
-        RefreshReplays();
+        _ = RefreshReplays();
     }
 
     public override void Unselected()
@@ -303,7 +303,7 @@ public sealed class ReplaysTabViewModel : MainWindowTabViewModel
         });
     }
 
-    public async void RefreshReplays()
+    public async Task RefreshReplays()
     {
         try
         {
@@ -369,7 +369,7 @@ public sealed class ReplaysTabViewModel : MainWindowTabViewModel
         }
     }
 
-    public async void OpenFilePickerAndPlay()
+    public async Task OpenFilePickerAndPlay()
     {
         if (Control?.GetVisualRoot() is not Window window)
             return;
@@ -399,7 +399,7 @@ public sealed class ReplaysTabViewModel : MainWindowTabViewModel
         ConnectingViewModel.StartContentBundle(_windowVm, file);
     }
 
-    public async void LaunchReplay(string filePath)
+    public async Task LaunchReplay(string filePath)
     {
         if (Control?.GetVisualRoot() is not Window window)
             return;

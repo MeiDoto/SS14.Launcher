@@ -56,7 +56,7 @@ public sealed partial class ServerListCache : ObservableObject, IServerSource
     {
         _refreshCancel?.Cancel();
         _refreshCancel = new CancellationTokenSource(15000);
-        RefreshServerList(_refreshCancel.Token);
+        _ = RefreshServerList(_refreshCancel.Token);
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public sealed partial class ServerListCache : ObservableObject, IServerSource
     /// In case of connection drops or errors, preserves existing cached servers (graceful degradation).
     /// </summary>
     /// <param name="cancel">Cancellation token to abort the network queries.</param>
-    public async void RefreshServerList(CancellationToken cancel)
+    public async Task RefreshServerList(CancellationToken cancel)
     {
         Status = RefreshListStatus.UpdatingMaster;
 
@@ -91,7 +91,7 @@ public sealed partial class ServerListCache : ObservableObject, IServerSource
             {
                 await Task.WhenAll(requests.Select(t => t.Request));
             }
-            catch
+            catch (Exception ex)
             {
                 // Exceptions inspected per-task below
             }
@@ -195,14 +195,14 @@ public sealed partial class ServerListCache : ObservableObject, IServerSource
                                         await http.SendAsync(req, System.Net.Http.HttpCompletionOption.ResponseHeadersRead);
                                     }
                                 }
-                                catch
+                                catch (Exception ex)
                                 {
                                     // Ignore individual prefetch fails
                                 }
                             }
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         // Ignore background prefetch fails
                     }

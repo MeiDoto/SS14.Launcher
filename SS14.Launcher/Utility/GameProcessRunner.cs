@@ -53,19 +53,34 @@ public static class GameProcessRunner
                 0,
                 FileOptions.Asynchronous);
 
-            PipeOutput(process, fileStdout, fileStderr);
+            _ = PipeOutputAsync(process, fileStdout, fileStderr);
         }
 
         return process;
     }
 
     /// <summary>
+    /// Backward-compatible fire-and-forget pipe output invocation.
+    /// </summary>
+    public static void PipeOutput(Process process, Stream targetStdout, Stream targetStderr)
+    {
+        _ = PipeOutputAsync(process, targetStdout, targetStderr);
+    }
+
+    /// <summary>
     /// Asynchronously pipes standard output and standard error from the game process to target log streams.
     /// </summary>
-    public static async void PipeOutput(Process process, Stream targetStdout, Stream targetStderr)
+    public static async Task PipeOutputAsync(Process process, Stream targetStdout, Stream targetStderr)
     {
         int pid = 0;
-        try { pid = process.Id; } catch { /* ignore */ }
+        try
+        {
+            pid = process.Id;
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Failed to retrieve game process ID for pipe logging.");
+        }
 
         async Task DoPipe(StreamReader reader, Stream writer)
         {
@@ -108,8 +123,23 @@ public static class GameProcessRunner
         }
         finally
         {
-            try { await targetStdout.DisposeAsync(); } catch { /* ignore */ }
-            try { await targetStderr.DisposeAsync(); } catch { /* ignore */ }
+            try
+            {
+                await targetStdout.DisposeAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "Failed to cleanly dispose targetStdout stream.");
+            }
+
+            try
+            {
+                await targetStderr.DisposeAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "Failed to cleanly dispose targetStderr stream.");
+            }
         }
     }
 }

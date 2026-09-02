@@ -64,7 +64,7 @@ public sealed class AccountInfoViewModel : ViewModelBase
             }
             TotalPlaytimeText = PlaytimeFormatter.Format(totalSec);
         }
-        catch
+        catch (Exception ex)
         {
             TotalPlaytimeText = PlaytimeFormatter.Format(0);
         }
@@ -76,7 +76,7 @@ public sealed class AccountInfoViewModel : ViewModelBase
             Hwid = Convert.ToHexString(hash)[..24];
             SystemInfo = $"{Environment.OSVersion} ({Environment.ProcessorCount} Cores)";
         }
-        catch
+        catch (Exception ex)
         {
             Hwid = "UNKNOWN-HWID";
             SystemInfo = Environment.OSVersion.ToString();

@@ -1,4 +1,5 @@
 using System;
+using Serilog;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -145,9 +146,10 @@ public sealed partial class ServerListFiltersViewModel : ObservableObject
                     {
                         culture = new CultureInfo(primaryTag);
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        // Language doesn't exist I guess.
+                        // Language tag not recognized by the runtime
+                        Log.Debug(ex, "Unknown language tag {Tag}", primaryTag);
                         continue;
                     }
 
@@ -217,13 +219,13 @@ public sealed partial class ServerListFiltersViewModel : ObservableObject
         if (_dataManager.Filters.Contains(filter) && !value)
         {
             _dataManager.Filters.Remove(filter);
-            _dataManager.CommitConfig();
+            _ = _dataManager.CommitConfig();
             FiltersUpdated?.Invoke();
         }
         else if (!_dataManager.Filters.Contains(filter) && value)
         {
             _dataManager.Filters.Add(filter);
-            _dataManager.CommitConfig();
+            _ = _dataManager.CommitConfig();
             FiltersUpdated?.Invoke();
         }
     }
@@ -232,7 +234,7 @@ public sealed partial class ServerListFiltersViewModel : ObservableObject
     {
         FiltersUpdated?.Invoke();
 
-        _dataManager.CommitConfig();
+        _ = _dataManager.CommitConfig();
     }
 
     /// <summary>

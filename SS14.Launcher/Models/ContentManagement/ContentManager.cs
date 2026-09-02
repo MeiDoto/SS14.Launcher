@@ -174,12 +174,12 @@ public sealed class ContentManager
             {
                 return proc.MainModule?.FileName == mainModule;
             }
-            catch
+            catch (Exception ex)
             {
                 return !proc.HasExited;
             }
         }
-        catch
+        catch (Exception ex)
         {
             // Process doesn't exist or access denied.
             return false;

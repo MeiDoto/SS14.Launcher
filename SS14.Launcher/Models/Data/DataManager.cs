@@ -417,7 +417,7 @@ public sealed class DataManager : ObservableObject
     }
 
     [SuppressMessage("ReSharper", "UseAwaitUsing")]
-    public async void CommitConfig()
+    public async Task CommitConfig()
     {
         DbCommand[] commands;
         lock (_dbCommandQueue)

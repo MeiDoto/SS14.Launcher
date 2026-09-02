@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using CodeHollow.FeedReader;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Serilog;
@@ -68,14 +69,14 @@ public partial class NewsTabViewModel : MainWindowTabViewModel
 
         if (!_startedPullingNews)
         {
-            PullNews();
+            _ = PullNews();
         }
     }
 
-    public async void RefreshNews()
+    public async Task RefreshNews()
     {
         _startedPullingNews = false;
-        PullNews();
+        await PullNews();
     }
 
     private static string NewsCacheFile => System.IO.Path.Combine(LauncherPaths.DirLocalData, "news_cache.json");
@@ -125,7 +126,7 @@ public partial class NewsTabViewModel : MainWindowTabViewModel
         }
     }
 
-    private async void PullNews()
+    private async Task PullNews()
     {
         if (_isBusy)
             return;

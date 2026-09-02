@@ -117,9 +117,9 @@ public sealed class ServerHistoryViewModel : ViewModelBase
         try
         {
             _cfg.AddFavoriteServer(new FavoriteServer(item.Name, item.Address));
-            _cfg.CommitConfig();
+            _ = _cfg.CommitConfig();
         }
-        catch
+        catch (Exception ex)
         {
             // Already favorited
         }

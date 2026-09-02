@@ -94,7 +94,7 @@ public class LauncherCommands
         CommandChannel.Writer.Complete();
     }
 
-    public async void RunCommandTask()
+    public async Task RunCommandTask()
     {
         var reader = CommandChannel.Reader;
         while (await reader.WaitToReadAsync())

@@ -419,7 +419,7 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
             {
                 PreviewLogo = new Bitmap(_customLogoImagePath);
             }
-            catch
+            catch (Exception ex)
             {
                 PreviewLogo = null;
             }
