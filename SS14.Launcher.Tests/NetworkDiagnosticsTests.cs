@@ -55,6 +55,8 @@ public sealed class NetworkDiagnosticsTests
         var text = report.GenerateFormattedReport();
 
         Assert.That(text, Does.Contain("SS14 Launcher Network Diagnostic Report"));
+        Assert.That(text, Does.Contain("Client OS:"));
+        Assert.That(text, Does.Contain("Client Runtime:"));
         Assert.That(text, Does.Contain("Target: ss14s://test.server:1212"));
         Assert.That(text, Does.Contain("[OK] DNS Resolution: 12 ms - Resolved 127.0.0.1"));
         Assert.That(text, Does.Contain("Latency: Min=38.0ms, Max=52.1ms, Avg=45.2ms"));

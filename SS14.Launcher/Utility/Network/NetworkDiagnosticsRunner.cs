@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Security.Authentication;
 using System.Text;
 using System.Threading;
@@ -60,6 +61,8 @@ public sealed class DiagnosticsReport
         var sb = new StringBuilder();
         sb.AppendLine("=== SS14 Launcher Network Diagnostic Report ===");
         sb.AppendLine($"Timestamp: {Timestamp:yyyy-MM-dd HH:mm:ss} UTC");
+        sb.AppendLine($"Client OS: {RuntimeInformation.OSDescription} ({RuntimeInformation.OSArchitecture})");
+        sb.AppendLine($"Client Runtime: {RuntimeInformation.FrameworkDescription}");
         sb.AppendLine($"Target: {TargetUri} ({Host}:{Port})");
         sb.AppendLine($"TLS Enabled: {IsSecure}");
         sb.AppendLine("------------------------------------------------");
