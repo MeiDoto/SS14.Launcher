@@ -140,7 +140,7 @@ public sealed class UrlFallbackSet
 
     public static UrlFallbackSet operator +(UrlFallbackSet set, string s)
     {
-        return new UrlFallbackSet([..set.Urls.Select(x => x + s)], set.Stats);
+        return new UrlFallbackSet([.. set.Urls.Select(x => x + s)], set.Stats);
     }
 
     public static UrlFallbackSet FromSingle(Uri url)

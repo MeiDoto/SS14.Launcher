@@ -126,7 +126,7 @@ public sealed class LocalizationManager
         // Weblate stores secondary language codes (like zh-Hans) with an UNDERSCORE.
         // WHY.
         if (culture.Name.Contains('-'))
-            attemptNames = [..attemptNames, $"avares://SS14.Launcher/Assets/Locale/{culture.Name.Replace("-", "_")}"];
+            attemptNames = [.. attemptNames, $"avares://SS14.Launcher/Assets/Locale/{culture.Name.Replace("-", "_")}"];
 
         foreach (var location in attemptNames)
         {

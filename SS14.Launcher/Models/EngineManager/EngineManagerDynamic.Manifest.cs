@@ -124,13 +124,16 @@ public sealed partial class EngineManagerDynamic
 
     private sealed class BuildInfo
     {
-        [JsonInclude] [JsonPropertyName("url")]
+        [JsonInclude]
+        [JsonPropertyName("url")]
         public string Url = default!;
 
-        [JsonInclude] [JsonPropertyName("sha256")]
+        [JsonInclude]
+        [JsonPropertyName("sha256")]
         public string Sha256 = default!;
 
-        [JsonInclude] [JsonPropertyName("sig")]
+        [JsonInclude]
+        [JsonPropertyName("sig")]
         public string Signature = default!;
     }
 }

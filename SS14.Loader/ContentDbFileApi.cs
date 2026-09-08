@@ -133,7 +133,7 @@ internal sealed class ContentDbFileApi : IFileApi, IDisposable
         {
             var rowId = sqlite3_column_int64(stmt, 0);
             var size = sqlite3_column_int(stmt, 1);
-            var compression = (ContentCompressionScheme) sqlite3_column_int(stmt, 2);
+            var compression = (ContentCompressionScheme)sqlite3_column_int(stmt, 2);
             var path = sqlite3_column_text(stmt, 3).utf8_to_string();
 
             _files.Add(path, (rowId, size, compression));
@@ -146,7 +146,7 @@ internal sealed class ContentDbFileApi : IFileApi, IDisposable
         CheckThrowSqliteErr(db, err);
     }
 
-    private static void CheckThrowSqliteErr(sqlite3 db, int err, int expect=SQLITE_OK)
+    private static void CheckThrowSqliteErr(sqlite3 db, int err, int expect = SQLITE_OK)
     {
         if (err != expect)
             SqliteException.ThrowExceptionForRC(err, db);
@@ -215,37 +215,37 @@ internal sealed class ContentDbFileApi : IFileApi, IDisposable
             switch (compression)
             {
                 case ContentCompressionScheme.Deflate:
-                {
-                    var buffer = GC.AllocateUninitializedArray<byte>(length);
-                    stream = new MemoryStream(buffer);
-
-                    using var blobStream = new SqliteBlobStream(blob, canWrite: false, ownsBlob: false);
-                    using var deflater = new DeflateStream(blobStream, CompressionMode.Decompress);
-                    deflater.CopyTo(stream);
-                    stream.Position = 0;
-                    break;
-                }
-                case ContentCompressionScheme.ZStd:
-                {
-                    var buffer = GC.AllocateUninitializedArray<byte>(length);
-                    stream = new MemoryStream(buffer, writable: false);
-
-                    unsafe
                     {
-                        ReadBlobZStd(buffer, blob, db, entry.DecompressionContext);
-                    }
-                    break;
-                }
-                case ContentCompressionScheme.None:
-                {
-                    var buffer = GC.AllocateUninitializedArray<byte>(length);
-                    err = sqlite3_blob_read(blob, buffer.AsSpan(), 0);
-                    if (err != SQLITE_OK)
-                        SqliteException.ThrowExceptionForRC(err, db);
+                        var buffer = GC.AllocateUninitializedArray<byte>(length);
+                        stream = new MemoryStream(buffer);
 
-                    stream = new MemoryStream(buffer, writable: false);
-                    break;
-                }
+                        using var blobStream = new SqliteBlobStream(blob, canWrite: false, ownsBlob: false);
+                        using var deflater = new DeflateStream(blobStream, CompressionMode.Decompress);
+                        deflater.CopyTo(stream);
+                        stream.Position = 0;
+                        break;
+                    }
+                case ContentCompressionScheme.ZStd:
+                    {
+                        var buffer = GC.AllocateUninitializedArray<byte>(length);
+                        stream = new MemoryStream(buffer, writable: false);
+
+                        unsafe
+                        {
+                            ReadBlobZStd(buffer, blob, db, entry.DecompressionContext);
+                        }
+                        break;
+                    }
+                case ContentCompressionScheme.None:
+                    {
+                        var buffer = GC.AllocateUninitializedArray<byte>(length);
+                        err = sqlite3_blob_read(blob, buffer.AsSpan(), 0);
+                        if (err != SQLITE_OK)
+                            SqliteException.ThrowExceptionForRC(err, db);
+
+                        stream = new MemoryStream(buffer, writable: false);
+                        break;
+                    }
                 default:
                     throw new NotSupportedException($"Unknown compression scheme: {compression}");
             }
@@ -278,7 +278,7 @@ internal sealed class ContentDbFileApi : IFileApi, IDisposable
                 fixed (byte* inputPtr = buffer)
                 fixed (byte* outputPtr = into)
                 {
-                    var inputBuf = new ZSTD_inBuffer { src =  inputPtr, pos = 0, size = (nuint)toRead};
+                    var inputBuf = new ZSTD_inBuffer { src = inputPtr, pos = 0, size = (nuint)toRead };
                     var outputBuf = new ZSTD_outBuffer { dst = outputPtr, pos = 0, size = (nuint)into.Length };
 
                     var err = ZSTD_decompressStream(context, &outputBuf, &inputBuf);

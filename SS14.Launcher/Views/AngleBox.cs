@@ -64,7 +64,7 @@ public class AngleBox : Shape
         }
         else
         {
-            context.LineTo(new(b.Width-c, 0));
+            context.LineTo(new(b.Width - c, 0));
             context.LineTo(new(b.Width, c));
         }
 
@@ -77,7 +77,7 @@ public class AngleBox : Shape
         else
         {
             context.LineTo(new(c, b.Height));
-            context.LineTo(new(0, b.Height-c));
+            context.LineTo(new(0, b.Height - c));
         }
 
         context.EndFigure(isClosed: true);

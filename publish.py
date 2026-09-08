@@ -135,6 +135,8 @@ def publish_linux(x64_only: bool):
     shutil.copyfile("PublishFiles/SS14.png", "bin/publish/Linux/SS14.png")
     shutil.copyfile("PublishFiles/setup-desktop.sh", "bin/publish/Linux/setup-desktop.sh")
     shutil.copyfile("SS14.Launcher/Assets/icon.ico", "bin/publish/Linux/SS14.ico")
+    if os.path.isfile("packaging/appstream/org.spacestation14.launcher.metainfo.xml"):
+        shutil.copyfile("packaging/appstream/org.spacestation14.launcher.metainfo.xml", "bin/publish/Linux/org.spacestation14.launcher.metainfo.xml")
 
     # Ensure scripts have execute permissions
     try:

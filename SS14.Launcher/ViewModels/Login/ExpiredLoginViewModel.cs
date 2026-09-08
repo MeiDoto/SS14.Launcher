@@ -5,7 +5,7 @@ using SS14.Launcher.Models.Logins;
 
 namespace SS14.Launcher.ViewModels.Login;
 
-public partial class ExpiredLoginViewModel (
+public partial class ExpiredLoginViewModel(
     MainWindowLoginViewModel parentVm,
     DataManager cfg,
     AuthApi authApi,

@@ -213,7 +213,7 @@ public static class CVars
     /// </summary>
     public static readonly CVarDef<int> MaxForkVersionsToKeep = CVarDef.Create("MaxForkVersionsToKeep", 3);
 
-     /// <summary>
+    /// <summary>
     /// If a download gets interrupted, keep the files for a week.
     /// </summary>
     public static readonly CVarDef<int> InterruptibleDownloadKeepHours = CVarDef.Create("InterruptibleDownloadKeepHours", 7 * 24);
@@ -247,7 +247,7 @@ public static class CVars
 
     /// <summary>
     /// The CPU architecture this launcher was last run with.
-    public static readonly CVarDef<int> CurrentArchitecture = CVarDef.Create("CurrentArchitecture", (int) Architecture.X64);
+    public static readonly CVarDef<int> CurrentArchitecture = CVarDef.Create("CurrentArchitecture", (int)Architecture.X64);
 
     public static readonly CVarDef<bool> HighProcessPriority = CVarDef.Create("HighProcessPriority", false);
     public static readonly CVarDef<bool> ForceDedicatedGpu = CVarDef.Create("ForceDedicatedGpu", false);

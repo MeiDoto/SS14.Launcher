@@ -84,7 +84,7 @@ public sealed class LoginManager : ObservableObject
 
         Logins = _logins
             .Connect()
-            .Transform((data, guid) => (LoggedInAccount) data)
+            .Transform((data, guid) => (LoggedInAccount)data)
             .AsObservableCache();
     }
 
@@ -163,7 +163,7 @@ public sealed class LoginManager : ObservableObject
 
     public void UpdateToNewToken(LoggedInAccount account, LoginToken token)
     {
-        var cast = (ActiveLoginData) account;
+        var cast = (ActiveLoginData)account;
         cast.SetStatus(AccountLoginStatus.Available);
         account.LoginInfo.Token = token;
     }
@@ -171,7 +171,7 @@ public sealed class LoginManager : ObservableObject
     /// <exception cref="AuthApiException">Thrown if an API error occured.</exception>
     public Task UpdateSingleAccountStatus(LoggedInAccount account)
     {
-        return UpdateSingleAccountStatus((ActiveLoginData) account);
+        return UpdateSingleAccountStatus((ActiveLoginData)account);
     }
 
     private async Task UpdateSingleAccountStatus(ActiveLoginData data)

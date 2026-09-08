@@ -30,7 +30,7 @@ public static class ZStd
 
     private static IntPtr ResolveZstd(string name, Assembly assembly, DllImportSearchPath? path)
     {
-         if (name == "zstd")
+        if (name == "zstd")
         {
             if (OperatingSystem.IsLinux())
             {

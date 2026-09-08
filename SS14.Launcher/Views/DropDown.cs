@@ -82,7 +82,7 @@ public sealed class DropDown : TemplatedControl
     {
         if (!e.Handled)
         {
-            if (e.Source != null && _popup?.IsInsidePopup((Visual) e.Source) == false)
+            if (e.Source != null && _popup?.IsInsidePopup((Visual)e.Source) == false)
             {
                 IsDropDownOpen ^= true;
                 e.Handled = true;

@@ -38,10 +38,10 @@ public static class VcRedistCheck
         if (ret == TerraFX.Interop.Windows.Windows.IDYES)
         {
             Process.Start(new ProcessStartInfo
-                {
-                    FileName = "https://aka.ms/vs/16/release/vc_redist.x64.exe",
-                    UseShellExecute = true
-                })!
+            {
+                FileName = "https://aka.ms/vs/16/release/vc_redist.x64.exe",
+                UseShellExecute = true
+            })!
                 .WaitForExit();
         }
 

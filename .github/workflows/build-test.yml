@@ -54,6 +54,12 @@ jobs:
     - name: Run Tests (Release)
       run: dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj --no-build --configuration Release -v normal
 
+    - name: Validate AppStream Metadata (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update && sudo apt-get install -y appstream
+        appstreamcli validate packaging/appstream/org.spacestation14.launcher.metainfo.xml --no-net
+
     - name: Upload test results
       if: failure()
       uses: actions/upload-artifact@v4

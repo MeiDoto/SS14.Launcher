@@ -13,13 +13,13 @@ public sealed class AlgorithmsDeepTests
     public void TestKalmanLatencyTracker_SuppressesSpikes()
     {
         var tracker = new AdvancedAlgorithms.KalmanLatencyTracker();
-        
+
         // Initial clean samples around 50ms
         for (int i = 0; i < 10; i++)
         {
             tracker.Update(50f);
         }
-        
+
         Assert.That(tracker.EstimatedPing, Is.InRange(45f, 55f));
 
         // Inject an extreme spike (e.g. 500ms momentary hiccup)

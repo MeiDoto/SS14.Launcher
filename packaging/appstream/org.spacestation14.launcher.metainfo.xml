@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.spacestation14.launcher</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  
+  <name>Space Station 14 Launcher</name>
+  <name xml:lang="ru">Лаунчер Space Station 14</name>
+  
+  <summary>Modern, fast and secure cross-platform launcher for Space Station 14</summary>
+  <summary xml:lang="ru">Современный, быстрый и безопасный кросс-платформенный лаунчер для Space Station 14</summary>
+  
+  <description>
+    <p>
+      Space Station 14 Launcher is the official and community-enhanced launcher for Space Station 14,
+      a multiplayer space role-playing disaster simulation sandbox game inspired by Space Station 13.
+    </p>
+    <p xml:lang="ru">
+      Space Station 14 Launcher — это официальный и улучшенный сообществом лаунчер для Space Station 14,
+      многопользовательской космической ролевой песочницы-симулятора катастроф, вдохновленной Space Station 13.
+    </p>
+    <ul>
+      <li>Fast server search with instant SIMD-accelerated fuzzy matching and latency tracking (1D Kalman filter).</li>
+      <li xml:lang="ru">Быстрый поиск серверов с SIMD-ускоренным нечетким поиском и сглаживанием пинга (фильтр Калмана).</li>
+      <li>Integrated Network Diagnostics Tool (DNS, TCP, TLS handshake, jitter, and packet loss analysis).</li>
+      <li xml:lang="ru">Встроенный инструмент диагностики сети (DNS, TCP, TLS, измерение джиттера и потерь пакетов).</li>
+      <li>Storage &amp; Cache Manager with selective engine pruning and SQLite VACUUM optimization.</li>
+      <li xml:lang="ru">Менеджер хранилища и кэша с удалением старых движков и оптимизацией базы данных SQLite VACUUM.</li>
+      <li>Integrated Replay Inspector and round player.</li>
+      <li xml:lang="ru">Встроенный инспектор записей раундов (реплеев) и их запуск в один клик.</li>
+      <li>Complete bilingual support (English &amp; Russian) with live on-the-fly switching.</li>
+      <li xml:lang="ru">Полная поддержка русского и английского языков с переключением на лету.</li>
+      <li>Comprehensive security: STRIDE threat model, encrypted credentials, ZipSlip defense, and environment scrubbing.</li>
+      <li xml:lang="ru">Надежная безопасность: шифрование токенов, защита от ZipSlip и очистка переменных окружения.</li>
+      <li>Customization: custom themes, video backgrounds, accent colors, and GPU offloading controls.</li>
+      <li xml:lang="ru">Кастомизация: поддержка видео-обоев, акцентных цветов, тем и переключения на дискретный GPU.</li>
+    </ul>
+  </description>
+  
+  <launchable type="desktop-id">SS14.Launcher.desktop</launchable>
+  <launchable type="desktop-id">SS14.desktop</launchable>
+  
+  <url type="homepage">https://spacestation14.com/</url>
+  <url type="bugtracker">https://github.com/MeiDoto/SS14.Launcher/issues</url>
+  <url type="vcs-browser">https://github.com/MeiDoto/SS14.Launcher</url>
+  <url type="help">https://docs.spacestation14.com/</url>
+  <url type="donation">https://spacestation14.com/donate/</url>
+  
+  <developer id="com.spacestation14">
+    <name>Space Wizards Federation &amp; Contributors</name>
+  </developer>
+  
+  <categories>
+    <category>Game</category>
+    <category>RolePlaying</category>
+    <category>Simulation</category>
+  </categories>
+  
+  <keywords>
+    <keyword>game</keyword>
+    <keyword>multiplayer</keyword>
+    <keyword>ss14</keyword>
+    <keyword>space</keyword>
+    <keyword>station</keyword>
+    <keyword>launcher</keyword>
+    <keyword xml:lang="ru">игра</keyword>
+    <keyword xml:lang="ru">космос</keyword>
+    <keyword xml:lang="ru">лаунчер</keyword>
+    <keyword xml:lang="ru">станция</keyword>
+  </keywords>
+  
+  <screenshots>
+    <screenshot type="default">
+      <caption>Server browser and discovery interface</caption>
+      <caption xml:lang="ru">Окно поиска и списка доступных серверов</caption>
+      <image>https://raw.githubusercontent.com/MeiDoto/SS14.Launcher/master/SS14.Launcher/Assets/banner.png</image>
+    </screenshot>
+  </screenshots>
+  
+  <content_rating type="oars-1.1">
+    <content_attribute id="violence-cartoon">moderate</content_attribute>
+    <content_attribute id="violence-fantasy">moderate</content_attribute>
+    <content_attribute id="social-chat">intense</content_attribute>
+  </content_rating>
+  
+  <releases>
+    <release version="1.2.6" date="2026-09-08">
+      <description>
+        <p>Release 1.2.6 brings Network Diagnostics Tool, Storage Manager dialog, Replay Details Inspector, full Linux Wayland icon auto-installation, and expanded 157-test suite.</p>
+        <p xml:lang="ru">Версия 1.2.6: Инструмент диагностики сети, диалог управления хранилищем и кэшем, инспектор реплеев, автоустановка иконки под Linux/Wayland и 157 автотестов со 100% успехом.</p>
+      </description>
+    </release>
+    <release version="1.2.5" date="2026-09-08">
+      <description>
+        <p>Release 1.2.5: Architecture modularization, strict async safety (-warnaserror:CS4014), and comprehensive bilingual documentation.</p>
+        <p xml:lang="ru">Версия 1.2.5: Модуляризация архитектуры, строгая асинхронная безопасность и исчерпывающая двуязычная документация.</p>
+      </description>
+    </release>
+  </releases>
+</component>

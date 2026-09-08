@@ -59,7 +59,8 @@ public partial class HomePageViewModel : MainWindowTabViewModel
                     _statusCache.InitialUpdateStatus(a.CacheData);
                 }
             })
-            .Sort(Comparer<ServerEntryViewModel>.Create((a, b) => {
+            .Sort(Comparer<ServerEntryViewModel>.Create((a, b) =>
+            {
                 var dc = a.Favorite!.RaiseTime.CompareTo(b.Favorite!.RaiseTime);
                 if (dc != 0)
                 {

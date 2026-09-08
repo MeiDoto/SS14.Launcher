@@ -25,16 +25,30 @@ fi
 
 # Установка иконки в системную директорию
 ICONS_DIR="$HOME/.local/share/icons/hicolor/256x256/apps"
-mkdir -p "$ICONS_DIR"
+PIXMAPS_DIR="$HOME/.local/share/pixmaps"
+mkdir -p "$ICONS_DIR" "$PIXMAPS_DIR"
 if [ -f "$ICON_PATH" ]; then
     cp -f "$ICON_PATH" "$ICONS_DIR/SS14.png"
-    echo "✔ Иконка установлена в $ICONS_DIR/SS14.png"
+    cp -f "$ICON_PATH" "$PIXMAPS_DIR/SS14.png"
+    echo "✔ Иконка установлена в $ICONS_DIR/SS14.png и $PIXMAPS_DIR/SS14.png"
 fi
 
-# Создание .desktop файла для меню приложений
+# Установка AppStream метаинформации
+METAINFO_DIR="$HOME/.local/share/metainfo"
+mkdir -p "$METAINFO_DIR"
+if [ -f "$LAUNCHER_DIR/org.spacestation14.launcher.metainfo.xml" ]; then
+    cp -f "$LAUNCHER_DIR/org.spacestation14.launcher.metainfo.xml" "$METAINFO_DIR/"
+    echo "✔ AppStream metainfo установлена в $METAINFO_DIR"
+elif [ -f "$LAUNCHER_DIR/packaging/appstream/org.spacestation14.launcher.metainfo.xml" ]; then
+    cp -f "$LAUNCHER_DIR/packaging/appstream/org.spacestation14.launcher.metainfo.xml" "$METAINFO_DIR/"
+    echo "✔ AppStream metainfo установлена в $METAINFO_DIR"
+fi
+
+# Создание .desktop файлов для меню приложений
 APPS_DIR="$HOME/.local/share/applications"
 mkdir -p "$APPS_DIR"
 DESKTOP_FILE="$APPS_DIR/SS14.desktop"
+LAUNCHER_DESKTOP_FILE="$APPS_DIR/SS14.Launcher.desktop"
 
 cat > "$DESKTOP_FILE" << EOF
 [Desktop Entry]
@@ -58,8 +72,9 @@ Terminal=false
 PrefersNonDefaultGPU=false
 EOF
 
-chmod +x "$DESKTOP_FILE"
-echo "✔ Ярлык добавлен в меню приложений ($DESKTOP_FILE)"
+cp -f "$DESKTOP_FILE" "$LAUNCHER_DESKTOP_FILE"
+chmod +x "$DESKTOP_FILE" "$LAUNCHER_DESKTOP_FILE"
+echo "✔ Ярлыки добавлены в меню приложений ($DESKTOP_FILE, $LAUNCHER_DESKTOP_FILE)"
 
 # Определение каталога рабочего стола через xdg-user-dir или дефолтные пути
 DESKTOP_DIR=""

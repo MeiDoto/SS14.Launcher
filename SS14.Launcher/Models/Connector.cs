@@ -491,7 +491,7 @@ public partial class Connector : ObservableObject
         try
         {
             var info = await _http.GetFromJsonAsync<ServerInfo>(infoAddr, cancel) ?? throw new InvalidDataException();
-            if (info.BuildInformation is {} buildInfo && (buildInfo.Acz || string.IsNullOrEmpty(buildInfo.DownloadUrl)))
+            if (info.BuildInformation is { } buildInfo && (buildInfo.Acz || string.IsNullOrEmpty(buildInfo.DownloadUrl)))
             {
                 var acz = info.BuildInformation.Acz;
                 var apiAddress = UriHelper.GetServerApiAddress(parsedAddress);

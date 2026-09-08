@@ -19,7 +19,7 @@ public partial class OptionsTabView : UserControl
 
     private void Flip(object? o, RoutedEventArgs routedEventArgs)
     {
-        var window = (Window?) VisualRoot;
+        var window = (Window?)VisualRoot;
         if (window == null)
             return;
 

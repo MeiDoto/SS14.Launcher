@@ -310,15 +310,15 @@ public sealed class AuthApi
     public enum AuthenticateDenyResponseCode
     {
         // @formatter:off
-        None               =  0,
-        InvalidCredentials =  1,
-        AccountUnconfirmed =  2,
-        TfaRequired        =  3,
-        TfaInvalid         =  4,
-        AccountLocked      =  5,
+        None = 0,
+        InvalidCredentials = 1,
+        AccountUnconfirmed = 2,
+        TfaRequired = 3,
+        TfaInvalid = 4,
+        AccountLocked = 5,
 
         // Not actually from the API, but used internally.
-        UnknownError       = -1,
+        UnknownError = -1,
         // @formatter:on
     }
 

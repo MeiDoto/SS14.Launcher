@@ -27,12 +27,12 @@ internal sealed class AvaloniaSeriLogger : ILogSink
 
     public bool IsEnabled(LogEventLevel level, string area)
     {
-        return _logger.IsEnabled((Serilog.Events.LogEventLevel) level);
+        return _logger.IsEnabled((Serilog.Events.LogEventLevel)level);
     }
 
     public void Log(LogEventLevel level, string area, object? source, string messageTemplate)
     {
-        Context(area, source).Write((Serilog.Events.LogEventLevel) level, messageTemplate);
+        Context(area, source).Write((Serilog.Events.LogEventLevel)level, messageTemplate);
     }
 
     public void Log<T0>(
@@ -42,7 +42,7 @@ internal sealed class AvaloniaSeriLogger : ILogSink
         string messageTemplate,
         T0 propertyValue0)
     {
-        Context(area, source).Write((Serilog.Events.LogEventLevel) level, messageTemplate, propertyValue0);
+        Context(area, source).Write((Serilog.Events.LogEventLevel)level, messageTemplate, propertyValue0);
     }
 
     public void Log<T0, T1>(
@@ -53,7 +53,7 @@ internal sealed class AvaloniaSeriLogger : ILogSink
         T0 propertyValue0,
         T1 propertyValue1)
     {
-        Context(area, source).Write((Serilog.Events.LogEventLevel) level, messageTemplate, propertyValue0, propertyValue1);
+        Context(area, source).Write((Serilog.Events.LogEventLevel)level, messageTemplate, propertyValue0, propertyValue1);
     }
 
     public void Log<T0, T1, T2>(
@@ -65,7 +65,7 @@ internal sealed class AvaloniaSeriLogger : ILogSink
         T1 propertyValue1,
         T2 propertyValue2)
     {
-        Context(area, source).Write((Serilog.Events.LogEventLevel) level, messageTemplate, propertyValue0, propertyValue1,
+        Context(area, source).Write((Serilog.Events.LogEventLevel)level, messageTemplate, propertyValue0, propertyValue1,
             propertyValue2);
     }
 
@@ -76,6 +76,6 @@ internal sealed class AvaloniaSeriLogger : ILogSink
         string messageTemplate,
         params object?[] propertyValues)
     {
-        Context(area, source).Write((Serilog.Events.LogEventLevel) level, messageTemplate, propertyValues);
+        Context(area, source).Write((Serilog.Events.LogEventLevel)level, messageTemplate, propertyValues);
     }
 }

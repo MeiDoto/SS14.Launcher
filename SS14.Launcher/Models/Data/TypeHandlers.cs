@@ -15,7 +15,7 @@ public sealed class GuidTypeHandler : SqlMapper.TypeHandler<Guid>
 
     public override Guid Parse(object value)
     {
-        return Guid.Parse((string) value);
+        return Guid.Parse((string)value);
     }
 }
 
@@ -29,7 +29,7 @@ public sealed class DateTimeOffsetTypeHandler : SqlMapper.TypeHandler<DateTimeOf
 
     public override DateTimeOffset Parse(object value)
     {
-        return DateTimeOffset.Parse((string) value, CultureInfo.InvariantCulture);
+        return DateTimeOffset.Parse((string)value, CultureInfo.InvariantCulture);
     }
 }
 
@@ -46,6 +46,6 @@ public sealed class UriTypeHandler : SqlMapper.TypeHandler<Uri>
 
     public override Uri Parse(object value)
     {
-        return new Uri((string) value);
+        return new Uri((string)value);
     }
 }

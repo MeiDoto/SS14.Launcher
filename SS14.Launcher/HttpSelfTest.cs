@@ -54,30 +54,30 @@ internal static class HttpSelfTest
     {
         try
         {
-        Log.Information("SELF TEST [{Id}]: testing URL {Url}", id, url);
+            Log.Information("SELF TEST [{Id}]: testing URL {Url}", id, url);
 
-        await RunSingleTest("HappyEyeballsHttp", TestHappyEyeballsHttp);
-        await RunSingleTest("PlainHttpClient", TestPlainHttpClient);
-        await RunSingleTest("WinHttp", TestWinHttp);
-        await RunSingleTest("LoggedSockets", TestLoggedSockets);
+            await RunSingleTest("HappyEyeballsHttp", TestHappyEyeballsHttp);
+            await RunSingleTest("PlainHttpClient", TestPlainHttpClient);
+            await RunSingleTest("WinHttp", TestWinHttp);
+            await RunSingleTest("LoggedSockets", TestLoggedSockets);
 
-        Log.Information("SELF TEST [{Id}]: Done", id);
+            Log.Information("SELF TEST [{Id}]: Done", id);
 
-        return;
+            return;
 
-        async Task RunSingleTest(string name, Func<int, string, Task> test)
-        {
-            try
+            async Task RunSingleTest(string name, Func<int, string, Task> test)
             {
-                Log.Information("SELF TEST [{Id}]: {TestName}", id, name);
-                await test(id, url);
-                Log.Information("SELF TEST [{Id}]: {TestName} DONE", id, name);
+                try
+                {
+                    Log.Information("SELF TEST [{Id}]: {TestName}", id, name);
+                    await test(id, url);
+                    Log.Information("SELF TEST [{Id}]: {TestName} DONE", id, name);
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e, "SELF TEST [{Id}]: {TestName} FAILED", id, name);
+                }
             }
-            catch (Exception e)
-            {
-                Log.Error(e, "SELF TEST [{Id}]: {TestName} FAILED", id, name);
-            }
-        }
         }
         catch (Exception ex)
         {

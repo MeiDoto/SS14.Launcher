@@ -10,7 +10,7 @@ namespace SS14.Launcher.Utility;
 
 public static class RidUtility
 {
-    public static string? FindBestRid(ICollection<string> runtimes, string? currentRid=null)
+    public static string? FindBestRid(ICollection<string> runtimes, string? currentRid = null)
     {
         var catalog = LoadRidCatalog();
 
@@ -112,20 +112,22 @@ public static class RidUtility
         var ms = new MemoryStream();
         stream.CopyTo(ms);
 
-        return JsonSerializer.Deserialize<RidCatalog>(ms.GetBuffer().AsSpan(0, (int) ms.Length))!;
+        return JsonSerializer.Deserialize<RidCatalog>(ms.GetBuffer().AsSpan(0, (int)ms.Length))!;
     }
 
 #pragma warning disable 649
     private sealed class RidCatalog
     {
-        [JsonInclude] [JsonPropertyName("runtimes")]
+        [JsonInclude]
+        [JsonPropertyName("runtimes")]
         public Dictionary<string, Runtime> Runtimes = default!;
 
         public class Runtime
         {
             public bool Discovered;
 
-            [JsonInclude] [JsonPropertyName("#import")]
+            [JsonInclude]
+            [JsonPropertyName("#import")]
             public string[] Imports = default!;
         }
     }

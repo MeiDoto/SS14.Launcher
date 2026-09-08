@@ -84,7 +84,7 @@ internal sealed class Program
 
             overlayApi = new ZipFileApi(overlayArchive, "");
             // Put this *before* the game's regular installation so it masks files.
-            extraMounts = [new ApiMount(overlayApi, "/"), ..extraMounts ?? []];
+            extraMounts = [new ApiMount(overlayApi, "/"), .. extraMounts ?? []];
         }
 
         var args = new MainArgs(_engineArgs, _fileApi, redialApi, extraMounts);
@@ -119,7 +119,7 @@ internal sealed class Program
             return false;
         }
 
-        loader = (ILoaderEntryPoint) Activator.CreateInstance(type)!;
+        loader = (ILoaderEntryPoint)Activator.CreateInstance(type)!;
         return true;
     }
 

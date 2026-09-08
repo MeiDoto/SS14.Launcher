@@ -326,7 +326,7 @@ internal static class Program
             curArchitecture);
 
         engineManager.ClearAllEngines();
-        cfg.SetCVar(CVars.CurrentArchitecture, (int) curArchitecture);
+        cfg.SetCVar(CVars.CurrentArchitecture, (int)curArchitecture);
         _ = cfg.CommitConfig();
     }
 

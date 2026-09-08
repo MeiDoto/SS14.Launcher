@@ -353,11 +353,11 @@ public sealed class DataManager : ObservableObject
                 continue;
 
             if (entry.Type == typeof(string))
-                Set((string?) v);
+                Set((string?)v);
             else if (entry.Type == typeof(bool))
-                Set((long) v != 0);
+                Set((long)v != 0);
             else if (entry.Type == typeof(int))
-                Set((int)(long) v);
+                Set((int)(long)v);
 
             void Set<T>(T value) => ((CVarEntry<T>)entry).ValueInternal = value;
         }
@@ -492,12 +492,12 @@ public sealed class DataManager : ObservableObject
         AddDbCommand(con =>
         {
             con.Execute(reason switch
-                {
-                    ChangeReason.Add => "INSERT INTO FavoriteServer VALUES (@Address, @Name, @RaiseTime)",
-                    ChangeReason.Update => "UPDATE FavoriteServer SET Name = @Name, RaiseTime = @RaiseTime WHERE Address = @Address",
-                    ChangeReason.Remove => "DELETE FROM FavoriteServer WHERE Address = @Address",
-                    _ => throw new ArgumentOutOfRangeException(nameof(reason), reason, null)
-                },
+            {
+                ChangeReason.Add => "INSERT INTO FavoriteServer VALUES (@Address, @Name, @RaiseTime)",
+                ChangeReason.Update => "UPDATE FavoriteServer SET Name = @Name, RaiseTime = @RaiseTime WHERE Address = @Address",
+                ChangeReason.Remove => "DELETE FROM FavoriteServer WHERE Address = @Address",
+                _ => throw new ArgumentOutOfRangeException(nameof(reason), reason, null)
+            },
                 data
             );
         });
@@ -516,13 +516,13 @@ public sealed class DataManager : ObservableObject
         AddDbCommand(con =>
         {
             con.Execute(reason switch
-                {
-                    ChangeReason.Add => "INSERT INTO Login VALUES (@UserId, @UserName, @Token, @Expires)",
-                    ChangeReason.Update =>
-                        "UPDATE Login SET UserName = @UserName, Token = @Token, Expires = @Expires WHERE UserId = @UserId",
-                    ChangeReason.Remove => "DELETE FROM Login WHERE UserId = @UserId",
-                    _ => throw new ArgumentOutOfRangeException(nameof(reason), reason, null)
-                },
+            {
+                ChangeReason.Add => "INSERT INTO Login VALUES (@UserId, @UserName, @Token, @Expires)",
+                ChangeReason.Update =>
+                    "UPDATE Login SET UserName = @UserName, Token = @Token, Expires = @Expires WHERE UserId = @UserId",
+                ChangeReason.Remove => "DELETE FROM Login WHERE UserId = @UserId",
+                _ => throw new ArgumentOutOfRangeException(nameof(reason), reason, null)
+            },
                 data
             );
         });
@@ -531,13 +531,13 @@ public sealed class DataManager : ObservableObject
     private void ChangeEngineInstallation(ChangeReason reason, InstalledEngineVersion engine)
     {
         AddDbCommand(con => con.Execute(reason switch
-            {
-                ChangeReason.Add => "INSERT INTO EngineInstallation VALUES (@Version, @Signature)",
-                ChangeReason.Update =>
-                    "UPDATE EngineInstallation SET Signature = @Signature WHERE Version = @Version",
-                ChangeReason.Remove => "DELETE FROM EngineInstallation WHERE Version = @Version",
-                _ => throw new ArgumentOutOfRangeException(nameof(reason), reason, null)
-            },
+        {
+            ChangeReason.Add => "INSERT INTO EngineInstallation VALUES (@Version, @Signature)",
+            ChangeReason.Update =>
+                "UPDATE EngineInstallation SET Signature = @Signature WHERE Version = @Version",
+            ChangeReason.Remove => "DELETE FROM EngineInstallation WHERE Version = @Version",
+            _ => throw new ArgumentOutOfRangeException(nameof(reason), reason, null)
+        },
             // Already immutable.
             engine
         ));
@@ -642,7 +642,7 @@ public sealed class DataManager : ObservableObject
 
             _parent.AddDbCommand(cmd => cmd.Execute(
                 "INSERT INTO ServerFilter (Category, Data) VALUES (@Category, @Data)",
-                new { item.Category, item.Data}));
+                new { item.Category, item.Data }));
         }
 
         public void Clear()
@@ -659,7 +659,7 @@ public sealed class DataManager : ObservableObject
 
             _parent.AddDbCommand(cmd => cmd.Execute(
                 "DELETE FROM ServerFilter WHERE Category = @Category AND Data = @Data",
-                new { item.Category, item.Data}));
+                new { item.Category, item.Data }));
 
             return true;
         }

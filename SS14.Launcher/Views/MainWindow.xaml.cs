@@ -29,7 +29,7 @@ public partial class MainWindow : Window
         AddHandler(DragDrop.DragOverEvent, DragOver);
         AddHandler(DragDrop.DropEvent, Drop);
 
-        _content = (MainWindowContent) Content!;
+        _content = (MainWindowContent)Content!;
 
         if (Application.Current?.Resources.TryGetResource("WindowIcon", null, out var iconObj) == true && iconObj is WindowIcon winIcon)
         {
@@ -82,15 +82,15 @@ public partial class MainWindow : Window
 
         // Immersive dark mode for Windows 10 (19041+) and Windows 11 (22000+)
         int useDarkMode = 1;
-        TerraFX.Interop.Windows.Windows.DwmSetWindowAttribute(hWnd, 20, &useDarkMode, (uint) sizeof(int));
+        TerraFX.Interop.Windows.Windows.DwmSetWindowAttribute(hWnd, 20, &useDarkMode, (uint)sizeof(int));
 
         if (Environment.OSVersion.Version.Build >= 22000)
         {
             COLORREF caption = 0x00262121;
-            TerraFX.Interop.Windows.Windows.DwmSetWindowAttribute(hWnd, 35, &caption, (uint) sizeof(COLORREF));
+            TerraFX.Interop.Windows.Windows.DwmSetWindowAttribute(hWnd, 35, &caption, (uint)sizeof(COLORREF));
 
             COLORREF text = 0x00E0E0E0;
-            TerraFX.Interop.Windows.Windows.DwmSetWindowAttribute(hWnd, 36, &text, (uint) sizeof(COLORREF));
+            TerraFX.Interop.Windows.Windows.DwmSetWindowAttribute(hWnd, 36, &text, (uint)sizeof(COLORREF));
 
             // Removes the top margin of the window on Windows 11, since there's ample space after we recolor the title bar.
             Classes.Add("WindowsTitlebarColorActive");
