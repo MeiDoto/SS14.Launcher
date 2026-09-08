@@ -46,6 +46,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Verify Code Formatting
+      if: matrix.os == 'ubuntu-latest'
       run: dotnet format --verify-no-changes --no-restore
 
     - name: Run Tests
