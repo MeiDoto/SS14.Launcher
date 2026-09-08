@@ -190,9 +190,21 @@ public sealed partial class ServerListCache : ObservableObject, IServerSource
                                 {
                                     if (Uri.TryCreate(fav.Address, UriKind.Absolute, out var uri))
                                     {
-                                        var infoUri = new Uri(uri, "/info");
-                                        using var req = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, infoUri);
-                                        await http.SendAsync(req, System.Net.Http.HttpCompletionOption.ResponseHeadersRead);
+                                        Uri? infoUri = null;
+                                        if (uri.Scheme == "ss14" || uri.Scheme == "ss14s")
+                                        {
+                                            infoUri = UriHelper.GetServerInfoAddress(uri);
+                                        }
+                                        else if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
+                                        {
+                                            infoUri = new Uri(uri, "/info");
+                                        }
+
+                                        if (infoUri != null)
+                                        {
+                                            using var req = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, infoUri);
+                                            await http.SendAsync(req, System.Net.Http.HttpCompletionOption.ResponseHeadersRead);
+                                        }
                                     }
                                 }
                                 catch (Exception ex)
