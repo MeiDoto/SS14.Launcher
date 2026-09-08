@@ -4,7 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Launcher-loader shared stuff -->
-    <PackageVersion Include="Microsoft.Data.Sqlite.Core" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.Data.Sqlite.Core" Version="10.0.11" />
     <PackageVersion Include="Splat" Version="15.3.1" />
     <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.10" Condition="'$(UseSystemSqlite)' != 'True'" />
     <PackageVersion Include="SQLitePCLRaw.provider.sqlite3" Version="2.1.10" Condition="'$(UseSystemSqlite)' == 'True'" />
