@@ -31,7 +31,7 @@ public partial class MainWindow : Window
 
         _content = (MainWindowContent) Content!;
 
-        if (Icon == null && Application.Current?.Resources.TryGetResource("WindowIcon", null, out var iconObj) == true && iconObj is WindowIcon winIcon)
+        if (Application.Current?.Resources.TryGetResource("WindowIcon", null, out var iconObj) == true && iconObj is WindowIcon winIcon)
         {
             Icon = winIcon;
         }

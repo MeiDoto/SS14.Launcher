@@ -25,7 +25,7 @@ public class App : Application
 {
     private static readonly Dictionary<string, AssetDef> AssetDefs = new()
     {
-        ["WindowIcon"] = new AssetDef("icon.ico", AssetType.WindowIcon),
+        ["WindowIcon"] = new AssetDef(OperatingSystem.IsWindows() ? "icon.ico" : "icon.png", AssetType.WindowIcon),
         ["LogoLong"] = new AssetDef("logo-long.png", AssetType.Bitmap),
     };
 
@@ -159,6 +159,7 @@ public class App : Application
         launcherInfo.Initialize();
         contentManager.Initialize();
         overrideAssets.Initialize();
+        DesktopIntegration.EnsureLinuxIconInstalled();
 
         var viewModel = new MainWindowViewModel();
         var window = new MainWindow

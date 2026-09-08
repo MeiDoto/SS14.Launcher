@@ -130,18 +130,23 @@ if (Test-Path $programs) {{
             Directory.CreateDirectory(iconDestDir);
             var iconDestPath = Path.Combine(iconDestDir, "SS14.png");
 
-            var iconSrcPath = Path.Combine(installDir, "SS14.png");
-            if (!File.Exists(iconSrcPath))
-                iconSrcPath = Path.Combine(installDir, "Assets", "SS14.png");
+            CopyIconToDestination(iconDestPath);
 
-            if (File.Exists(iconSrcPath))
+            var pixmapsDir = Path.Combine(dataHome, "pixmaps");
+            try
             {
-                File.Copy(iconSrcPath, iconDestPath, overwrite: true);
+                Directory.CreateDirectory(pixmapsDir);
+                if (File.Exists(iconDestPath))
+                {
+                    File.Copy(iconDestPath, Path.Combine(pixmapsDir, "SS14.png"), overwrite: true);
+                }
             }
+            catch (Exception) { }
 
             var appsDir = Path.Combine(dataHome, "applications");
             Directory.CreateDirectory(appsDir);
             var menuDesktopPath = Path.Combine(appsDir, "SS14.desktop");
+            var launcherDesktopPath = Path.Combine(appsDir, "SS14.Launcher.desktop");
 
             var desktopContent = $@"#!/usr/bin/env xdg-open
 [Desktop Entry]
@@ -165,9 +170,11 @@ Terminal=false
 PrefersNonDefaultGPU=false
 ";
             File.WriteAllText(menuDesktopPath, desktopContent);
+            File.WriteAllText(launcherDesktopPath, desktopContent);
             try
             {
                 File.SetUnixFileMode(menuDesktopPath, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+                File.SetUnixFileMode(launcherDesktopPath, UnixFileMode.UserRead | UnixFileMode.UserWrite);
             }
             catch (Exception ex)
             {
@@ -249,6 +256,87 @@ PrefersNonDefaultGPU=false
         {
             Log.Error(ex, "Failed to create Linux desktop shortcut");
             return (false, ex.Message);
+        }
+    }
+
+    public static void EnsureLinuxIconInstalled()
+    {
+        if (!OperatingSystem.IsLinux())
+            return;
+
+        try
+        {
+            var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            var xdgDataHome = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+            var dataHome = !string.IsNullOrEmpty(xdgDataHome)
+                ? xdgDataHome
+                : Path.Combine(home, ".local", "share");
+
+            var iconDestDir = Path.Combine(dataHome, "icons", "hicolor", "256x256", "apps");
+            Directory.CreateDirectory(iconDestDir);
+            var iconDestPath = Path.Combine(iconDestDir, "SS14.png");
+
+            if (!File.Exists(iconDestPath))
+            {
+                CopyIconToDestination(iconDestPath);
+            }
+
+            var pixmapsDir = Path.Combine(dataHome, "pixmaps");
+            var pixmapPath = Path.Combine(pixmapsDir, "SS14.png");
+            if (!File.Exists(pixmapPath) && File.Exists(iconDestPath))
+            {
+                Directory.CreateDirectory(pixmapsDir);
+                File.Copy(iconDestPath, pixmapPath, overwrite: true);
+            }
+
+            var appsDir = Path.Combine(dataHome, "applications");
+            var ss14DesktopPath = Path.Combine(appsDir, "SS14.desktop");
+            var launcherDesktopPath = Path.Combine(appsDir, "SS14.Launcher.desktop");
+
+            if (File.Exists(ss14DesktopPath) && !File.Exists(launcherDesktopPath))
+            {
+                File.Copy(ss14DesktopPath, launcherDesktopPath, overwrite: true);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Failed to ensure Linux icon is installed");
+        }
+    }
+
+    private static void CopyIconToDestination(string iconDestPath)
+    {
+        var installDir = AppDomain.CurrentDomain.BaseDirectory;
+        string[] candidateSrcs =
+        [
+            Path.Combine(installDir, "SS14.png"),
+            Path.Combine(installDir, "icon.png"),
+            Path.Combine(installDir, "Assets", "SS14.png"),
+            Path.Combine(installDir, "Assets", "icon.png"),
+            Path.Combine(AppContext.BaseDirectory, "SS14.png"),
+            Path.Combine(AppContext.BaseDirectory, "icon.png"),
+            Path.Combine(AppContext.BaseDirectory, "Assets", "SS14.png"),
+            Path.Combine(AppContext.BaseDirectory, "Assets", "icon.png")
+        ];
+
+        foreach (var cand in candidateSrcs)
+        {
+            if (File.Exists(cand))
+            {
+                File.Copy(cand, iconDestPath, overwrite: true);
+                return;
+            }
+        }
+
+        try
+        {
+            using var assetStream = Avalonia.Platform.AssetLoader.Open(new Uri("avares://SS14.Launcher/Assets/icon.png"));
+            using var fileStream = File.Create(iconDestPath);
+            assetStream.CopyTo(fileStream);
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Failed to extract embedded icon to {Dest}", iconDestPath);
         }
     }
 }
