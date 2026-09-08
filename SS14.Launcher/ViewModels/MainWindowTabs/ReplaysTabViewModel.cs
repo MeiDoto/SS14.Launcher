@@ -144,6 +144,16 @@ public sealed class ReplayItemViewModel : ViewModelBase
         _ = _parent.LaunchReplay(FilePath);
     }
 
+    public void ShowDetails()
+    {
+        var window = _parent.Control?.GetVisualRoot() as Window;
+        var dialog = new Views.ReplayDetailsDialog(FilePath, () => Play());
+        if (window != null)
+            dialog.ShowDialog(window);
+        else
+            dialog.Show();
+    }
+
     public void Delete()
     {
         try

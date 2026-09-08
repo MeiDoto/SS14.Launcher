@@ -69,6 +69,8 @@
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                       <Button Content="{loc:Loc tab-replays-play}" Command="{Binding Play}"
                               Background="#27AE60" Foreground="White" FontWeight="Bold" Padding="14, 6" />
+                      <Button Content="ℹ️" Command="{Binding ShowDetails}"
+                              Background="#2980B9" Foreground="White" Padding="8, 6" ToolTip.Tip="{loc:Loc tab-replays-details-tooltip}" />
                       <Button Content="🗑" Command="{Binding Delete}"
                               Background="#C0392B" Foreground="White" Padding="8, 6" ToolTip.Tip="{loc:Loc tab-replays-delete-tooltip}" />
                     </StackPanel>

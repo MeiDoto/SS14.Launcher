@@ -23,10 +23,12 @@ public static class LauncherPaths
     public static readonly string DirUserData = GetUserDataDir();
     public static readonly string DirLocalData = GetLocalUserDataDir();
     public static readonly string DirEngineInstallations = Path.Combine(DirUserData, EngineInstallationsDirName);
+    public static readonly string DirEngines = DirEngineInstallations;
     public static readonly string DirModuleInstallations = Path.Combine(DirUserData, EngineModulesDirName);
     // Legacy server content directory. No longer used except to delete on launch.
     public static readonly string DirServerContent = Path.Combine(DirUserData, ServerContentDirName);
     public static readonly string DirLogs = Path.Combine(DirUserData, LogsDirName);
+    public static readonly string DirReplays = Path.Combine(DirUserData, "replays");
     public static readonly string PathLauncherLog = Path.Combine(DirLogs, LauncherLogName);
     public static readonly string PathClientMacLog = Path.Combine(DirLogs, ClientMacLogName);
     public static readonly string PathClientStdoutLog = Path.Combine(DirLogs, ClientStdoutLogName);

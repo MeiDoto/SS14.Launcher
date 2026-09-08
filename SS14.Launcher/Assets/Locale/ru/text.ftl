@@ -998,7 +998,66 @@ tab-dev-btn-sysinfo = Диагностика системы
 tab-dev-btn-netdiag = Тест сети и CDN
 tab-dev-btn-force-gc = Сборка мусора (Force GC)
 tab-dev-clear-playtime = Сбросить наигранное время
-tab-dev-clear-slots = Сбросить трекинг слотов
 tab-dev-clear-news-cache = Очистить кэш новостей
 tab-dev-reset-all-cvars = Сбросить все CVars настройки
+
+## Сетевая диагностика
+diagnostics-dialog-title = Сетевая диагностика
+diagnostics-dialog-close = Закрыть
+diagnostics-section-target = Целевой хост / адрес сервера
+diagnostics-target-desc = Низкоуровневая диагностика соединения (разрешение DNS, TCP-рукопожатие сокета, TLS-сертификат, замер пинга, джиттера и потерь пакетов).
+diagnostics-run-button = Запустить тест
+diagnostics-section-report = Диагностический отчёт
+diagnostics-copy-report = 📋 Скопировать отчёт в буфер
+diagnostics-status-running = Выполняется сетевая диагностика…
+diagnostics-status-passed = Все сетевые проверки успешно пройдены!
+diagnostics-status-issues-found = Проверка завершена с предупреждениями или ошибками.
+diagnostics-status-cancelled = Диагностика была прервана.
+diagnostics-status-error = Ошибка диагностики: { $err }
+tab-options-diagnostics-button = Диагностика сети
+tab-options-diagnostics-desc = Замер пинга, джиттера, резолва DNS и доступности портов игровых серверов или хаба.
+
+## Менеджер хранилища и кэша
+storage-dialog-title = Управление хранилищем и кэшем
+storage-dialog-close = Закрыть
+storage-section-overview = Обзор использования диска
+storage-refresh-button = 🔄 Обновить
+storage-cat-content-db = База контента
+storage-cat-engines = Движки игры
+storage-cat-logs = Файлы журналов
+storage-cat-replays = Записи реплеев
+storage-total-label = Общий размер данных лаунчера:
+storage-section-engines = Установленные версии движка
+storage-delete-selected-engine = 🗑 Удалить выбранную версию
+storage-section-actions = Действия по очистке и оптимизации
+storage-action-clean-14-days = Удалить контент старше 14 дней
+storage-action-vacuum = Сжать и оптимизировать базу (VACUUM)
+storage-action-clear-logs = 🧹 Очистить все логи
+storage-status-analyzing = Анализ использования диска…
+storage-status-ready = Готово
+storage-status-cleaning = Очистка устаревшего контента серверов…
+storage-status-vacuuming = Сжатие базы данных и усечение WAL…
+storage-status-error = Ошибка: { $err }
+storage-engine-deleted = Версия движка { $ver } успешно удалена
+storage-engine-delete-failed = Не удалось удалить версию движка { $ver }
+storage-clean-completed = Очищено старых версий контента: { $count }
+storage-vacuum-completed = База данных успешно сжата и оптимизирована
+storage-vacuum-failed = Сжатие базы завершилось ошибкой
+storage-logs-cleared = Файлы журналов успешно очищены
+tab-options-storage-manager = Хранилище и кэш
+
+## Инспектор реплеев
+tab-replays-details-tooltip = Подробная информация о записи раунда и содержимом архива
+replay-dialog-title = Инспектор реплея
+replay-dialog-server = Сервер:
+replay-dialog-map = Карта:
+replay-dialog-duration = Длительность:
+replay-dialog-date = Записан:
+replay-dialog-size = Размер архива:
+replay-dialog-uncompressed = Несжатый размер:
+replay-dialog-files-header = Содержимое архива:
+replay-dialog-play = ▶ Воспроизвести
+replay-dialog-open-folder = 📁 Открыть в папке
+replay-dialog-copy-path = 📋 Скопировать путь
+replay-dialog-close = Закрыть
 

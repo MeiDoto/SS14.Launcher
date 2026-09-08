@@ -1,0 +1,86 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:SS14.Launcher.ViewModels"
+        xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+        mc:Ignorable="d" d:DesignWidth="680" d:DesignHeight="560"
+        Width="680" Height="560"
+        CanResize="True"
+        x:Class="SS14.Launcher.Views.NetworkDiagnosticsDialog"
+        x:DataType="vm:NetworkDiagnosticsViewModel"
+        Icon="/Assets/icon.ico"
+        Title="{loc:Loc diagnostics-dialog-title}"
+        Padding="16"
+        Background="{DynamicResource ThemePopupBackgroundBrush}"
+        WindowStartupLocation="CenterOwner">
+  <Design.DataContext>
+    <vm:NetworkDiagnosticsViewModel />
+  </Design.DataContext>
+  <Window.DataContext>
+    <vm:NetworkDiagnosticsViewModel />
+  </Window.DataContext>
+
+  <DockPanel>
+    <!-- BOTTOM ACTION BAR -->
+    <DockPanel DockPanel.Dock="Bottom" Margin="0, 12, 0, 0" LastChildFill="False">
+      <Button DockPanel.Dock="Left" Click="CopyReportClicked" Content="{loc:Loc diagnostics-copy-report}"
+              IsVisible="{Binding HasReport}" Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
+      <Button DockPanel.Dock="Right" Click="CloseClicked" Content="{loc:Loc diagnostics-dialog-close}" Margin="6, 0, 0, 0" />
+    </DockPanel>
+
+    <StackPanel Spacing="10">
+      <!-- TARGET CONFIGURATION CARD -->
+      <Border Classes="Card" Padding="12">
+        <StackPanel Spacing="8">
+          <TextBlock Text="{loc:Loc diagnostics-section-target}" Classes="SectionTitle" />
+          <TextBlock Text="{loc:Loc diagnostics-target-desc}" Classes="SubText" FontSize="12" TextWrapping="Wrap" />
+
+          <Grid ColumnDefinitions="*, Auto" Margin="0, 4, 0, 0">
+            <TextBox Grid.Column="0" Text="{Binding TargetAddress}"
+                     Watermark="ss14s://central.spacestation14.io:1212"
+                     IsEnabled="{Binding !IsRunning}" VerticalAlignment="Center" Margin="0, 0, 8, 0" />
+            <Button Grid.Column="1" Click="RunDiagnosticsClicked"
+                    Content="{loc:Loc diagnostics-run-button}"
+                    IsEnabled="{Binding CanRun}"
+                    Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="Bold" />
+          </Grid>
+
+          <TextBlock Text="{Binding StatusSummary}" FontWeight="SemiBold"
+                     Foreground="{DynamicResource ThemeNanoGoldBrush}"
+                     IsVisible="{Binding StatusSummary, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        </StackPanel>
+      </Border>
+
+      <!-- RESULTS LIST -->
+      <Border Classes="Card" Padding="12" MinHeight="180" MaxHeight="220">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <ItemsControl ItemsSource="{Binding Steps}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:DiagnosticsStepViewModel">
+                <Border Margin="0, 2" Padding="6, 4" Background="#1AFFFFFF" CornerRadius="4">
+                  <Grid ColumnDefinitions="30, 200, 80, *">
+                    <TextBlock Grid.Column="0" Text="{Binding StatusBadge}" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="6, 0, 0, 0" />
+                    <TextBlock Grid.Column="2" Text="{Binding ElapsedFormatted}" Classes="SubText" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0, 0, 8, 0" />
+                    <TextBlock Grid.Column="3" Text="{Binding Details}" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="11" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Border>
+
+      <!-- REPORT TEXT PREVIEW -->
+      <Border Classes="Card" Padding="8" IsVisible="{Binding HasReport}">
+        <StackPanel Spacing="4">
+          <TextBlock Text="{loc:Loc diagnostics-section-report}" Classes="SectionTitle" FontSize="13" />
+          <TextBox Text="{Binding ReportText}" IsReadOnly="True" AcceptsReturn="True"
+                   FontFamily="Consolas, Monospace, Courier New" FontSize="11"
+                   Height="110" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </DockPanel>
+</Window>

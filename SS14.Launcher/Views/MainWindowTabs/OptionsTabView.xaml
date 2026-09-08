@@ -83,10 +83,14 @@
                        Text="{loc:Loc tab-options-http-compression-desc}"
                        Margin="8, 0, 8, 8" />
 
-            <Button Click="OpenProxySettings" Content="{loc:Loc tab-options-proxy-button}" Margin="4" HorizontalAlignment="Left"
-                    Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
+            <WrapPanel Orientation="Horizontal" Margin="4, 0, 0, 4">
+              <Button Click="OpenProxySettings" Content="{loc:Loc tab-options-proxy-button}" Margin="0, 0, 6, 6"
+                      Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
+              <Button Click="OpenNetworkDiagnostics" Content="{loc:Loc tab-options-diagnostics-button}" Margin="0, 0, 6, 6"
+                      Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
+            </WrapPanel>
             <TextBlock VerticalAlignment="Center" TextWrapping="Wrap"
-                       Text="{loc:Loc tab-options-proxy-settings-desc}"
+                       Text="{loc:Loc tab-options-diagnostics-desc}"
                        Margin="8, 0, 8, 8" />
           </StackPanel>
         </Border>
@@ -181,6 +185,8 @@
 
             <WrapPanel Orientation="Horizontal" Margin="4, 0, 0, 4">
               <Button Click="OpenLogViewer" Content="{loc:Loc tab-options-log-viewer}" Margin="0, 0, 6, 6"
+                      Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
+              <Button Click="OpenStorageManager" Content="{loc:Loc tab-options-storage-manager}" Margin="0, 0, 6, 6"
                       Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
               <Button Click="OpenLocalBuilds" Content="{loc:Loc tab-options-local-builds}" Margin="0, 0, 6, 6"
                       Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />

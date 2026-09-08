@@ -1,0 +1,124 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:SS14.Launcher.ViewModels"
+        xmlns:contentManagement="clr-namespace:SS14.Launcher.Models.ContentManagement"
+        xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+        mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="580"
+        Width="700" Height="580"
+        CanResize="True"
+        x:Class="SS14.Launcher.Views.StorageManagerDialog"
+        x:DataType="vm:StorageManagerViewModel"
+        Icon="/Assets/icon.ico"
+        Title="{loc:Loc storage-dialog-title}"
+        Padding="16"
+        Background="{DynamicResource ThemePopupBackgroundBrush}"
+        WindowStartupLocation="CenterOwner">
+  <Design.DataContext>
+    <vm:StorageManagerViewModel />
+  </Design.DataContext>
+  <Window.DataContext>
+    <vm:StorageManagerViewModel />
+  </Window.DataContext>
+
+  <DockPanel>
+    <!-- BOTTOM ACTION BAR -->
+    <DockPanel DockPanel.Dock="Bottom" Margin="0, 12, 0, 0">
+      <TextBlock DockPanel.Dock="Left" Text="{Binding StatusMessage}" VerticalAlignment="Center"
+                 Foreground="{DynamicResource ThemeNanoGoldBrush}" FontSize="12" />
+      <Button DockPanel.Dock="Right" Click="CloseClicked" Content="{loc:Loc storage-dialog-close}"
+              HorizontalAlignment="Right" Margin="6, 0, 0, 0" />
+    </DockPanel>
+
+    <StackPanel Spacing="10">
+      <!-- OVERVIEW CARD -->
+      <Border Classes="Card" Padding="14">
+        <StackPanel Spacing="8">
+          <DockPanel LastChildFill="False">
+            <TextBlock DockPanel.Dock="Left" Text="{loc:Loc storage-section-overview}" Classes="SectionTitle" VerticalAlignment="Center" />
+            <Button DockPanel.Dock="Right" Click="RefreshClicked" Content="{loc:Loc storage-refresh-button}"
+                    IsEnabled="{Binding CanOperate}" Margin="0" />
+          </DockPanel>
+
+          <Grid ColumnDefinitions="*, *, *, *" Margin="0, 4, 0, 0">
+            <Border Grid.Column="0" Background="#15FFFFFF" CornerRadius="6" Padding="10, 8" Margin="0, 0, 4, 0">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{loc:Loc storage-cat-content-db}" Classes="SubText" FontSize="11" />
+                <TextBlock Text="{Binding ContentDbFormatted}" FontWeight="Bold" FontSize="14" />
+              </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Background="#15FFFFFF" CornerRadius="6" Padding="10, 8" Margin="4, 0, 4, 0">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{loc:Loc storage-cat-engines}" Classes="SubText" FontSize="11" />
+                <TextBlock Text="{Binding EnginesFormatted}" FontWeight="Bold" FontSize="14" />
+              </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Background="#15FFFFFF" CornerRadius="6" Padding="10, 8" Margin="4, 0, 4, 0">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{loc:Loc storage-cat-logs}" Classes="SubText" FontSize="11" />
+                <TextBlock Text="{Binding LogsFormatted}" FontWeight="Bold" FontSize="14" />
+              </StackPanel>
+            </Border>
+
+            <Border Grid.Column="3" Background="#15FFFFFF" CornerRadius="6" Padding="10, 8" Margin="4, 0, 0, 0">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{loc:Loc storage-cat-replays}" Classes="SubText" FontSize="11" />
+                <TextBlock Text="{Binding ReplaysFormatted}" FontWeight="Bold" FontSize="14" />
+              </StackPanel>
+            </Border>
+          </Grid>
+
+          <DockPanel Margin="0, 4, 0, 0">
+            <TextBlock Text="{loc:Loc storage-total-label}" Classes="SubText" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding TotalUsageFormatted}" FontWeight="Bold" FontSize="16"
+                       HorizontalAlignment="Right" Foreground="{DynamicResource ThemeNanoGoldBrush}" />
+          </DockPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- ENGINES BREAKDOWN CARD -->
+      <Border Classes="Card" Padding="12" MinHeight="160" MaxHeight="200">
+        <StackPanel Spacing="6">
+          <DockPanel LastChildFill="False">
+            <TextBlock DockPanel.Dock="Left" Text="{loc:Loc storage-section-engines}" Classes="SectionTitle" FontSize="13" VerticalAlignment="Center" />
+            <Button DockPanel.Dock="Right" Click="DeleteEngineClicked"
+                    Content="{loc:Loc storage-delete-selected-engine}"
+                    IsEnabled="{Binding HasSelectedEngine}"
+                    Foreground="#FF5252" FontWeight="SemiBold" FontSize="11" />
+          </DockPanel>
+
+          <ListBox ItemsSource="{Binding Engines}" SelectedItem="{Binding SelectedEngine}" Height="130">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="contentManagement:EngineStorageItem">
+                <Grid ColumnDefinitions="*, 100, 140">
+                  <TextBlock Grid.Column="0" Text="{Binding Version}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="1" Text="{Binding FormattedSize}" Classes="SubText" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="2" Text="{Binding FormattedDate}" Classes="SubText" FontSize="11" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="12, 0, 0, 0" />
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </StackPanel>
+      </Border>
+
+      <!-- CLEANUP ACTIONS CARD -->
+      <Border Classes="Card" Padding="12">
+        <StackPanel Spacing="8">
+          <TextBlock Text="{loc:Loc storage-section-actions}" Classes="SectionTitle" FontSize="13" />
+
+          <WrapPanel Orientation="Horizontal">
+            <Button Click="CleanOldContentClicked" Content="{loc:Loc storage-action-clean-14-days}"
+                    IsEnabled="{Binding CanOperate}" Margin="0, 0, 6, 6" />
+            <Button Click="VacuumDbClicked" Content="{loc:Loc storage-action-vacuum}"
+                    IsEnabled="{Binding CanOperate}" Margin="0, 0, 6, 6" />
+            <Button Click="ClearLogsClicked" Content="{loc:Loc storage-action-clear-logs}"
+                    IsEnabled="{Binding CanOperate}" Margin="0, 0, 6, 6" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </DockPanel>
+</Window>

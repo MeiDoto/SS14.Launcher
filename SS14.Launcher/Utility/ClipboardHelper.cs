@@ -79,4 +79,26 @@ public static class ClipboardHelper
 
         return null;
     }
+
+    /// <summary>
+    /// Sets text to the clipboard of the active window safely.
+    /// </summary>
+    public static async Task SetTextAsync(string text)
+    {
+        try
+        {
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var window = desktop.Windows.FirstOrDefault(w => w.IsActive) ?? desktop.MainWindow;
+                if (window?.Clipboard != null)
+                {
+                    await window.Clipboard.SetTextAsync(text);
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Ignore clipboard access errors
+        }
+    }
 }

@@ -1,0 +1,74 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:SS14.Launcher.ViewModels"
+        xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+        mc:Ignorable="d" d:DesignWidth="650" d:DesignHeight="520"
+        Width="650" Height="520"
+        CanResize="True"
+        x:Class="SS14.Launcher.Views.ReplayDetailsDialog"
+        x:DataType="vm:ReplayDetailsViewModel"
+        Icon="/Assets/icon.ico"
+        Title="{loc:Loc replay-dialog-title}"
+        Padding="16"
+        Background="{DynamicResource ThemePopupBackgroundBrush}"
+        WindowStartupLocation="CenterOwner">
+  <Design.DataContext>
+    <vm:ReplayDetailsViewModel />
+  </Design.DataContext>
+
+  <DockPanel>
+    <!-- BOTTOM ACTIONS -->
+    <DockPanel DockPanel.Dock="Bottom" Margin="0, 12, 0, 0" LastChildFill="False">
+      <Button DockPanel.Dock="Left" Click="PlayClicked" Content="{loc:Loc replay-dialog-play}"
+              Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="Bold" />
+      <Button DockPanel.Dock="Left" Click="OpenFolderClicked" Content="{loc:Loc replay-dialog-open-folder}" Margin="6, 0, 0, 0" />
+      <Button DockPanel.Dock="Left" Click="CopyPathClicked" Content="{loc:Loc replay-dialog-copy-path}" Margin="6, 0, 0, 0" />
+      <Button DockPanel.Dock="Right" Click="CloseClicked" Content="{loc:Loc replay-dialog-close}" Margin="6, 0, 0, 0" />
+    </DockPanel>
+
+    <StackPanel Spacing="10">
+      <!-- ROUND OVERVIEW CARD -->
+      <Border Classes="Card" Padding="14">
+        <StackPanel Spacing="6">
+          <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource ThemeNanoGoldBrush}" />
+
+          <Grid ColumnDefinitions="140, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" Margin="0, 4, 0, 0">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc replay-dialog-server}" Classes="SubText" />
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ServerName}" FontWeight="SemiBold" TextWrapping="Wrap" />
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc replay-dialog-map}" Classes="SubText" Margin="0, 3, 0, 0" />
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding MapName}" Margin="0, 3, 0, 0" />
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc replay-dialog-duration}" Classes="SubText" Margin="0, 3, 0, 0" />
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Duration}" Margin="0, 3, 0, 0" />
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc replay-dialog-date}" Classes="SubText" Margin="0, 3, 0, 0" />
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DateFormatted}" Margin="0, 3, 0, 0" />
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Loc replay-dialog-size}" Classes="SubText" Margin="0, 3, 0, 0" />
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding FileSizeFormatted}" Margin="0, 3, 0, 0" />
+
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="{loc:Loc replay-dialog-uncompressed}" Classes="SubText" Margin="0, 3, 0, 0" />
+            <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding UncompressedSizeFormatted}" Margin="0, 3, 0, 0" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- ARCHIVE CONTENTS LIST -->
+      <Border Classes="Card" Padding="12" MinHeight="180" MaxHeight="220">
+        <StackPanel Spacing="6">
+          <TextBlock Text="{loc:Loc replay-dialog-files-header}" Classes="SectionTitle" FontSize="13" />
+          <ListBox ItemsSource="{Binding FileEntries}" Height="150">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding}" FontFamily="Consolas, Monospace, Courier New" FontSize="11" />
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </DockPanel>
+</Window>

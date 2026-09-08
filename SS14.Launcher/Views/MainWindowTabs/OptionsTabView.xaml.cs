@@ -79,6 +79,16 @@ public partial class OptionsTabView : UserControl
         await new ProxySettingsDialog().ShowDialog((Window)this.GetVisualRoot()!);
     }
 
+    public async void OpenNetworkDiagnostics(object? sender, RoutedEventArgs args)
+    {
+        await new NetworkDiagnosticsDialog().ShowDialog((Window)this.GetVisualRoot()!);
+    }
+
+    public async void OpenStorageManager(object? sender, RoutedEventArgs args)
+    {
+        await new StorageManagerDialog().ShowDialog((Window)this.GetVisualRoot()!);
+    }
+
     public async void CheckForUpdatesPressed(object? sender, RoutedEventArgs args)
     {
         if (DataContext is OptionsTabViewModel vm)

@@ -822,7 +822,66 @@ tab-dev-btn-sysinfo = System Diagnostics
 tab-dev-btn-netdiag = Network & CDN Diagnostics
 tab-dev-btn-force-gc = Force Garbage Collection (GC)
 tab-dev-clear-playtime = Reset Server Playtime
-tab-dev-clear-slots = Reset Watched Slots
 tab-dev-clear-news-cache = Clear News Cache
 tab-dev-reset-all-cvars = Reset All CVars to Defaults
+
+## Network Diagnostics
+diagnostics-dialog-title = Network Diagnostics
+diagnostics-dialog-close = Close
+diagnostics-section-target = Target Host / Server URI
+diagnostics-target-desc = Run low-level connectivity diagnostics (DNS resolution, TCP socket connection, TLS negotiation, ping, jitter, and packet loss).
+diagnostics-run-button = Run Diagnostics
+diagnostics-section-report = Diagnostic Report
+diagnostics-copy-report = Copy Report to Clipboard
+diagnostics-status-running = Running network diagnostics…
+diagnostics-status-passed = All network tests passed successfully!
+diagnostics-status-issues-found = Diagnostic tests completed with warnings or failures.
+diagnostics-status-cancelled = Diagnostic run was cancelled.
+diagnostics-status-error = Diagnostic error: { $err }
+tab-options-diagnostics-button = Network Diagnostics
+tab-options-diagnostics-desc = Measure ping, jitter, DNS resolution, and TCP/TLS connectivity to any game server or hub.
+
+## Storage & Cache Manager
+storage-dialog-title = Storage & Cache Manager
+storage-dialog-close = Close
+storage-section-overview = Storage Overview
+storage-refresh-button = Refresh
+storage-cat-content-db = Content Database
+storage-cat-engines = Game Engines
+storage-cat-logs = Log Files
+storage-cat-replays = Saved Replays
+storage-total-label = Total Launcher Disk Usage:
+storage-section-engines = Installed Engine Versions
+storage-delete-selected-engine = Delete Selected Version
+storage-section-actions = Maintenance & Cleanup Actions
+storage-action-clean-14-days = Clean Content Older Than 14 Days
+storage-action-vacuum = Optimize & Compress DB (VACUUM)
+storage-action-clear-logs = Clear All Logs
+storage-status-analyzing = Analyzing disk usage…
+storage-status-ready = Ready
+storage-status-cleaning = Cleaning old server content…
+storage-status-vacuuming = Compressing database and truncating WAL…
+storage-status-error = Error: { $err }
+storage-engine-deleted = Successfully deleted engine version { $ver }
+storage-engine-delete-failed = Failed to delete engine version { $ver }
+storage-clean-completed = Cleaned up { $count } old content versions
+storage-vacuum-completed = Database vacuumed and optimized successfully
+storage-vacuum-failed = Database vacuum failed
+storage-logs-cleared = Log files cleared successfully
+tab-options-storage-manager = Storage Manager
+
+## Replay Inspector
+tab-replays-details-tooltip = Inspect replay metadata and contents
+replay-dialog-title = Replay Inspector
+replay-dialog-server = Server:
+replay-dialog-map = Map:
+replay-dialog-duration = Duration:
+replay-dialog-date = Recorded:
+replay-dialog-size = File Size:
+replay-dialog-uncompressed = Uncompressed Size:
+replay-dialog-files-header = Archive Contents:
+replay-dialog-play = Play Replay
+replay-dialog-open-folder = Open in Folder
+replay-dialog-copy-path = Copy Path
+replay-dialog-close = Close
 
