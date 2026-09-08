@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Serilog;
 using System.Text.Json;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
@@ -85,7 +86,7 @@ public class LocalBuildsViewModel : ViewModelBase
             var list = Builds.Select(b => b.Entry).ToArray();
             var json = JsonSerializer.Serialize(list);
             _cfg.SetCVar(CVars.LocalBuilds, json);
-            _cfg.CommitConfig();
+            _ = _cfg.CommitConfig();
             OnPropertyChanged(nameof(HasBuilds));
             OnPropertyChanged(nameof(HasNoBuilds));
         }
@@ -249,7 +250,10 @@ public class LocalBuildItemViewModel : ViewModelBase
                 });
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Failed to open folder for local build {Path}", Entry.Path);
+        }
     }
 
     public void Delete()

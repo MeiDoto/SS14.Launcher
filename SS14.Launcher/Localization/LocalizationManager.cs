@@ -206,7 +206,7 @@ public sealed class LocalizationManager
             {
                 return new CultureInfo(name);
             }
-            catch
+            catch (Exception)
             {
                 return new CultureInfo(FallbackCulture);
             }

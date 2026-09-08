@@ -169,7 +169,10 @@ PrefersNonDefaultGPU=false
             {
                 File.SetUnixFileMode(menuDesktopPath, UnixFileMode.UserRead | UnixFileMode.UserWrite);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "Could not set UnixFileMode on {Path}", menuDesktopPath);
+            }
 
             // Try to find Desktop directory from user-dirs.dirs or fallback
             var desktopDir = Path.Combine(home, "Desktop");
@@ -193,7 +196,10 @@ PrefersNonDefaultGPU=false
                     }
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "Failed to parse user-dirs.dirs for XDG_DESKTOP_DIR");
+            }
 
             if (!Directory.Exists(desktopDir))
             {
@@ -212,20 +218,29 @@ PrefersNonDefaultGPU=false
                 {
                     File.SetUnixFileMode(desktopShortcut, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex, "Could not set UnixFileMode on {Path}", desktopShortcut);
+                }
 
                 try
                 {
                     Process.Start(new ProcessStartInfo("gio", $"set \"{desktopShortcut}\" metadata::trusted true") { CreateNoWindow = true, UseShellExecute = false });
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Log.Debug(ex, "Failed to execute gio metadata trust on shortcut");
+                }
             }
 
             try
             {
                 Process.Start(new ProcessStartInfo("update-desktop-database", $"\"{appsDir}\"") { CreateNoWindow = true, UseShellExecute = false });
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "Failed to run update-desktop-database");
+            }
 
             Log.Information("Linux desktop shortcuts created successfully.");
             return (true, "Shortcuts created on Desktop and Application Menu!");

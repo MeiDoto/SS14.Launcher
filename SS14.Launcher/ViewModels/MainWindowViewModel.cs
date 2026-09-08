@@ -482,20 +482,20 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
     public void DismissEarlyAccessPressed()
     {
         Cfg.SetCVar(CVars.HasDismissedEarlyAccessWarning, true);
-        Cfg.CommitConfig();
+        _ = Cfg.CommitConfig();
     }
 
     public void DismissIntelDegradationPressed()
     {
         Cfg.SetCVar(CVars.HasDismissedIntelDegradation, true);
-        Cfg.CommitConfig();
+        _ = Cfg.CommitConfig();
         OnPropertyChanged(nameof(ShouldShowIntelDegradationWarning));
     }
 
     public void DismissAppleSiliconRosettaPressed()
     {
         Cfg.SetCVar(CVars.HasDismissedRosettaWarning, true);
-        Cfg.CommitConfig();
+        _ = Cfg.CommitConfig();
         OnPropertyChanged(nameof(ShouldShowRosettaWarning));
     }
 

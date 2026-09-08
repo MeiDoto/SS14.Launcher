@@ -11,12 +11,18 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
@@ -32,7 +38,26 @@ jobs:
 
     - name: Install dependencies
       run: dotnet restore
-    - name: Build
+
+    - name: Build (Debug)
+      run: dotnet build --configuration Debug --no-restore
+
+    - name: Build (Release)
       run: dotnet build --configuration Release --no-restore
+
+    - name: Verify Code Formatting
+      run: dotnet format --verify-no-changes --no-restore
+
     - name: Run Tests
+      run: dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj --no-build --configuration Debug -v normal
+
+    - name: Run Tests (Release)
       run: dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj --no-build --configuration Release -v normal
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.os }}
+        path: '**/TestResults/**'
+        retention-days: 7

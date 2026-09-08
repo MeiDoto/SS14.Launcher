@@ -82,9 +82,9 @@ public static class DesktopNotificationManager
                     CreateNoWindow = true
                 });
             }
-            catch
+            catch (Exception notifEx)
             {
-                // ignore
+                Log.Debug(notifEx, "kdialog notification fallback failed");
             }
         }
     }

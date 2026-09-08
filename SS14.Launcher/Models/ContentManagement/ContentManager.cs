@@ -174,14 +174,15 @@ public sealed class ContentManager
             {
                 return proc.MainModule?.FileName == mainModule;
             }
-            catch
+            catch (Exception ex)
             {
+                Log.Debug(ex, "Failed to inspect process module");
                 return !proc.HasExited;
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Process doesn't exist or access denied.
+            Log.Debug(ex, "Process does not exist or access denied");
             return false;
         }
     }

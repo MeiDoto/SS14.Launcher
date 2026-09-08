@@ -82,11 +82,11 @@ public sealed class OverrideAssetsManager
 
         if (!_overridesUpdated)
         {
-            UpdateAssets();
+            _ = UpdateAssets();
         }
     }
 
-    private async void UpdateAssets()
+    private async Task UpdateAssets()
     {
         _updateCancel?.Cancel();
 

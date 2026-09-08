@@ -298,7 +298,7 @@ public sealed partial class Updater : ObservableObject
         await CullEngineVersionsMaybe(con);
 
         Status = UpdateStatus.CommittingDownload;
-        _cfg.CommitConfig();
+        _ = _cfg.CommitConfig();
 
         Log.Information("Update done!");
         return new ContentLaunchInfo(versionRowId, modules);

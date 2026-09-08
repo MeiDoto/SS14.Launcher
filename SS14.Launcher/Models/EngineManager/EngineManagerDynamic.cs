@@ -133,7 +133,7 @@ public sealed partial class EngineManagerDynamic : IEngineManager
         }
 
         _cfg.AddEngineInstallation(new InstalledEngineVersion(foundVersion.Version, buildInfo.Signature));
-        _cfg.CommitConfig();
+        _ = _cfg.CommitConfig();
         return new EngineInstallationResult(foundVersion.Version, true);
     }
 
@@ -229,7 +229,7 @@ public sealed partial class EngineManagerDynamic : IEngineManager
         }
 
         _cfg.AddEngineModule(new InstalledEngineModule(moduleName, moduleVersion));
-        _cfg.CommitConfig();
+        _ = _cfg.CommitConfig();
 
         Log.Debug("Done installing module!");
 
@@ -410,7 +410,7 @@ public sealed partial class EngineManagerDynamic : IEngineManager
             Directory.Delete(dir, recursive: true);
         }
 
-        _cfg.CommitConfig();
+        _ = _cfg.CommitConfig();
     }
 
     private static string FindOverrideZip(string name, string dir)

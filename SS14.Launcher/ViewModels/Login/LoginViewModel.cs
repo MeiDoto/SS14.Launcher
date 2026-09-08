@@ -53,7 +53,7 @@ public partial class LoginViewModel : BaseLoginViewModel
 
             await DoLogin(this, request, resp, _loginMgr, _authApi);
 
-            _dataManager.CommitConfig();
+            await _dataManager.CommitConfig();
         }
         finally
         {

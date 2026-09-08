@@ -96,7 +96,14 @@ public sealed class LoginManager : ObservableObject
         {
             async void Impl()
             {
-                await RefreshAllTokens();
+                try
+                {
+                    await RefreshAllTokens();
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(ex, "Failed to refresh login tokens in background timer");
+                }
             }
 
             Impl();

@@ -135,7 +135,7 @@ public partial class HomePageViewModel : MainWindowTabViewModel
         try
         {
             _cfg.AddFavoriteServer(new FavoriteServer(name, address));
-            _cfg.CommitConfig();
+            _ = _cfg.CommitConfig();
         }
         catch (ArgumentException)
         {

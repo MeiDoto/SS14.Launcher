@@ -123,7 +123,7 @@ public sealed class DataManager : ObservableObject
             }
 
             SetCVar(CVars.SelectedLogin, value.ToString()!);
-            CommitConfig();
+            _ = CommitConfig();
         }
     }
 
@@ -217,7 +217,7 @@ public sealed class DataManager : ObservableObject
         {
             Hubs.Add(hub);
         }
-        CommitConfig();
+        _ = CommitConfig();
     }
 
     public bool HasAcceptedPrivacyPolicy(string privacyPolicy, [NotNullWhen(true)] out string? version)
@@ -316,7 +316,7 @@ public sealed class DataManager : ObservableObject
             SetCVar(CVars.Fingerprint, Guid.NewGuid().ToString());
         }
 
-        CommitConfig();
+        _ = CommitConfig();
     }
 
     private void LoadSqliteConfig(SqliteConnection sqliteConnection)
@@ -417,7 +417,7 @@ public sealed class DataManager : ObservableObject
     }
 
     [SuppressMessage("ReSharper", "UseAwaitUsing")]
-    public async void CommitConfig()
+    public async Task CommitConfig()
     {
         DbCommand[] commands;
         lock (_dbCommandQueue)
@@ -461,7 +461,7 @@ public sealed class DataManager : ObservableObject
 
     public void Close()
     {
-        CommitConfig();
+        _ = CommitConfig();
         // Wait for any DB writes to finish to make sure we commit everything.
         _dbWritingSemaphore.Wait();
     }
@@ -579,7 +579,7 @@ public sealed class DataManager : ObservableObject
         {
             entry.ResetToDefault();
         }
-        CommitConfig();
+        _ = CommitConfig();
     }
 
     private abstract class CVarEntry
@@ -770,7 +770,7 @@ public sealed class DataManager : ObservableObject
             }
 
             SetCVar(CVars.ServerHistory, JsonSerializer.Serialize(list));
-            CommitConfig();
+            _ = CommitConfig();
         }
         catch (Exception e)
         {
@@ -785,7 +785,7 @@ public sealed class DataManager : ObservableObject
             var list = GetServerHistory();
             list.RemoveAll(x => string.Equals(x.Address, address, StringComparison.OrdinalIgnoreCase));
             SetCVar(CVars.ServerHistory, JsonSerializer.Serialize(list));
-            CommitConfig();
+            _ = CommitConfig();
         }
         catch (Exception e)
         {
@@ -796,7 +796,7 @@ public sealed class DataManager : ObservableObject
     public void ClearServerHistory()
     {
         SetCVar(CVars.ServerHistory, "[]");
-        CommitConfig();
+        _ = CommitConfig();
     }
 
     public Dictionary<string, long> GetServerPlaytime()
@@ -834,7 +834,7 @@ public sealed class DataManager : ObservableObject
                 dict[address] = seconds;
 
             SetCVar(CVars.ServerPlaytime, JsonSerializer.Serialize(dict));
-            CommitConfig();
+            _ = CommitConfig();
         }
         catch (Exception e)
         {
@@ -878,7 +878,7 @@ public sealed class DataManager : ObservableObject
             }
 
             SetCVar(CVars.WatchedSlotServers, JsonSerializer.Serialize(set.ToList()));
-            CommitConfig();
+            _ = CommitConfig();
         }
         catch (Exception e)
         {

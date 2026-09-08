@@ -176,7 +176,7 @@ public class App : Application
         };
 
         var lc = new LauncherCommands(viewModel);
-        lc.RunCommandTask();
+        _ = lc.RunCommandTask();
         Locator.CurrentMutable.RegisterConstant(lc);
         msgr.StartServerTask(lc);
 

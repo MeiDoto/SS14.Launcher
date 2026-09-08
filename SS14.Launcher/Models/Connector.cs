@@ -50,7 +50,7 @@ public partial class Connector : ObservableObject
     /// </summary>
     /// <param name="address">Target server address.</param>
     /// <param name="cancel">Cancellation token.</param>
-    public async void Connect(string address, CancellationToken cancel = default)
+    public async Task Connect(string address, CancellationToken cancel = default)
     {
         try
         {
@@ -82,7 +82,7 @@ public partial class Connector : ObservableObject
     /// </summary>
     /// <param name="file">Storage file reference to the content bundle.</param>
     /// <param name="cancel">Cancellation token.</param>
-    public async void LaunchContentBundle(IStorageFile file, CancellationToken cancel = default)
+    public async Task LaunchContentBundle(IStorageFile file, CancellationToken cancel = default)
     {
         Log.Information("Launching content bundle: {FileName}", file.Path);
 
@@ -154,7 +154,7 @@ public partial class Connector : ObservableObject
 
                 // User has previously accepted privacy policy, update last connected time in DB at least.
                 _cfg.UpdateConnectedToPrivacyPolicy(identifier);
-                _cfg.CommitConfig();
+                _ = _cfg.CommitConfig();
                 return;
             }
             else
@@ -177,7 +177,7 @@ public partial class Connector : ObservableObject
             // User accepted privacy policy.
             Log.Debug("User accepted privacy policy");
             _cfg.AcceptPrivacyPolicy(identifier, version);
-            _cfg.CommitConfig();
+            _ = _cfg.CommitConfig();
             return;
         }
 
@@ -876,10 +876,18 @@ public partial class Connector : ObservableObject
     private static void PipeLogOutput(Process process)
     {
         int pid = 0;
-        try { pid = process.Id; } catch { /* ignore */ }
+        try
+        {
+            pid = process.Id;
+        }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Failed to retrieve process Id for pipe log output.");
+        }
+
         Log.Debug("Piping output for process {pid} straight to logs", pid);
 
-        async void DoPipe(TextReader reader)
+        async Task DoPipe(TextReader reader)
         {
             try
             {
@@ -900,12 +908,17 @@ public partial class Connector : ObservableObject
             {
                 Log.Debug("Pipe log ended for {pid}", pid);
             }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "Unexpected error in DoPipe for {pid}", pid);
+            }
         }
 
         try
         {
-            DoPipe(process.StandardError);
-            DoPipe(process.StandardOutput);
+            _ = Task.WhenAll(
+                DoPipe(process.StandardError),
+                DoPipe(process.StandardOutput));
         }
         catch (Exception ex)
         {

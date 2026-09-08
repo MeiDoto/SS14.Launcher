@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Serilog;
 using Splat;
 using SS14.Launcher.Localization;
 using SS14.Launcher.Models.ContentManagement;
@@ -33,7 +34,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
     public override void Selected()
     {
         base.Selected();
-        RefreshStorageUsageAsync();
+        _ = RefreshStorageUsageAsync();
     }
 
     public override string Name
@@ -51,7 +52,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.CompatMode, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -61,7 +62,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.LogLauncherVerbose, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -71,7 +72,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.OverrideAssets, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -81,7 +82,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.MultiAccounts, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -91,7 +92,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.EnableTieredPGO, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -101,7 +102,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.ForceServerGC, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -111,7 +112,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.EnableFastPing, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -121,7 +122,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.EnableHttpCompression, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -131,7 +132,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.ForceIPv4, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -141,7 +142,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.FastHubFallback, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -151,7 +152,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.HighProcessPriority, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -161,7 +162,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.ForceDedicatedGpu, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -171,7 +172,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.MaxPerformanceJit, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -181,7 +182,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.LowLatencyNetworking, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -191,7 +192,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.DisableDiagnosticsOverhead, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -201,7 +202,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.LowPauseGc, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -211,7 +212,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.SmartCacheCleaner, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -221,7 +222,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.FastLaunchPreload, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -231,7 +232,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.DnsOverHttps, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -246,7 +247,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.ShowDevelopmentTab, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -256,7 +257,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.ShowNewsTab, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -266,7 +267,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.ShowReplaysTab, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -276,7 +277,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.TrackPlaytime, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -286,7 +287,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set
         {
             Cfg.SetCVar(CVars.EnableSlotNotifier, value);
-            Cfg.CommitConfig();
+            _ = Cfg.CommitConfig();
         }
     }
 
@@ -341,7 +342,7 @@ public class OptionsTabViewModel : MainWindowTabViewModel
         set => SetProperty(ref _storageUsageText, value);
     }
 
-    public async void RefreshStorageUsageAsync()
+    public async Task RefreshStorageUsageAsync()
     {
         StorageUsageText = "...";
         var report = await Task.Run(() =>
@@ -354,7 +355,14 @@ public class OptionsTabViewModel : MainWindowTabViewModel
                     long size = 0;
                     foreach (var f in Directory.GetFiles(dir, "*", SearchOption.AllDirectories))
                     {
-                        try { size += new FileInfo(f).Length; } catch { }
+                        try
+                        {
+                            size += new FileInfo(f).Length;
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Debug(ex, "Failed to get size of {Path}", f);
+                        }
                     }
                     return size;
                 }
@@ -376,8 +384,9 @@ public class OptionsTabViewModel : MainWindowTabViewModel
                     ("replays", Fmt(replays)),
                     ("logs", Fmt(logs)));
             }
-            catch
+            catch (Exception ex)
             {
+                Log.Debug(ex, "Failed to calculate storage usage");
                 return "";
             }
         });

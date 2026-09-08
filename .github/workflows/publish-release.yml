@@ -9,8 +9,53 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  # Gate: run tests before any release
+  test:
+    name: Pre-release Tests
     runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Verify Formatting
+      run: |
+        dotnet restore
+        dotnet format --verify-no-changes --no-restore
+
+    - name: Run Full Test Suite
+      run: dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj -v normal --configuration Release
+
+  # Build and publish release artifacts
+  build:
+    name: Build & Publish (${{ matrix.platform }})
+    needs: test
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - platform: linux-x64
+            runner: ubuntu-latest
+            rid: linux-x64
+            archive: tar.gz
+          - platform: windows-x64
+            runner: windows-latest
+            rid: win-x64
+            archive: zip
 
     steps:
     - name: Checkout code
@@ -31,13 +76,56 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-nuget-
 
-    - name: Run Test Suite
-      run: dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj -v normal
+    - name: Publish self-contained binary
+      run: >
+        dotnet publish SS14.Launcher/SS14.Launcher.csproj
+        --configuration Release
+        --runtime ${{ matrix.rid }}
+        --self-contained true
+        -p:PublishSingleFile=true
+        -p:PublishTrimmed=false
+        -o ./publish/${{ matrix.platform }}
 
-    - name: Build release packages
-      run: python3 publish.py windows linux --x64-only
+    - name: Create archive (Linux)
+      if: matrix.archive == 'tar.gz'
+      run: tar -czf SS14.Launcher_${{ matrix.platform }}.tar.gz -C ./publish/${{ matrix.platform }} .
 
-    - name: Create Release and Upload Assets
+    - name: Create archive (Windows)
+      if: matrix.archive == 'zip'
+      shell: pwsh
+      run: Compress-Archive -Path ./publish/${{ matrix.platform }}/* -DestinationPath SS14.Launcher_${{ matrix.platform }}.zip
+
+    - name: Generate SHA256 checksum
+      run: |
+        if [ -f "SS14.Launcher_${{ matrix.platform }}.tar.gz" ]; then
+          sha256sum SS14.Launcher_${{ matrix.platform }}.tar.gz > SHA256SUMS_${{ matrix.platform }}.txt
+        fi
+        if [ -f "SS14.Launcher_${{ matrix.platform }}.zip" ]; then
+          sha256sum SS14.Launcher_${{ matrix.platform }}.zip > SHA256SUMS_${{ matrix.platform }}.txt
+        fi
+      shell: bash
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-${{ matrix.platform }}
+        path: |
+          SS14.Launcher_${{ matrix.platform }}.*
+          SHA256SUMS_${{ matrix.platform }}.txt
+
+  # Create GitHub Release from artifacts
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        merge-multiple: true
+
+    - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ github.ref_name }}
@@ -46,6 +134,4 @@ jobs:
         prerelease: false
         generate_release_notes: true
         files: |
-          SS14.Launcher_Linux.tar.gz
-          SS14.Launcher_Windows.zip
-          SHA256SUMS.txt
+          artifacts/**/*

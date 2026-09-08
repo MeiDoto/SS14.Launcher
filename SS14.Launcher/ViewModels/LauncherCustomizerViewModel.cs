@@ -419,7 +419,7 @@ public sealed class LauncherCustomizerViewModel : ViewModelBase
             {
                 PreviewLogo = new Bitmap(_customLogoImagePath);
             }
-            catch
+            catch (Exception)
             {
                 PreviewLogo = null;
             }
@@ -973,7 +973,7 @@ Opacity = 0.88
         _dataManager.SetCVar(CVars.CustomReplaysTabName, CustomReplaysTabName);
         _dataManager.SetCVar(CVars.CustomOptionsTabName, CustomOptionsTabName);
         _dataManager.SetCVar(CVars.CustomTabPlacement, CustomTabPlacement);
-        _dataManager.CommitConfig();
+        _ = _dataManager.CommitConfig();
     }
 
     public void Reset()

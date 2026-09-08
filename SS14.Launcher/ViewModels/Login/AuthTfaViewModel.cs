@@ -64,7 +64,7 @@ public sealed partial class AuthTfaViewModel : BaseLoginViewModel
 
             await LoginViewModel.DoLogin(this, tfaLogin, resp, _loginMgr, _authApi);
 
-            _cfg.CommitConfig();
+            _ = _cfg.CommitConfig();
         }
         finally
         {

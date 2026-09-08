@@ -3,6 +3,7 @@ obj/
 .idea/
 *.zip
 *.tar.gz
+SHA256SUMS.txt
 *.DotSettings.user
 .DS_Store
 cmake-build*

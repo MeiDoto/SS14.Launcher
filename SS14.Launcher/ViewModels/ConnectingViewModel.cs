@@ -230,12 +230,12 @@ public class ConnectingViewModel : ViewModelBase
 
     private void Start(string address)
     {
-        _connector.Connect(address, _cancelSource.Token);
+        _ = _connector.Connect(address, _cancelSource.Token);
     }
 
     private void StartContentBundle(IStorageFile file)
     {
-        _connector.LaunchContentBundle(file, _cancelSource.Token);
+        _ = _connector.LaunchContentBundle(file, _cancelSource.Token);
     }
 
     public void ErrorDismissed()

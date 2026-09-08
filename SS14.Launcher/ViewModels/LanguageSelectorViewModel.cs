@@ -82,7 +82,7 @@ public sealed class LanguageSelectorViewModel : ObservableRecipient
 
         var selected = Languages.SingleOrDefault(x => x.IsChecked) ?? _systemDefaultLanguage;
         _dataManager.SetCVar(CVars.Language, selected.Culture?.Name);
-        _dataManager.CommitConfig();
+        _ = _dataManager.CommitConfig();
         _localization.SwitchToLanguage(selected.Culture);
     }
 

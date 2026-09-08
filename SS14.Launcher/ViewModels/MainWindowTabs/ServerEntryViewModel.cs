@@ -301,7 +301,7 @@ public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<Favor
             _cfg.AddFavoriteServer(fav);
         }
 
-        _cfg.CommitConfig();
+        _ = _cfg.CommitConfig();
     }
 
     public void FavoriteRaiseButtonPressed()
@@ -312,7 +312,7 @@ public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<Favor
             _cfg.RaiseFavoriteServer(_cfg.FavoriteServers.Lookup(Address).Value);
         }
 
-        _cfg.CommitConfig();
+        _ = _cfg.CommitConfig();
     }
 
     public void Receive(FavoritesChanged message)

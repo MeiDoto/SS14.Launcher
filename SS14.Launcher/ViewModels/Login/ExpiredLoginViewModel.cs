@@ -29,7 +29,7 @@ public partial class ExpiredLoginViewModel (
 
             await LoginViewModel.DoLogin(this, request, resp, loginMgr, authApi);
 
-            cfg.CommitConfig();
+            await cfg.CommitConfig();
         }
         finally
         {
@@ -40,7 +40,7 @@ public partial class ExpiredLoginViewModel (
     public void OnLogOutButtonPressed()
     {
         cfg.RemoveLogin(Account.LoginInfo);
-        cfg.CommitConfig();
+        _ = cfg.CommitConfig();
 
         ParentVM.SwitchToLogin();
     }
