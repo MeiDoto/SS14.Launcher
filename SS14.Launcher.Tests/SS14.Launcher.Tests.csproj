@@ -6,6 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="libsodium" />
+    <PackageReference Include="NSec.Cryptography" />
     <PackageReference Include="nunit"/>
     <PackageReference Include="NUnit.Analyzers"/>
     <PackageReference Include="NUnit3TestAdapter"/>
