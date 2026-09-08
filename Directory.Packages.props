@@ -37,7 +37,7 @@
     <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
     <PackageVersion Include="Linguini.Bundle" Version="0.8.1" />
     <!-- Test stuff -->
-    <PackageVersion Include="nunit" Version="3.14.0"/>
+    <PackageVersion Include="nunit" Version="4.6.1"/>
     <PackageVersion Include="NUnit.Analyzers" Version="3.6.1"/>
     <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0"/>
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
