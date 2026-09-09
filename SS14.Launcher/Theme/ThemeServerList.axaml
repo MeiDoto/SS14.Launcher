@@ -46,10 +46,15 @@
   <Style Selector="mwt|ServerList">
     <Setter Property="Template">
       <ControlTemplate>
-        <DockPanel ZIndex="-1">
+        <DockPanel ZIndex="-1" Grid.IsSharedSizeScope="True">
           <!-- Server Name, Round Time, Player Count, Connect -->
-          <Grid DockPanel.Dock="Top" Margin="24 0 24 0" IsVisible="{TemplateBinding ShowHeader}"
-                ColumnDefinitions="*,100,100,112">
+          <Grid DockPanel.Dock="Top" Margin="24 0 24 0" IsVisible="{TemplateBinding ShowHeader}">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" /> <!-- Server Name -->
+              <ColumnDefinition SharedSizeGroup="TimeCol" MinWidth="80" Width="Auto" />
+              <ColumnDefinition SharedSizeGroup="StatusCol" MinWidth="80" Width="Auto" />
+              <ColumnDefinition SharedSizeGroup="ConnectCol" Width="Auto" />
+            </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Classes="GridCell">
               <TextBlock Text="{loc:Loc tab-servers-table-name}" Classes="SubText" />
