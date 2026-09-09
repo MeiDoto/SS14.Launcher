@@ -13,8 +13,15 @@ using SS14.Launcher.Utility;
 
 namespace SS14.Launcher.Models.ContentManagement;
 
+/// <summary>
+/// Manages the local SS14 content database (content.db), holding game build files,
+/// BLAKE2B blob storage, version manifests, and active client locking.
+/// </summary>
 public sealed class ContentManager
 {
+    /// <summary>
+    /// Initializes SQLite WAL mode and runs pending database migrations.
+    /// </summary>
     public void Initialize()
     {
         using var con = GetSqliteConnection();
@@ -105,6 +112,9 @@ public sealed class ContentManager
         }
     }
 
+    /// <summary>
+    /// Creates and opens a new SQLite connection to the content database with WAL mode and busy timeouts configured.
+    /// </summary>
     public static SqliteConnection GetSqliteConnection()
     {
         var con = new SqliteConnection(GetContentDbConnectionString());
@@ -187,6 +197,11 @@ public sealed class ContentManager
         }
     }
 
+    /// <summary>
+    /// Prunes unused content versions older than the specified age in days that are not currently locked by running clients.
+    /// </summary>
+    /// <param name="maxAgeDays">Maximum age in days to retain unused versions (defaults to 14).</param>
+    /// <returns>Number of culled versions.</returns>
     public async Task<int> RunSmartCleanerAsync(int maxAgeDays = 14)
     {
         return await Task.Run(() =>
@@ -228,6 +243,10 @@ public sealed class ContentManager
         });
     }
 
+    /// <summary>
+    /// Performs SQLite integrity check, prunes orphaned content blobs, and executes WAL truncation and index optimization.
+    /// </summary>
+    /// <returns>A tuple with integrity status and number of cleaned orphan blobs.</returns>
     public async Task<(bool IntegrityOk, int CleanedOrphans)> VerifyAndOptimizeDatabaseAsync()
     {
         return await Task.Run(() =>

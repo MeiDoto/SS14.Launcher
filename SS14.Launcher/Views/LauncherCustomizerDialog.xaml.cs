@@ -57,6 +57,12 @@ public partial class LauncherCustomizerDialog : Window
         }
     }
 
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+        _viewModel.Dispose();
+    }
+
     private void ResetClicked(object? sender, RoutedEventArgs args)
     {
         _viewModel.Reset();

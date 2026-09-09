@@ -9,7 +9,7 @@ using SS14.Launcher.Utility;
 
 namespace SS14.Launcher.ViewModels;
 
-public sealed class LauncherCustomizerViewModel : ViewModelBase
+public sealed class LauncherCustomizerViewModel : ViewModelBase, IDisposable
 {
     private readonly DataManager _dataManager = Locator.Current.GetRequiredService<DataManager>();
 
@@ -1134,5 +1134,10 @@ Opacity = 0.88
         EnableClickVfx = true;
         ScriptOutputText = "Preset: Midnight Blue";
         ApplyLivePreview();
+    }
+
+    public void Dispose()
+    {
+        _previewBgManager.Dispose();
     }
 }

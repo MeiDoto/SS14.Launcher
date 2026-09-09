@@ -248,13 +248,17 @@ public sealed class DataManager : ObservableObject
         _acceptedPrivacyPolicies[privacyPolicy] = version;
     }
 
+    /// <summary>
+    /// Updates the LastConnected timestamp for the specified privacy policy identifier in the SQLite database.
+    /// </summary>
+    /// <param name="privacyPolicy">Identifier of the accepted privacy policy.</param>
     public void UpdateConnectedToPrivacyPolicy(string privacyPolicy)
     {
         AddDbCommand(db => db.Execute("""
             UPDATE AcceptedPrivacyPolicy
             SET LastConnected = DATETIME('now')
-            WHERE Version = @Version
-            """, new { Version = privacyPolicy }));
+            WHERE Identifier = @Identifier
+            """, new { Identifier = privacyPolicy }));
     }
 
     /// <summary>
@@ -416,6 +420,9 @@ public sealed class DataManager : ObservableObject
         return con;
     }
 
+    /// <summary>
+    /// Asynchronously flushes and commits all queued database changes to the settings.db SQLite file within a single transaction.
+    /// </summary>
     [SuppressMessage("ReSharper", "UseAwaitUsing")]
     public async Task CommitConfig()
     {
@@ -459,11 +466,43 @@ public sealed class DataManager : ObservableObject
         });
     }
 
+    /// <summary>
+    /// Synchronously flushes all pending database commands, awaits active transactions, and closes the configuration database.
+    /// </summary>
     public void Close()
     {
-        _ = CommitConfig();
-        // Wait for any DB writes to finish to make sure we commit everything.
+        // Ensure all pending background commits finish and any remaining queue is synchronously committed.
         _dbWritingSemaphore.Wait();
+        try
+        {
+            DbCommand[] commands;
+            lock (_dbCommandQueue)
+            {
+                commands = _dbCommandQueue.ToArray();
+                _dbCommandQueue.Clear();
+            }
+
+            if (commands.Length > 0)
+            {
+                using var connection = OpenCfgConnection();
+                using var transaction = connection.BeginTransaction();
+
+                foreach (var cmd in commands)
+                {
+                    cmd(connection);
+                }
+
+                transaction.Commit();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error committing config on Close");
+        }
+        finally
+        {
+            _dbWritingSemaphore.Release();
+        }
     }
 
     private static string GetCfgDbConnectionString()
@@ -505,6 +544,16 @@ public sealed class DataManager : ObservableObject
 
     private void ChangeLogin(ChangeReason reason, LoginInfo login)
     {
+        if (reason == ChangeReason.Remove)
+        {
+            var userId = login.UserId;
+            AddDbCommand(con =>
+            {
+                con.Execute("DELETE FROM Login WHERE UserId = @UserId", new { UserId = userId });
+            });
+            return;
+        }
+
         // Make immutable copy to avoid race condition bugs, protecting token with DPAPI / AES.
         var data = new
         {
@@ -520,7 +569,6 @@ public sealed class DataManager : ObservableObject
                 ChangeReason.Add => "INSERT INTO Login VALUES (@UserId, @UserName, @Token, @Expires)",
                 ChangeReason.Update =>
                     "UPDATE Login SET UserName = @UserName, Token = @Token, Expires = @Expires WHERE UserId = @UserId",
-                ChangeReason.Remove => "DELETE FROM Login WHERE UserId = @UserId",
                 _ => throw new ArgumentOutOfRangeException(nameof(reason), reason, null)
             },
                 data
@@ -705,7 +753,7 @@ public sealed class DataManager : ObservableObject
 
             _parent.AddDbCommand(cmd => cmd.Execute(
                 "DELETE FROM Hub WHERE Address = @Address",
-                new { item.Address, item.Priority }));
+                new { item.Address }));
 
             return true;
         }

@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
@@ -115,34 +117,25 @@ public sealed partial class Updater
             var compressBuffer = new MemoryStream();
             using var zStdCompressor = new ZStdCompressStream(compressBuffer);
 
+            var existingPaths = underlay
+                ? new HashSet<string>(con.Query<string>("SELECT Path FROM ContentManifest WHERE VersionId = @VersionId", new { VersionId = versionId }), StringComparer.Ordinal)
+                : null;
+
             var count = 0;
             foreach (var entry in zip.Entries)
             {
                 cancel.ThrowIfCancellationRequested();
 
-                if (count++ % 100 == 0)
-                    Progress = (count++, zip.Entries.Count, ProgressUnit.None);
+                count++;
+                if (count % 100 == 0)
+                    Progress = (count, zip.Entries.Count, ProgressUnit.None);
 
                 // Ignore directory entries.
                 if (entry.Name == "")
                     continue;
 
-                if (underlay)
-                {
-                    // Ignore files from the zip file we already have.
-                    var exists = con.ExecuteScalar<bool>(
-                        @"SELECT COUNT(*) FROM ContentManifest
-                        WHERE Path = @Path AND VersionId = @VersionId",
-                        new
-                        {
-                            Path = entry.FullName,
-                            VersionId = versionId
-                        }
-                    );
-
-                    if (exists)
-                        continue;
-                }
+                if (existingPaths != null && existingPaths.Contains(entry.FullName))
+                    continue;
 
                 // Log.Verbose("Storing file {EntryName}", entry.FullName);
 

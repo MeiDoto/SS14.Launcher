@@ -190,7 +190,7 @@ public partial class Connector : ObservableObject
     {
         if (_acceptPrivacyPolicyTcs == null)
         {
-            Log.Error("_acceptPrivacyPolicyTcs is null???");
+            Log.Debug("Privacy policy confirmation received after request completion or cancellation");
             return;
         }
 
@@ -301,32 +301,53 @@ public partial class Connector : ObservableObject
 
         if (clientProc != null)
         {
-            var startTime = DateTime.UtcNow;
-            var targetAddr = parsedAddr?.ToString() ?? connectAddress?.ToString();
-
-            // Wait 300ms to verify the client process initialized without immediate crash.
-            var waitClient = clientProc.WaitForExitAsync(cancel);
-            var waitDelay = Task.Delay(300, cancel);
-
-            await Task.WhenAny(waitDelay, waitClient);
-
-            if (!clientProc.HasExited)
+            using (clientProc)
             {
-                Status = ConnectionStatus.ClientRunning;
-                await waitClient;
+                var startTime = DateTime.UtcNow;
+                var targetAddr = parsedAddr?.ToString() ?? connectAddress?.ToString();
 
-                if (_cfg.GetCVar(CVars.TrackPlaytime) && !string.IsNullOrEmpty(targetAddr))
+                // Wait 300ms to verify the client process initialized without immediate crash.
+                var waitClient = clientProc.WaitForExitAsync(cancel);
+                var waitDelay = Task.Delay(300, cancel);
+
+                await Task.WhenAny(waitDelay, waitClient);
+
+                if (!clientProc.HasExited)
                 {
-                    var seconds = (long)(DateTime.UtcNow - startTime).TotalSeconds;
-                    if (seconds >= 3)
+                    Status = ConnectionStatus.ClientRunning;
+                    try
                     {
-                        _cfg.AddServerPlaytime(targetAddr, seconds);
+                        await waitClient;
                     }
-                }
-                return;
-            }
+                    catch (OperationCanceledException)
+                    {
+                        // Launcher stopped waiting or was cancelled
+                    }
 
-            ClientExitedBadly = clientProc.ExitCode != 0;
+                    if (_cfg.GetCVar(CVars.TrackPlaytime) && !string.IsNullOrEmpty(targetAddr))
+                    {
+                        var seconds = (long)(DateTime.UtcNow - startTime).TotalSeconds;
+                        if (seconds >= 3)
+                        {
+                            _cfg.AddServerPlaytime(targetAddr, seconds);
+                        }
+                    }
+
+                    try
+                    {
+                        ClientExitedBadly = clientProc.HasExited && clientProc.ExitCode != 0;
+                    }
+                    catch
+                    {
+                        // External process termination
+                    }
+
+                    Status = ConnectionStatus.ClientExited;
+                    return;
+                }
+
+                ClientExitedBadly = clientProc.ExitCode != 0;
+            }
         }
         else
         {
@@ -514,6 +535,13 @@ public partial class Connector : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Finds the highest installed version of an engine module compatible with the specified target engine version.
+    /// </summary>
+    /// <param name="engineVersion">Target Robust engine version.</param>
+    /// <param name="moduleName">Name of the engine module (e.g. Robust.Client).</param>
+    /// <param name="dataManager">DataManager holding engine module registrations.</param>
+    /// <returns>Matching installed module or null if none is compatible.</returns>
     public static InstalledEngineModule? GetInstalledModuleForEngineVersion(
         Version engineVersion,
         string moduleName,
@@ -1077,6 +1105,9 @@ public partial class Connector : ObservableObject
     }
 #pragma warning restore 162
 
+    /// <summary>
+    /// Represents the current lifecycle state of a game connection or local content bundle launch.
+    /// </summary>
     public enum ConnectionStatus
     {
         None,
@@ -1109,6 +1140,9 @@ public partial class Connector : ObservableObject
     }
 }
 
+/// <summary>
+/// Deserialized metadata structure stored in rt_content_bundle.json inside replay or content bundle archives.
+/// </summary>
 public sealed record ContentBundleMetadata(
     [property: JsonPropertyName("server_gc")]
     bool? ServerGC,
@@ -1138,6 +1172,9 @@ public sealed record ContentBundleMetadata(
     }
 }
 
+/// <summary>
+/// Represents base build information for content bundles with delta/overlay downloads.
+/// </summary>
 public sealed record ContentBundleBaseBuild(
     [property: JsonPropertyName("fork_id")] string ForkId,
     [property: JsonPropertyName("version")] string Version,
@@ -1150,6 +1187,9 @@ public sealed record ContentBundleBaseBuild(
     [property: JsonPropertyName("manifest_hash")] string? ManifestHash
 );
 
+/// <summary>
+/// User decision result on a server's privacy policy prompt.
+/// </summary>
 public enum PrivacyPolicyAcceptResult
 {
     Denied,

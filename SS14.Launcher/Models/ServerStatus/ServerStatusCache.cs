@@ -251,6 +251,12 @@ public sealed class ServerStatusCache : IServerSource
     private static readonly ConcurrentDictionary<string, AdvancedAlgorithms.KalmanLatencyTracker> _kalmanTrackers = new();
     private static readonly ConcurrentDictionary<string, (System.Net.IPAddress[] IPs, long ExpiryTicks)> _dnsCache = new();
 
+    /// <summary>
+    /// Performs asynchronous TCP socket connect latency measurement against the target game server,
+    /// filtering results through an adaptive Kalman filter and caching DNS resolutions for fast updates.
+    /// </summary>
+    /// <param name="data">ServerStatusData instance to update with ping metrics.</param>
+    /// <param name="cancel">Cancellation token.</param>
     public static async Task MeasurePingAsync(ServerStatusData data, CancellationToken cancel = default)
     {
         if (!UriHelper.TryParseSs14Uri(data.Address, out var parsedAddress))

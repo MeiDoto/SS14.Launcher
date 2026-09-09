@@ -9,6 +9,12 @@ namespace SS14.Launcher.Utility;
 /// </summary>
 public static class SearchAlgorithm
 {
+    private static readonly char[] WordSeparators = [' ', '-', '_', '/', '|', ':', '[', ']'];
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+    private static bool IsWordSeparator(char c) =>
+        c is ' ' or '-' or '_' or '/' or '|' or ':' or '[' or ']';
+
     /// <summary>
     /// Computes a relevance match score between a user search query and a candidate server name.
     /// </summary>
@@ -37,12 +43,24 @@ public static class SearchAlgorithm
         if (t.StartsWith(q, StringComparison.OrdinalIgnoreCase))
             return 800;
 
-        // Word boundary match
-        var words = t.Split([' ', '-', '_', '/', '|', ':', '[', ']'], StringSplitOptions.RemoveEmptyEntries);
-        foreach (var word in words)
+        // Word boundary match (zero allocations)
+        var tSpan = t.AsSpan();
+        var qSpan = q.AsSpan();
+        var atWordBoundary = true;
+        for (var i = 0; i < tSpan.Length; i++)
         {
-            if (word.StartsWith(q, StringComparison.OrdinalIgnoreCase))
-                return 600;
+            if (IsWordSeparator(tSpan[i]))
+            {
+                atWordBoundary = true;
+                continue;
+            }
+
+            if (atWordBoundary)
+            {
+                if (tSpan[i..].StartsWith(qSpan, StringComparison.OrdinalIgnoreCase))
+                    return 600;
+                atWordBoundary = false;
+            }
         }
 
         // Substring match
@@ -78,6 +96,7 @@ public static class SearchAlgorithm
             if (trigramSim >= 0.65)
                 return (int)(trigramSim * 350);
 
+            var words = t.Split(WordSeparators, StringSplitOptions.RemoveEmptyEntries);
             foreach (var word in words)
             {
                 var jw = AdvancedAlgorithms.JaroWinklerSimilarity(q, word);

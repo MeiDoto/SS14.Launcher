@@ -70,4 +70,24 @@ public sealed class SearchAlgorithmTests
         Assert.That(SearchAlgorithm.LevenshteinDistance("station", "station"), Is.EqualTo(0));
         Assert.That(SearchAlgorithm.LevenshteinDistance("station", "station1"), Is.EqualTo(1));
     }
+
+    [Test]
+    public void TestGetMatchScore_SpecialSeparators()
+    {
+        // Tests word boundaries across different delimiter characters
+        Assert.That(SearchAlgorithm.GetMatchScore("Nuke", "SS14-Nuke-Ops"), Is.EqualTo(600));
+        Assert.That(SearchAlgorithm.GetMatchScore("Delta", "Server_Delta_V"), Is.EqualTo(600));
+        Assert.That(SearchAlgorithm.GetMatchScore("Wizards", "Space/Wizards/Hub"), Is.EqualTo(600));
+        Assert.That(SearchAlgorithm.GetMatchScore("Vanilla", "[Vanilla] Space Station"), Is.EqualTo(600));
+        Assert.That(SearchAlgorithm.GetMatchScore("LRP", "Station|LRP|Roleplay"), Is.EqualTo(600));
+        Assert.That(SearchAlgorithm.GetMatchScore("Main", "Server:Main"), Is.EqualTo(600));
+    }
+
+    [Test]
+    public void TestGetMatchScore_FuzzyMatch()
+    {
+        // Slight typo in 4+ letter word should trigger fuzzy Myers / Jaro-Winkler match (> 0)
+        var score = SearchAlgorithm.GetMatchScore("staiton", "Space Station 14");
+        Assert.That(score, Is.GreaterThan(0));
+    }
 }

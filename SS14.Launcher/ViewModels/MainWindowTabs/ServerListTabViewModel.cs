@@ -159,10 +159,14 @@ public partial class ServerListTabViewModel : MainWindowTabViewModel
         var scoredList = new List<(ServerStatusData Server, int SearchScore, double QualityScore)>();
         var serverList = _serverListCache.AllServers.ToArray();
 
+        var terms = searchActive
+            ? SearchString!.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            : Array.Empty<string>();
+
         foreach (var server in serverList)
         {
             var isFav = favorites.Contains(server.Address);
-            var searchScore = CalculateSearchScore(server);
+            var searchScore = searchActive ? CalculateSearchScore(server, SearchString!, terms) : 100;
 
             if (searchActive && searchScore <= 0)
                 continue;
@@ -214,20 +218,16 @@ public partial class ServerListTabViewModel : MainWindowTabViewModel
         OnPropertyChanged(nameof(ListText));
     }
 
-    private int CalculateSearchScore(ServerStatusData data)
+    private static int CalculateSearchScore(ServerStatusData data, string searchString, string[] terms)
     {
-        if (string.IsNullOrWhiteSpace(SearchString))
-            return 100;
-
-        var terms = SearchString.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        var nameScore = SearchAlgorithm.GetMatchScore(SearchString, data.Name);
+        var nameScore = SearchAlgorithm.GetMatchScore(searchString, data.Name);
         var totalScore = nameScore * 3;
 
         if (data.Tags != null)
         {
             foreach (var tag in data.Tags)
             {
-                var tagScore = SearchAlgorithm.GetMatchScore(SearchString, tag);
+                var tagScore = SearchAlgorithm.GetMatchScore(searchString, tag);
                 if (tagScore > 0)
                 {
                     totalScore = Math.Max(totalScore, tagScore * 2);
@@ -235,13 +235,13 @@ public partial class ServerListTabViewModel : MainWindowTabViewModel
             }
         }
 
-        var descScore = SearchAlgorithm.GetMatchScore(SearchString, data.Description);
+        var descScore = SearchAlgorithm.GetMatchScore(searchString, data.Description);
         if (descScore > 0)
         {
             totalScore = Math.Max(totalScore, (int)(descScore * 0.8));
         }
 
-        var addrScore = SearchAlgorithm.GetMatchScore(SearchString, data.Address);
+        var addrScore = SearchAlgorithm.GetMatchScore(searchString, data.Address);
         if (addrScore > 0)
         {
             totalScore = Math.Max(totalScore, (int)(addrScore * 0.5));

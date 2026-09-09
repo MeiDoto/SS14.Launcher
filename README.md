@@ -4,7 +4,7 @@
 
 [![Build & Test](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/build-test.yml/badge.svg)](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/build-test.yml)
 [![Release](https://img.shields.io/github/v/release/MeiDoto/SS14.Launcher?color=blue&logo=github)](https://github.com/MeiDoto/SS14.Launcher/releases/latest)
-[![Tests](https://img.shields.io/badge/tests-170%20passed%20%7C%20100%25-brightgreen)](https://github.com/MeiDoto/SS14.Launcher)
+[![Tests](https://img.shields.io/badge/tests-172%20passed%20%7C%20100%25-brightgreen)](https://github.com/MeiDoto/SS14.Launcher)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Avalonia UI](https://img.shields.io/badge/Avalonia-11.2-blue)](https://avaloniaui.net/)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)](https://github.com/MeiDoto/SS14.Launcher/releases/latest)
@@ -105,7 +105,7 @@ flowchart TD
         DetailsDialog["Инспектор Реплея (ReplayDetailsDialog)"]
     end
 
-    subgraph ViewModels ["Слой ViewModels (ReactiveUI / MVVM)"]
+    subgraph ViewModels ["Слой ViewModels (CommunityToolkit.Mvvm / MVVM)"]
         MainVM["MainWindowViewModel"]
         ReplaysVM["ReplaysTabViewModel"]
         CleanerVM["SmartReplayCleanerViewModel"]

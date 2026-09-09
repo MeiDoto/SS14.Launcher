@@ -329,12 +329,12 @@ public sealed partial class Updater : ObservableObject
         // NOTE: GetRunningClientVersions may modify DB, best to let it commit for cleanup.
         var usedVersions = ContentManager.GetRunningClientVersions(con);
 
-        var forkCounts = versions.Select(x => x.ForkId).Distinct().ToDictionary(x => x, _ => 0);
+        var forkCounts = versions.Select(x => x.ForkId ?? string.Empty).Distinct().ToDictionary(x => x, _ => 0);
 
         var totalCount = 0;
         foreach (var version in versions)
         {
-            ref var count = ref CollectionsMarshal.GetValueRefOrAddDefault(forkCounts, version.ForkId, out _);
+            ref var count = ref CollectionsMarshal.GetValueRefOrAddDefault(forkCounts, version.ForkId ?? string.Empty, out _);
 
             var keep = count < maxForkVersions && totalCount < maxVersions;
             if (keep)
