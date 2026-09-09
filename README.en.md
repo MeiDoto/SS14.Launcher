@@ -4,7 +4,7 @@
 
 [![Build & Test](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/build-test.yml/badge.svg)](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/build-test.yml)
 [![Release](https://img.shields.io/github/v/release/MeiDoto/SS14.Launcher?color=blue&logo=github)](https://github.com/MeiDoto/SS14.Launcher/releases/latest)
-[![Tests](https://img.shields.io/badge/tests-172%20passed%20%7C%20100%25-brightgreen)](https://github.com/MeiDoto/SS14.Launcher)
+[![Tests](https://img.shields.io/badge/tests-186%20passed%20%7C%20100%25-brightgreen)](https://github.com/MeiDoto/SS14.Launcher)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Avalonia UI](https://img.shields.io/badge/Avalonia-11.2-blue)](https://avaloniaui.net/)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)](https://github.com/MeiDoto/SS14.Launcher/releases/latest)
@@ -49,6 +49,12 @@ Precompiled standalone release binaries are available directly on the **[GitHub 
 - **🌐 Network Diagnostics Tool** — Built-in DNS, TCP socket, TLS handshake, jitter, and packet loss analyzer with clipboard export for server staff support.
 
 ### 🎬 Next-Gen Replay Management (Replay System 2.0)
+- **📥 Direct & User-Centric Downloads (`ReplayDownloader`)**:
+  - Instant replay downloads via direct HTTP/HTTPS URLs or custom server `{roundId}` templates.
+  - Zero third-party coupling — pure client-side I/O without proprietary vendor lock-in.
+  - Streaming I/O with **256 KB** memory-pooled buffers via `ArrayPool<byte>.Shared` (zero LOH allocations).
+  - Exponential moving average speed smoothing (EMA, $\alpha=0.35$) and real-time ETA calculation.
+  - Smart clipboard auto-detection for replay URLs and round numbers.
 - **⚡ High-Performance Caching Engine (`ReplayMetadataCache`)**:
   - Instant loading of hundreds of replays backed by persistent JSON storage (`replays_cache.json`).
   - Fast timestamp and length verification with **0 ms I/O latency** on repeat views.
@@ -165,7 +171,7 @@ cd SS14.Launcher
 # 2. Build solution in Release configuration
 dotnet build -c Release -p:UseSharedCompilation=false
 
-# 3. Execute test suite (170 tests, 100% pass rate)
+# 3. Execute test suite (186 tests, 100% pass rate)
 dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj --configuration Release
 
 # 4. Run launcher locally
@@ -187,9 +193,14 @@ python3 publish.py windows linux
 
 ---
 
-## 📚 Technical Documentation
+## 📚 Technical Documentation & Architecture Decision Records (ADR)
 
 - 🏛️ **[Architecture & Subsystems](docs/ARCHITECTURE.md)** ([Русский](docs/ARCHITECTURE.ru.md))
+- 📋 **Architecture Decision Records (ADR)**:
+  - [ADR 0001: Core Architecture, Modularity & Performance](docs/adr/0001-architecture-decisions.md)
+  - [ADR 0002: Async Safety & Error Handling Policy](docs/adr/0002-async-safety-error-handling.md)
+  - [ADR 0003: Continuous Integration & Deployment Pipeline Design](docs/adr/0003-cicd-pipeline-design.md)
+  - [ADR 0004: Replay Subsystem, User-Centric Downloads, I/O Optimization & Architectural Stability](docs/adr/0004-replay-subsystem-and-user-architecture.md)
 - 🌐 **[Networking & API Protocols](docs/NETWORKING.md)** ([Русский](docs/NETWORKING.ru.md))
 - 🎨 **[Customization & Extensibility](docs/CUSTOMIZATION.md)** ([Русский](docs/CUSTOMIZATION.ru.md))
 - 🛡️ **[Security Disclosure & Threat Model](SECURITY.md)** ([Русский](SECURITY.ru.md))

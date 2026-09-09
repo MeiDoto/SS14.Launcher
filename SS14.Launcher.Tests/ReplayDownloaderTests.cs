@@ -10,18 +10,11 @@ namespace SS14.Launcher.Tests;
 public sealed class ReplayDownloaderTests
 {
     [Test]
-    public void NormalizeDownloadUrl_SpaceStoriesWebUrl_ConvertsToApiDownload()
+    public void NormalizeDownloadUrl_TrimsAndRemovesTrailingQuestionMark()
     {
-        var input = "https://spacestories.club/replays/core/2026_09_09-12_23-round_50135.zip";
-        var expected = "https://spacestories.club/replays/api/download/core/2026_09_09-12_23-round_50135.zip";
+        var input = "  https://example.com/replays/round-123.zip?  ";
+        var expected = "https://example.com/replays/round-123.zip";
         Assert.That(ReplayDownloader.NormalizeDownloadUrl(input), Is.EqualTo(expected));
-    }
-
-    [Test]
-    public void NormalizeDownloadUrl_AlreadyApiUrl_Unchanged()
-    {
-        var input = "https://spacestories.club/replays/api/download/core/2026_09_09-12_23-round_50135.zip";
-        Assert.That(ReplayDownloader.NormalizeDownloadUrl(input), Is.EqualTo(input));
     }
 
     [Test]
@@ -32,37 +25,40 @@ public sealed class ReplayDownloaderTests
     }
 
     [Test]
-    public async Task ResolveUrl_CustomTemplate_Success()
+    public void BuildUrlFromTemplate_Success()
     {
-        var url = await ReplayDownloader.ResolveUrlFromRoundIdAsync("999", ReplayProviderPreset.CustomTemplate, "https://myreplays.org/download/{roundId}.zip");
+        var url = ReplayDownloader.BuildUrlFromTemplate("999", "https://myreplays.org/download/{roundId}.zip");
         Assert.That(url, Is.EqualTo("https://myreplays.org/download/999.zip"));
+
+        var urlWithHash = ReplayDownloader.BuildUrlFromTemplate("#50135", "https://server.com/archive/{roundId}.zip");
+        Assert.That(urlWithHash, Is.EqualTo("https://server.com/archive/50135.zip"));
     }
 
     [Test]
-    public void ResolveUrl_CustomTemplate_MissingPlaceholder_ThrowsArgumentException()
+    public void BuildUrlFromTemplate_MissingPlaceholder_ThrowsArgumentException()
     {
-        Assert.ThrowsAsync<ArgumentException>(async () =>
-            await ReplayDownloader.ResolveUrlFromRoundIdAsync("999", ReplayProviderPreset.CustomTemplate, "https://myreplays.org/download/archive.zip"));
+        Assert.Throws<ArgumentException>(() =>
+            ReplayDownloader.BuildUrlFromTemplate("999", "https://myreplays.org/download/archive.zip"));
     }
 
     [TestCase("")]
     [TestCase("   ")]
     [TestCase("#")]
     [TestCase("###")]
-    public void ResolveUrl_InvalidRoundId_ThrowsArgumentException(string invalidId)
+    public void BuildUrlFromTemplate_InvalidRoundId_ThrowsArgumentException(string invalidId)
     {
-        Assert.ThrowsAsync<ArgumentException>(async () =>
-            await ReplayDownloader.ResolveUrlFromRoundIdAsync(invalidId, ReplayProviderPreset.SpaceStories));
+        Assert.Throws<ArgumentException>(() =>
+            ReplayDownloader.BuildUrlFromTemplate(invalidId, "https://myreplays.org/{roundId}.zip"));
     }
 
     [Test]
-    public void ResolveUrl_CustomTemplate_NullOrEmpty_ThrowsArgumentException()
+    public void BuildUrlFromTemplate_NullOrEmpty_ThrowsArgumentException()
     {
-        Assert.ThrowsAsync<ArgumentException>(async () =>
-            await ReplayDownloader.ResolveUrlFromRoundIdAsync("100", ReplayProviderPreset.CustomTemplate, null));
+        Assert.Throws<ArgumentException>(() =>
+            ReplayDownloader.BuildUrlFromTemplate("100", null!));
 
-        Assert.ThrowsAsync<ArgumentException>(async () =>
-            await ReplayDownloader.ResolveUrlFromRoundIdAsync("100", ReplayProviderPreset.CustomTemplate, ""));
+        Assert.Throws<ArgumentException>(() =>
+            ReplayDownloader.BuildUrlFromTemplate("100", ""));
     }
 
     [TestCase("not-a-valid-url")]
@@ -91,5 +87,38 @@ public sealed class ReplayDownloaderTests
         Assert.That(ReplayDownloader.FormatEta(TimeSpan.FromSeconds(45)), Is.EqualTo("~45 с."));
         Assert.That(ReplayDownloader.FormatEta(TimeSpan.FromSeconds(95)), Is.EqualTo("~1 мин. 35 с."));
         Assert.That(ReplayDownloader.FormatEta(TimeSpan.FromHours(1.5)), Is.EqualTo("~1 ч. 30 мин."));
+    }
+
+    [Test]
+    public void DownloadReplayViewModel_Validation_WorkCorrectly()
+    {
+        var vm = new SS14.Launcher.ViewModels.DownloadReplayViewModel(Path.GetTempPath());
+
+        // Default mode is by URL
+        Assert.That(vm.IsByUrl, Is.True);
+        Assert.That(vm.IsByRoundId, Is.False);
+        Assert.That(vm.CanDownload, Is.False);
+
+        // Valid URL
+        vm.UrlInput = "https://example.com/replay.zip";
+        Assert.That(vm.CanDownload, Is.True);
+
+        // Invalid URL
+        vm.UrlInput = "not-a-valid-url";
+        Assert.That(vm.CanDownload, Is.False);
+
+        // Switch to ByRoundId
+        vm.IsByRoundId = true;
+        Assert.That(vm.IsByUrl, Is.False);
+        Assert.That(vm.CanDownload, Is.False);
+
+        // Set Round ID with valid custom template
+        vm.RoundIdInput = "50135";
+        vm.CustomTemplateInput = "https://server.com/round_{roundId}.zip";
+        Assert.That(vm.CanDownload, Is.True);
+
+        // Template without {roundId} marker
+        vm.CustomTemplateInput = "https://server.com/round.zip";
+        Assert.That(vm.CanDownload, Is.False);
     }
 }

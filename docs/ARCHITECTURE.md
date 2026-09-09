@@ -24,6 +24,8 @@ This document provides an exhaustive, low-level technical reference of the **Spa
    - [4.2. Robust.LoaderApi & Dynamic Assembly Loading](#42-robustloaderapi--dynamic-assembly-loading)
 5. [Process Execution & Sandboxing Pipeline](#-process-execution--sandboxing-pipeline)
 6. [Single-Instance IPC Protocol](#-single-instance-ipc-protocol)
+7. [Replay Subsystem & Autonomous Content Ingestion](#-replay-subsystem--autonomous-content-ingestion)
+8. [Architectural Decision Records (ADR)](#-architectural-decision-records-adr)
 
 ---
 
@@ -200,3 +202,23 @@ If another instance of `SS14.Launcher` is started (for example, when clicking an
    - The second process terminates with exit code `0`.
 3. If connection fails or times out:
    - The process assumes the role of the primary launcher instance and starts listening on the IPC socket.
+
+---
+
+## 🎬 Replay Subsystem & Autonomous Content Ingestion
+
+The replay management subsystem is architected for maximum autonomy, low-latency I/O, and zero dependency on specific server communities:
+- **`ReplayMetadataCache`**: Persistent JSON metadata cache using file size and `LastWriteTimeUtc` validation to bypass disk I/O on repeat views.
+- **User-Centric Downloads**: Supports direct HTTP/HTTPS URLs and community `{roundId}` templates without proprietary third-party API lock-in (see [ADR 0004](adr/0004-replay-subsystem-and-user-architecture.md)).
+- **High-Throughput Stream I/O**: 256 KB memory pooling via `ArrayPool<byte>.Shared`, exponential moving average (EMA, $\alpha=0.35$) speed calculation, and adaptive ETA prediction.
+- **`SmartReplayCleaner`**: Heuristic evaluation of storage quotas, archive integrity, and round age with pin-to-top favorite protection.
+
+---
+
+## 📚 Architectural Decision Records (ADR)
+
+- [ADR 0001: Core Architecture, Modularity & Performance](adr/0001-architecture-decisions.md)
+- [ADR 0002: Async Safety & Error Handling Policy](adr/0002-async-safety-error-handling.md)
+- [ADR 0003: Continuous Integration & Deployment Pipeline Design](adr/0003-cicd-pipeline-design.md)
+- [ADR 0004: Replay Subsystem, User-Centric Downloads, I/O Optimization & Architectural Stability](adr/0004-replay-subsystem-and-user-architecture.md)
+

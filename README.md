@@ -4,7 +4,7 @@
 
 [![Build & Test](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/build-test.yml/badge.svg)](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/build-test.yml)
 [![Release](https://img.shields.io/github/v/release/MeiDoto/SS14.Launcher?color=blue&logo=github)](https://github.com/MeiDoto/SS14.Launcher/releases/latest)
-[![Tests](https://img.shields.io/badge/tests-172%20passed%20%7C%20100%25-brightgreen)](https://github.com/MeiDoto/SS14.Launcher)
+[![Tests](https://img.shields.io/badge/tests-186%20passed%20%7C%20100%25-brightgreen)](https://github.com/MeiDoto/SS14.Launcher)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Avalonia UI](https://img.shields.io/badge/Avalonia-11.2-blue)](https://avaloniaui.net/)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)](https://github.com/MeiDoto/SS14.Launcher/releases/latest)
@@ -49,6 +49,12 @@
 - **🌐 Диагностика сети** — встроенный модуль проверки DNS, TCP сокетов, TLS-сертификатов, джиттера и потерь пакетов с экспортом отчета для технической поддержки.
 
 ### 🎬 Система реплеев нового поколения (Replay System 2.0)
+- **📥 Прямое и пользовательское скачивание (`ReplayDownloader`)**:
+  - Мгновенное скачивание архивов записей по прямой HTTP/HTTPS ссылке или пользовательскому шаблону (`{roundId}`).
+  - Полная независимость от сторонних серверов — чистый клиентский I/O без привязки к внешним проектам.
+  - Потоковая загрузка с буфером **256 КБ** через пул памяти `ArrayPool<byte>.Shared` (нулевые LOH-аллокации).
+  - Экспоненциальное сглаживание скорости (EMA, $\alpha=0.35$) и динамический расчет времени до завершения (ETA).
+  - Умное авто-распознавание ссылок из системного буфера обмена.
 - **⚡ Высокопроизводительное кэширование (`ReplayMetadataCache`)**:
   - Мгновенная загрузка сотен записей благодаря персистентному JSON-кэшу (`replays_cache.json`).
   - Проверка изменений по метке времени и размеру файла — **0 ms I/O задержки** при повторных открытиях.
@@ -165,7 +171,7 @@ cd SS14.Launcher
 # 2. Сборка решения в конфигурации Release
 dotnet build -c Release -p:UseSharedCompilation=false
 
-# 3. Запуск полного набора автоматических тестов (170 тестов, 100% успех)
+# 3. Запуск полного набора автоматических тестов (186 тестов, 100% успех)
 dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj --configuration Release
 
 # 4. Локальный запуск приложения
@@ -187,9 +193,14 @@ python3 publish.py windows linux
 
 ---
 
-## 📚 Документация подсистем
+## 📚 Документация подсистем и архитектурные решения (ADR)
 
 - 🏛️ **[Архитектура и подсистемы](docs/ARCHITECTURE.ru.md)** ([English](docs/ARCHITECTURE.md))
+- 📋 **Архитектурные рекорды (ADR)**:
+  - [ADR 0001: Базовая архитектура, модульность и производительность](docs/adr/0001-architecture-decisions.ru.md)
+  - [ADR 0002: Политика Async-безопасности и обработки ошибок](docs/adr/0002-async-safety-error-handling.ru.md)
+  - [ADR 0003: Дизайн конвейера непрерывной интеграции (CI/CD)](docs/adr/0003-cicd-pipeline-design.ru.md)
+  - [ADR 0004: Подсистема реплеев, пользовательская загрузка, оптимизация I/O и архитектурная стабильность](docs/adr/0004-replay-subsystem-and-user-architecture.ru.md)
 - 🌐 **[Сетевые протоколы и API](docs/NETWORKING.ru.md)** ([English](docs/NETWORKING.md))
 - 🎨 **[Кастомизация и оформление](docs/CUSTOMIZATION.ru.md)** ([English](docs/CUSTOMIZATION.md))
 - 🛡️ **[Политика безопасности](SECURITY.ru.md)** ([English](SECURITY.md))

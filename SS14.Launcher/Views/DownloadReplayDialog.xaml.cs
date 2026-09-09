@@ -57,6 +57,15 @@ public partial class DownloadReplayDialog : Window
         Close();
     }
 
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        base.OnClosing(e);
+        if (DataContext is DownloadReplayViewModel vm && vm.IsDownloading)
+        {
+            vm.Cancel();
+        }
+    }
+
     private void CloseClicked(object? sender, RoutedEventArgs e)
     {
         if (DataContext is DownloadReplayViewModel vm && vm.IsDownloading)

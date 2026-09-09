@@ -25,37 +25,24 @@ public sealed class DownloadReplayViewModel : ViewModelBase
     private readonly Action? _onCompleted;
     private CancellationTokenSource? _cancelTokenSource;
 
-    private bool _isByRoundId = true;
-    public bool IsByRoundId
-    {
-        get => _isByRoundId;
-        set
-        {
-            if (SetProperty(ref _isByRoundId, value))
-            {
-                OnPropertyChanged(nameof(IsByUrl));
-                OnPropertyChanged(nameof(CanDownload));
-            }
-        }
-    }
-
+    private bool _isByUrl = true;
     public bool IsByUrl
     {
-        get => !_isByRoundId;
-        set => IsByRoundId = !value;
-    }
-
-    private string _roundIdInput = "";
-    public string RoundIdInput
-    {
-        get => _roundIdInput;
+        get => _isByUrl;
         set
         {
-            if (SetProperty(ref _roundIdInput, value))
+            if (SetProperty(ref _isByUrl, value))
             {
+                OnPropertyChanged(nameof(IsByRoundId));
                 OnPropertyChanged(nameof(CanDownload));
             }
         }
+    }
+
+    public bool IsByRoundId
+    {
+        get => !_isByUrl;
+        set => IsByUrl = !value;
     }
 
     private string _urlInput = "";
@@ -71,21 +58,18 @@ public sealed class DownloadReplayViewModel : ViewModelBase
         }
     }
 
-    private int _selectedProviderIndex = 0;
-    public int SelectedProviderIndex
+    private string _roundIdInput = "";
+    public string RoundIdInput
     {
-        get => _selectedProviderIndex;
+        get => _roundIdInput;
         set
         {
-            if (SetProperty(ref _selectedProviderIndex, value))
+            if (SetProperty(ref _roundIdInput, value))
             {
-                OnPropertyChanged(nameof(IsCustomProvider));
                 OnPropertyChanged(nameof(CanDownload));
             }
         }
     }
-
-    public bool IsCustomProvider => SelectedProviderIndex == 1;
 
     private string _customTemplateInput = "https://example.com/replays/round_{roundId}.zip";
     public string CustomTemplateInput
@@ -124,23 +108,20 @@ public sealed class DownloadReplayViewModel : ViewModelBase
             if (IsDownloading || IsSuccess)
                 return false;
 
-            if (IsByRoundId)
+            if (IsByUrl)
             {
-                if (string.IsNullOrWhiteSpace(RoundIdInput))
-                    return false;
-
-                if (IsCustomProvider)
-                {
-                    return !string.IsNullOrWhiteSpace(CustomTemplateInput) &&
-                           CustomTemplateInput.Contains("{roundId}", StringComparison.OrdinalIgnoreCase);
-                }
-
-                var clean = RoundIdInput.Trim().TrimStart('#');
-                return !string.IsNullOrWhiteSpace(clean) && int.TryParse(clean, out _);
+                return Uri.TryCreate(UrlInput?.Trim(), UriKind.Absolute, out var uri) &&
+                       (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
             }
 
-            return Uri.TryCreate(UrlInput, UriKind.Absolute, out var uri) &&
-                   (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+            var clean = RoundIdInput?.Trim().TrimStart('#');
+            if (string.IsNullOrWhiteSpace(clean) || !int.TryParse(clean, out _))
+                return false;
+
+            return !string.IsNullOrWhiteSpace(CustomTemplateInput) &&
+                   CustomTemplateInput.Contains("{roundId}", StringComparison.OrdinalIgnoreCase) &&
+                   Uri.TryCreate(CustomTemplateInput.Replace("{roundId}", "1", StringComparison.OrdinalIgnoreCase), UriKind.Absolute, out var templateUri) &&
+                   (templateUri.Scheme == Uri.UriSchemeHttp || templateUri.Scheme == Uri.UriSchemeHttps);
         }
     }
 
@@ -243,8 +224,6 @@ public sealed class DownloadReplayViewModel : ViewModelBase
                 if (string.IsNullOrWhiteSpace(RoundIdInput) && string.IsNullOrWhiteSpace(UrlInput))
                 {
                     RoundIdInput = clean;
-                    IsByRoundId = true;
-                    SelectedProviderIndex = 0; // Space Stories
                 }
             }
         }
@@ -303,27 +282,14 @@ public sealed class DownloadReplayViewModel : ViewModelBase
         string targetUrl;
         try
         {
+            StatusMessage = _loc.GetString("replay-download-status-connecting");
+
             if (IsByRoundId)
             {
-                var preset = (ReplayProviderPreset)SelectedProviderIndex;
-                if (preset == ReplayProviderPreset.SpaceStories)
-                {
-                    StatusMessage = _loc.GetString("replay-download-status-resolving");
-                }
-                else
-                {
-                    StatusMessage = _loc.GetString("replay-download-status-connecting");
-                }
-
-                targetUrl = await ReplayDownloader.ResolveUrlFromRoundIdAsync(
-                    RoundIdInput,
-                    preset,
-                    CustomTemplateInput,
-                    cancellationToken: _cancelTokenSource.Token);
+                targetUrl = ReplayDownloader.BuildUrlFromTemplate(RoundIdInput, CustomTemplateInput);
             }
             else
             {
-                StatusMessage = _loc.GetString("replay-download-status-connecting");
                 targetUrl = ReplayDownloader.NormalizeDownloadUrl(UrlInput.Trim());
             }
         }
