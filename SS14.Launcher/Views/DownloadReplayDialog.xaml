@@ -20,19 +20,20 @@
   <DockPanel LastChildFill="True">
     <!-- BOTTOM ACTIONS (always pinned to the bottom) -->
     <DockPanel DockPanel.Dock="Bottom" Margin="0, 16, 0, 0" LastChildFill="False">
-      <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="4" IsVisible="{Binding IsSuccess}">
+      <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="0" IsVisible="{Binding IsSuccess}">
         <Button Classes="OpenRight" Click="PlayClicked" Content="{loc:Loc replay-download-play-now}"
                 Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
         <Button Classes="OpenLeft" Click="CloseClicked" Content="{loc:Loc replay-download-close}" />
       </StackPanel>
 
-      <Button DockPanel.Dock="Right" Classes="OpenLeft" Click="CloseClicked" Content="{loc:Loc replay-download-close}"
-              IsVisible="{Binding !IsSuccess}" IsCancel="True" />
-      <Button DockPanel.Dock="Right" Classes="OpenRight" Click="StartDownloadClicked" Content="{loc:Loc replay-download-start-button}"
-              IsEnabled="{Binding CanDownload}" IsVisible="{Binding !IsSuccess}" IsDefault="True"
-              Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
-      <Button DockPanel.Dock="Right" Click="CancelDownloadClicked" Content="{loc:Loc replay-download-cancel-button}"
-              IsVisible="{Binding IsDownloading}" Margin="0, 0, 8, 0" />
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="0" IsVisible="{Binding !IsSuccess}">
+        <Button Classes="OpenRight" Click="StartDownloadClicked" Content="{loc:Loc replay-download-start-button}"
+                IsEnabled="{Binding CanDownload}" IsVisible="{Binding !IsDownloading}" IsDefault="True"
+                Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
+        <Button Classes="OpenRight" Click="CancelDownloadClicked" Content="{loc:Loc replay-download-cancel-button}"
+                IsVisible="{Binding IsDownloading}" />
+        <Button Classes="OpenLeft" Click="CloseClicked" Content="{loc:Loc replay-download-close}" IsCancel="True" />
+      </StackPanel>
     </DockPanel>
 
     <!-- SCROLLABLE BODY (ensures all elements fit any display/scaling) -->
@@ -72,7 +73,12 @@
               <TextBlock Text="{loc:Loc replay-download-round-id-label}" Classes="SubText" FontSize="11" Margin="0, 4, 0, 0" />
               <Grid ColumnDefinitions="*, Auto">
                 <TextBox Grid.Column="0" Text="{Binding RoundIdInput}" Watermark="{loc:Loc replay-download-round-id-watermark}" Margin="0, 0, 6, 0" />
-                <Button Grid.Column="1" Click="PasteClicked" Content="📋 {loc:Loc dialog-paste}" ToolTip.Tip="{loc:Loc dialog-paste-tooltip}" />
+                <Button Grid.Column="1" Click="PasteClicked" ToolTip.Tip="{loc:Loc dialog-paste-tooltip}">
+                  <StackPanel Orientation="Horizontal" Spacing="4">
+                    <TextBlock Text="📋" VerticalAlignment="Center" />
+                    <TextBlock Text="{loc:Loc dialog-paste}" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Button>
               </Grid>
             </StackPanel>
 
@@ -81,7 +87,12 @@
               <TextBlock Text="{loc:Loc replay-download-url-label}" Classes="SubText" FontSize="11" />
               <Grid ColumnDefinitions="*, Auto">
                 <TextBox Grid.Column="0" Text="{Binding UrlInput}" Watermark="https://example.com/path/to/replay.zip" Margin="0, 0, 6, 0" />
-                <Button Grid.Column="1" Click="PasteClicked" Content="📋 {loc:Loc dialog-paste}" ToolTip.Tip="{loc:Loc dialog-paste-tooltip}" />
+                <Button Grid.Column="1" Click="PasteClicked" ToolTip.Tip="{loc:Loc dialog-paste-tooltip}">
+                  <StackPanel Orientation="Horizontal" Spacing="4">
+                    <TextBlock Text="📋" VerticalAlignment="Center" />
+                    <TextBlock Text="{loc:Loc dialog-paste}" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Button>
               </Grid>
             </StackPanel>
           </StackPanel>

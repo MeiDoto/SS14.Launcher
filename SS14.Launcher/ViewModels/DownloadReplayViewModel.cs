@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -134,7 +135,8 @@ public sealed class DownloadReplayViewModel : ViewModelBase
                            CustomTemplateInput.Contains("{roundId}", StringComparison.OrdinalIgnoreCase);
                 }
 
-                return true;
+                var clean = RoundIdInput.Trim().TrimStart('#');
+                return !string.IsNullOrWhiteSpace(clean) && int.TryParse(clean, out _);
             }
 
             return Uri.TryCreate(UrlInput, UriKind.Absolute, out var uri) &&
@@ -208,6 +210,7 @@ public sealed class DownloadReplayViewModel : ViewModelBase
         _targetDirectory = targetDirectory;
         _onPlay = onPlay;
         _onCompleted = onCompleted;
+        _statusMessage = _loc.GetString("replay-download-status-ready");
     }
 
     public async Task TryAutoPasteFromClipboardAsync()
@@ -232,10 +235,11 @@ public sealed class DownloadReplayViewModel : ViewModelBase
                 return;
             }
 
-            // If it's a round number (like 50135 or #50135)
-            var clean = text.TrimStart('#').Trim();
-            if (int.TryParse(clean, out var roundNum) && roundNum > 0 && clean.Length <= 8)
+            // If it's a round number (like 50135 or #50135 or round_50135)
+            var match = Regex.Match(text, @"^(?:round[_\-\s]?|#)?(\d{2,8})$", RegexOptions.IgnoreCase);
+            if (match.Success)
             {
+                var clean = match.Groups[1].Value;
                 if (string.IsNullOrWhiteSpace(RoundIdInput) && string.IsNullOrWhiteSpace(UrlInput))
                 {
                     RoundIdInput = clean;
@@ -267,11 +271,11 @@ public sealed class DownloadReplayViewModel : ViewModelBase
             return;
         }
 
-        // If it's a round ID, clean and switch to ByRoundId
-        var clean = text.TrimStart('#').Trim();
-        if (int.TryParse(clean, out _))
+        // If it's a round ID (e.g. 50135, #50135, round_50135)
+        var match = Regex.Match(text, @"^(?:round[_\-\s]?|#)?(\d{1,8})$", RegexOptions.IgnoreCase);
+        if (match.Success)
         {
-            RoundIdInput = clean;
+            RoundIdInput = match.Groups[1].Value;
             IsByRoundId = true;
             return;
         }
@@ -279,7 +283,7 @@ public sealed class DownloadReplayViewModel : ViewModelBase
         if (IsByUrl)
             UrlInput = text;
         else
-            RoundIdInput = text;
+            RoundIdInput = text.TrimStart('#').Trim();
     }
 
     public async Task StartDownloadAsync()
