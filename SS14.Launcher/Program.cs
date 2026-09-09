@@ -305,7 +305,9 @@ internal static class Program
             .With(new X11PlatformOptions
             {
                 WmClass = "SS14.Launcher",
-                EnableMultiTouch = true
+                EnableMultiTouch = true,
+                UseDBusMenu = false,
+                UseDBusFilePicker = false
             })
             .With(new FontManagerOptions
             {
