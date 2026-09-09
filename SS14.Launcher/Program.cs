@@ -297,6 +297,7 @@ internal static class Program
         locator.RegisterConstant(loginManager);
         locator.RegisterConstant(overrideAssets);
         locator.RegisterConstant(launcherInfo);
+        locator.RegisterConstant<IThemeService>(ThemeService.Instance);
 
         CheckLauncherArchitecture(cfg, engineManager);
 

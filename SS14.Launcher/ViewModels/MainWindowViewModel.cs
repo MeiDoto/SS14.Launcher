@@ -32,6 +32,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
     private readonly LoginManager _loginMgr;
     private readonly LauncherInfoManager _infoManager;
     private readonly LocalizationManager _loc;
+    private readonly IThemeService _themeService;
 
     private int _selectedIndex;
 
@@ -68,6 +69,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
         _loginMgr = Locator.Current.GetRequiredService<LoginManager>();
         _infoManager = Locator.Current.GetRequiredService<LauncherInfoManager>();
         _loc = LocalizationManager.Instance;
+        _themeService = Locator.Current.GetService<IThemeService>() ?? ThemeService.Instance;
 
         ServersTab = new ServerListTabViewModel(this);
         HomeTab = new HomePageViewModel(this);
@@ -303,10 +305,10 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IErrorOverlayOw
         OnPropertyChanged(nameof(CustomBackgroundOverlayOpacity));
 
         var logoPath = _cfg.GetCVar(CVars.CustomLogoImagePath);
-        _customLogoImage = ThemeService.Instance.LoadBitmapSafely(logoPath);
+        _customLogoImage = _themeService.LoadBitmapSafely(logoPath);
         OnPropertyChanged(nameof(CustomLogoImage));
 
-        ThemeService.Instance.ApplyTheme(_cfg, HasCustomBackgroundImage);
+        _themeService.ApplyTheme(_cfg, HasCustomBackgroundImage);
 
         if (Control != null)
         {

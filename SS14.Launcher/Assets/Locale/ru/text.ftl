@@ -211,6 +211,8 @@ login-forgot-error = Ошибка
 # Strings for the "login" view on login
 login-login-title = Войти
 # Strings for the "login" view on login
+login-login-auth-server-changed = Сервер аутентификации изменился
+# Strings for the "login" view on login
 login-login-show-password = Показать пароль
 # Strings for the "login" view on login
 login-login-username-watermark = Имя пользователя или e-mail
@@ -256,6 +258,11 @@ main-window-busy-checking-account-status = Проверка статуса ак�
 main-window-error-connecting-auth-server = Ошибка подключения к серверу аутентификации
 # Strings for the general main window layout of the launcher
 main-window-error-unknown = Произошла неизвестная ошибка
+# Strings for the general main window layout of the launcher
+main-window-auth-override-title = URL-адрес сервера аутентификации изменился
+main-window-auth-override-desc =
+     Если вы не помните, чтобы меняли это значение, возможно, кто-то пытается перехватить ваши учётные данные. Закрывая это окно, вы соглашаетесь с тем, что несёте ответственность за свою безопасность самостоятельно, и поддержка вам предоставлена не будет.
+main-window-auth-override-acknowledge = Я понимаю
 # Long region names for server tag filters (shown in tooltip)
 region-africa-central = Центральная Африка
 # Long region names for server tag filters (shown in tooltip)

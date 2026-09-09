@@ -25,8 +25,10 @@
     <Color x:Key="ThemeServerListBackgroundColor">#1e1e22</Color>
     <Color x:Key="ThemeServerListRowAltColor">#262626</Color>
     <Color x:Key="ThemeHeaderBackgroundColor">#212126</Color>
+    <Color x:Key="ThemeBackgroundOverlayColor">#1A1B24</Color>
 
     <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="{StaticResource ThemeBackgroundColor}" />
+    <SolidColorBrush x:Key="ThemeBackgroundOverlayBrush" Color="{StaticResource ThemeBackgroundOverlayColor}" />
     <SolidColorBrush x:Key="ThemePopupBackgroundBrush" Color="{StaticResource ThemePopupBackgroundColor}" />
     <SolidColorBrush x:Key="ThemeServerListBackgroundBrush" Color="{StaticResource ThemeServerListBackgroundColor}" />
     <SolidColorBrush x:Key="ThemeServerListRowAltBrush" Color="{StaticResource ThemeServerListRowAltColor}" />

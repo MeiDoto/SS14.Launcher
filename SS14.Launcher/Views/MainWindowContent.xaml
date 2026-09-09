@@ -19,7 +19,7 @@
            HorizontalAlignment="Center"
            VerticalAlignment="Center" />
 
-    <Panel Background="#1A1B24"
+    <Panel Background="{DynamicResource ThemeBackgroundOverlayBrush}"
            Opacity="{Binding CustomBackgroundOverlayOpacity}"
            IsVisible="{Binding HasCustomBackgroundImage}" />
 
