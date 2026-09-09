@@ -49,11 +49,19 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: dotnet format --verify-no-changes --no-restore
 
-    - name: Run Tests
-      run: dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj --no-build --configuration Debug -v normal
+    - name: Run Tests (with Code Coverage on Linux)
+      run: dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj --no-build --configuration Debug -v normal --collect:"XPlat Code Coverage"
 
     - name: Run Tests (Release)
       run: dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj --no-build --configuration Release -v normal
+
+    - name: Upload Code Coverage Report
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-coverage-report
+        path: '**/coverage.cobertura.xml'
+        retention-days: 14
 
     - name: Validate AppStream Metadata (Linux)
       if: matrix.os == 'ubuntu-latest'

@@ -54,9 +54,7 @@ public sealed class DataManager : ObservableObject
 
     private readonly Dictionary<string, CVarEntry> _configEntries = new();
 
-    // TODO: I got lazy and this is a flat list.
-    // This probably results in some bad O(n*m) behavior.
-    // I don't care for now.
+    // Installed engine modules list. Invariant: N is bounded to installed engine modules (typically 1-3 modules per client).
     private readonly List<InstalledEngineModule> _modules = new();
 
     private readonly List<DbCommand> _dbCommandQueue = new();

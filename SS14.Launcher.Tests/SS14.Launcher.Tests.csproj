@@ -6,14 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nunit"/>
-    <PackageReference Include="NUnit.Analyzers"/>
-    <PackageReference Include="NUnit3TestAdapter"/>
-    <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="nunit" />
+    <PackageReference Include="NUnit.Analyzers" />
+    <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SS14.Launcher\SS14.Launcher.csproj"/>
+    <ProjectReference Include="..\SS14.Launcher\SS14.Launcher.csproj" />
   </ItemGroup>
 
 </Project>

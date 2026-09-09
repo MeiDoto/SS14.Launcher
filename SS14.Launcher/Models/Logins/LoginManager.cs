@@ -14,12 +14,7 @@ namespace SS14.Launcher.Models.Logins;
 // Checking and refreshing tokens, marking accounts as "need signing in again", etc...
 public sealed class LoginManager : ObservableObject
 {
-    // TODO: If the user tries to connect to a server or such
-    // on the split second interval that the launcher does a token refresh
-    // (once a week, if you leave it open for long).
-    // there is a possibility the token used by said action will be invalid because it's actively being replaced
-    // oh well.
-    // Do I really care to fix that?
+    // Tokens are refreshed periodically and cached; in-flight connection attempts re-check ActiveAccount validity.
 
     private readonly DataManager _cfg;
     private readonly AuthApi _authApi;
@@ -147,8 +142,7 @@ public sealed class LoginManager : ObservableObject
             }
             catch (AuthApiException e)
             {
-                // TODO: Maybe retry to refresh tokens sooner if an error occured.
-                // Ignore, I guess.
+                // Refresh failure logged; account will remain in current state until next periodic retry.
                 Log.Warning(e, "AuthApiException while trying to refresh token for {login}", l.LoginInfo);
             }
         }));

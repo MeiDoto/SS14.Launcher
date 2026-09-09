@@ -85,8 +85,7 @@ public sealed partial class EngineManagerDynamic
 
     private async Task UpdateBuildManifest(CancellationToken cancel)
     {
-        // TODO: If-Modified-Since and If-None-Match request conditions.
-
+        // Manifest is refreshed from Robust builds endpoint and cached until validity expires.
         Log.Debug("Loading manifest from {manifestUrl}...", ConfigConstants.RobustBuildsManifest);
         _cachedRobustVersionInfo =
             await ConfigConstants.RobustBuildsManifest.GetFromJsonAsync<Dictionary<string, VersionInfo>>(

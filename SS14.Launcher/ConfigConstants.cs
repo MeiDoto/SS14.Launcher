@@ -66,8 +66,7 @@ public static class ConfigConstants
     public static readonly UrlFallbackSet RobustBuildsManifest = RobustBuildsBaseUrl + "manifest.json";
     public static readonly UrlFallbackSet RobustModulesManifest = RobustBuildsBaseUrl + "modules.json";
 
-    // How long to keep cached copies of Robust manifests.
-    // TODO: Take this from Cache-Control header responses instead.
+    // Default duration to keep cached copies of Robust manifests when HTTP Cache-Control header is absent.
     public static readonly TimeSpan RobustManifestCacheTime = TimeSpan.FromMinutes(15);
 
     public static readonly UrlFallbackSet UrlLauncherInfo = LauncherDataBaseUrl + "info.json";

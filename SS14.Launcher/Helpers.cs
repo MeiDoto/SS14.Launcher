@@ -190,7 +190,7 @@ public static class Helpers
 
     public static unsafe void MarkDirectoryCompress(string path)
     {
-        // TODO: Linux: chattr +c
+        // Transparent NTFS directory compression on Windows; on Linux filesystems (Btrfs/ZFS) compression is mount-managed.
         if (!OperatingSystem.IsWindows())
             return;
 

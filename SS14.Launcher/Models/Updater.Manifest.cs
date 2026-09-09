@@ -310,8 +310,7 @@ public sealed partial class Updater
                         var compressedData = compressBuffer.AsMemory(0, compressedLength);
                         await stream.ReadExactAsync(compressedData, cancel);
 
-                        // Decompress so that we can verify hash down below.
-                        // TODO: It's possible to hash while we're decompressing to avoid using a full buffer.
+                        // Decompress so that we can verify content blob hash below.
 
                         swZstd.Start();
                         var decompressedLength = decompressContext!.Decompress(data.Span, compressedData.Span);

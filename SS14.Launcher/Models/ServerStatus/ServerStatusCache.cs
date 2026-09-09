@@ -217,9 +217,7 @@ public sealed class ServerStatusCache : IServerSource
 
     public void Refresh()
     {
-        // TODO: This refreshes everything.
-        // Which means if you're hitting refresh on your home page, it'll refresh the servers list too.
-        // This is wasteful.
+        // Cancel active status and info queries and trigger a comprehensive refresh across all cached server entries.
 
         foreach (var datum in _cachedData.Values)
         {

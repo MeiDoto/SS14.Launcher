@@ -37,7 +37,7 @@ jobs:
         dotnet format --verify-no-changes --no-restore
 
     - name: Run Full Test Suite
-      run: dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj -v normal --configuration Release
+      run: dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj -v normal --configuration Release --collect:"XPlat Code Coverage"
 
     - name: Validate AppStream Metadata
       run: |

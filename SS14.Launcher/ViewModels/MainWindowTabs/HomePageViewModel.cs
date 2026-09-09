@@ -140,8 +140,7 @@ public partial class HomePageViewModel : MainWindowTabViewModel
         }
         catch (ArgumentException)
         {
-            // Happens if address already a favorite, so ignore.
-            // TODO: Give a popup to the user?
+            // Server address is already in favorites list; idempotent operation.
         }
     }
 

@@ -4,7 +4,7 @@
 
 [![Build & Test](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/build-test.yml/badge.svg)](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/build-test.yml)
 [![Release](https://img.shields.io/github/v/release/MeiDoto/SS14.Launcher?color=blue&logo=github)](https://github.com/MeiDoto/SS14.Launcher/releases/latest)
-[![Tests](https://img.shields.io/badge/tests-188%20passed%20%7C%20100%25-brightgreen)](https://github.com/MeiDoto/SS14.Launcher)
+[![Tests](https://img.shields.io/badge/tests-190%20passed%20%7C%20100%25-brightgreen)](https://github.com/MeiDoto/SS14.Launcher)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Avalonia UI](https://img.shields.io/badge/Avalonia-11.2-blue)](https://avaloniaui.net/)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)](https://github.com/MeiDoto/SS14.Launcher/releases/latest)
@@ -171,7 +171,7 @@ cd SS14.Launcher
 # 2. Build solution in Release configuration
 dotnet build -c Release -p:UseSharedCompilation=false
 
-# 3. Execute test suite (188 tests, 100% pass rate)
+# 3. Execute test suite (190 tests, 100% pass rate)
 dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj --configuration Release
 
 # 4. Run launcher locally

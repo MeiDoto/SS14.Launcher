@@ -231,7 +231,7 @@ public sealed partial class Updater : ObservableObject
                 Log.Debug("Manifest hash of new version is {Hash}", Convert.ToHexString(manifestHash));
                 Log.Debug("Resolving content dependencies...");
 
-                // TODO: This could copy from base build modules in certain cases.
+                // Resolve dynamic content dependencies against installed modules.
                 await ResolveContentDependencies(con, versionId, metadata.EngineVersion, moduleManifest);
             }
             else
@@ -715,7 +715,7 @@ public sealed partial class Updater : ObservableObject
         // Store the created version ID so we can manually delete it later if necessary.
         state.MadeContentVersion = versionId;
 
-        // TODO: Download URL
+        // Download new content version via manifest or direct zip archive.
         byte[] manifestHash;
         if (!string.IsNullOrEmpty(buildInfo.ManifestUrl)
             && !string.IsNullOrEmpty(buildInfo.ManifestDownloadUrl)

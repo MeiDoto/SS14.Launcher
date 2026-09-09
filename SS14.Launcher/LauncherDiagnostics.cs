@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime;
@@ -138,8 +138,7 @@ internal static class LauncherDiagnostics
                 return name;
         }
 
-        // TODO: ask OS as fallback for when x86 CPUID isn't available on Windows and Linux.
-
+        // On non-x86 CPU architectures or environments where CPUID instruction is restricted, fall back gracefully.
         return "Unknown processor model";
     }
 

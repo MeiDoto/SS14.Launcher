@@ -67,7 +67,7 @@ public partial class HomePageView : UserControl
         using var file = result[0];
         if (!mainVm.IsContentBundleDropValid(file))
         {
-            // TODO: Report this nicely.
+            Log.Warning("Content bundle drop validation failed for {Path}", file.Path);
             return;
         }
 
