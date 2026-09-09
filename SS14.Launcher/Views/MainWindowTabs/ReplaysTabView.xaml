@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mainWindowTabs="clr-namespace:SS14.Launcher.ViewModels.MainWindowTabs"
              xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+             xmlns:views="clr-namespace:SS14.Launcher.Views"
              mc:Ignorable="d" d:DesignWidth="880" d:DesignHeight="600"
              x:Class="SS14.Launcher.Views.MainWindowTabs.ReplaysTabView"
              x:DataType="mainWindowTabs:ReplaysTabViewModel">
@@ -61,63 +62,70 @@
       </Grid>
     </Border>
 
-    <!-- TOP FILTER AND ACTION BAR (2 Perfectly Balanced Rows) -->
+    <!-- TOP FILTER AND ACTION BAR -->
     <Border DockPanel.Dock="Top" Classes="Card" Margin="0, 0, 0, 6" Padding="8">
       <StackPanel Spacing="6">
-        <!-- Row 1: Search and Primary File Tools -->
-        <Grid ColumnDefinitions="*, Auto, Auto, Auto" RowDefinitions="Auto">
-          <!-- Search -->
-          <TextBox Grid.Column="0" Text="{Binding SearchString}"
+        <!-- Row 1: Search and Primary Actions Toolbar -->
+        <DockPanel LastChildFill="True">
+          <!-- Action Buttons Group (Right) -->
+          <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="0" VerticalAlignment="Center">
+            <!-- Open File -->
+            <Button Content="{loc:Loc tab-replays-browse-zip}" Command="{Binding OpenFilePickerAndPlay}"
+                    Classes="OpenRight" VerticalAlignment="Center" Padding="10, 5" />
+
+            <!-- Open Folder -->
+            <Button Content="{loc:Loc tab-replays-open-folder}" Command="{Binding OpenReplaysFolder}"
+                    Classes="OpenBoth" VerticalAlignment="Center" Padding="8, 5" />
+
+            <!-- Smart Cleaner -->
+            <Button Content="{loc:Loc tab-replays-cleaner-button}" Command="{Binding OpenSmartCleaner}"
+                    Classes="OpenBoth" VerticalAlignment="Center" Padding="8, 5"
+                    ToolTip.Tip="{loc:Loc tab-replays-cleaner-tooltip}" />
+
+            <!-- Batch Mode Toggle -->
+            <ToggleButton IsChecked="{Binding IsBatchMode}" Content="{loc:Loc tab-replays-batch-button}"
+                          Classes="OpenBoth" VerticalAlignment="Center" Padding="8, 5"
+                          ToolTip.Tip="{loc:Loc tab-replays-batch-tooltip}" />
+
+            <!-- Refresh Button with Crisp Vector Icon -->
+            <Button Classes="OpenLeft" Command="{Binding RefreshReplays}"
+                    VerticalAlignment="Center" ToolTip.Tip="{loc:Loc tab-replays-refresh-tooltip}">
+              <views:IconLabel Icon="{DynamicResource ButtonIcon-refresh}" Height="18" Width="18" />
+            </Button>
+          </StackPanel>
+
+          <!-- Search (Left, Fills Remaining Width) -->
+          <TextBox Text="{Binding SearchString}"
                    Watermark="{loc:Loc tab-replays-search-watermark}"
-                   Margin="0, 0, 6, 0" VerticalAlignment="Center" MinWidth="180" />
+                   Margin="0, 0, 8, 0" VerticalAlignment="Center" />
+        </DockPanel>
 
-          <!-- Open External File -->
-          <Button Grid.Column="1" Content="{loc:Loc tab-replays-browse-zip}" Command="{Binding OpenFilePickerAndPlay}"
-                  Classes="OpenBoth" Margin="0, 0, 6, 0" VerticalAlignment="Center" />
-
-          <!-- Open Folder -->
-          <Button Grid.Column="2" Content="{loc:Loc tab-replays-open-folder}" Command="{Binding OpenReplaysFolder}"
-                  Classes="OpenBoth" Margin="0, 0, 6, 0" VerticalAlignment="Center" />
-
-          <!-- Refresh -->
-          <Button Grid.Column="3" Content="🔄" Command="{Binding RefreshReplays}"
-                  Classes="OpenLeft" VerticalAlignment="Center" ToolTip.Tip="{loc:Loc tab-replays-refresh-tooltip}" />
-        </Grid>
-
-        <!-- Row 2: Sort, Favorites, Mode, Server, Cleaner, Batch -->
-        <Grid ColumnDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, *, Auto, Auto" RowDefinitions="Auto">
+        <!-- Row 2: Sort and Filters (No clipping, cleanly wraps) -->
+        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
           <!-- Sort Dropdown -->
-          <ComboBox Grid.Column="0" ItemsSource="{Binding SortOptions}" SelectedIndex="{Binding SelectedSortIndex}"
-                    Margin="0, 0, 6, 0" VerticalAlignment="Center" MinWidth="160" />
+          <ComboBox ItemsSource="{Binding SortOptions}" SelectedIndex="{Binding SelectedSortIndex}"
+                    Margin="0, 0, 8, 0" VerticalAlignment="Center" MinWidth="150" />
 
           <!-- Favorites Toggle -->
-          <ToggleButton Grid.Column="1" IsChecked="{Binding OnlyFavorites}" Content="{loc:Loc tab-replays-filter-favorites}"
+          <ToggleButton IsChecked="{Binding OnlyFavorites}" Content="{loc:Loc tab-replays-filter-favorites}"
                         Margin="0, 0, 8, 0" VerticalAlignment="Center" Padding="8, 5" />
 
           <!-- Gamemode Label & Dropdown -->
-          <TextBlock Grid.Column="2" Text="{loc:Loc tab-replays-filter-mode-label}" VerticalAlignment="Center"
-                     Classes="SubText" FontSize="11" Margin="0, 0, 4, 0" />
-          <ComboBox Grid.Column="3" ItemsSource="{Binding AvailableGamemodes}" SelectedItem="{Binding SelectedGamemode}"
-                    Margin="0, 0, 8, 0" VerticalAlignment="Center" MinWidth="120" MaxWidth="160" />
+          <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0, 0, 8, 0" Spacing="4">
+            <TextBlock Text="{loc:Loc tab-replays-filter-mode-label}" VerticalAlignment="Center"
+                       Classes="SubText" FontSize="11" />
+            <ComboBox ItemsSource="{Binding AvailableGamemodes}" SelectedItem="{Binding SelectedGamemode}"
+                      VerticalAlignment="Center" MinWidth="110" MaxWidth="150" />
+          </StackPanel>
 
           <!-- Server Label & Dropdown -->
-          <TextBlock Grid.Column="4" Text="{loc:Loc tab-replays-filter-server-label}" VerticalAlignment="Center"
-                     Classes="SubText" FontSize="11" Margin="0, 0, 4, 0" />
-          <ComboBox Grid.Column="5" ItemsSource="{Binding AvailableServers}" SelectedItem="{Binding SelectedServer}"
-                    Margin="0, 0, 6, 0" VerticalAlignment="Center" MinWidth="130" MaxWidth="180" />
-
-          <!-- Spacer column 6: * -->
-
-          <!-- Smart Cleaner -->
-          <Button Grid.Column="7" Content="{loc:Loc tab-replays-cleaner-button}" Command="{Binding OpenSmartCleaner}"
-                  Margin="0, 0, 6, 0" VerticalAlignment="Center" Padding="8, 5"
-                  ToolTip.Tip="{loc:Loc tab-replays-cleaner-tooltip}" />
-
-          <!-- Batch Mode Toggle -->
-          <ToggleButton Grid.Column="8" IsChecked="{Binding IsBatchMode}" Content="{loc:Loc tab-replays-batch-button}"
-                        VerticalAlignment="Center" Padding="8, 5"
-                        ToolTip.Tip="{loc:Loc tab-replays-batch-tooltip}" />
-        </Grid>
+          <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0, 0, 8, 0" Spacing="4">
+            <TextBlock Text="{loc:Loc tab-replays-filter-server-label}" VerticalAlignment="Center"
+                       Classes="SubText" FontSize="11" />
+            <ComboBox ItemsSource="{Binding AvailableServers}" SelectedItem="{Binding SelectedServer}"
+                      VerticalAlignment="Center" MinWidth="120" MaxWidth="170" />
+          </StackPanel>
+        </WrapPanel>
       </StackPanel>
     </Border>
 
@@ -142,13 +150,17 @@
       <Panel>
         <!-- Empty State -->
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
-                    IsVisible="{Binding !FilteredReplays.Count}" Spacing="8">
+                    IsVisible="{Binding !FilteredReplays.Count}" Spacing="10">
           <TextBlock Text="🎬" FontSize="36" HorizontalAlignment="Center" />
           <TextBlock Text="{loc:Loc tab-replays-empty-title}" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" />
           <TextBlock Text="{loc:Loc tab-replays-empty-desc}"
-                     Classes="SubText" TextWrapping="Wrap" MaxWidth="440" TextAlignment="Center" />
-          <Button Content="{loc:Loc tab-replays-select-file}" Command="{Binding OpenFilePickerAndPlay}"
-                  HorizontalAlignment="Center" Margin="0, 6, 0, 0" />
+                     Classes="SubText" TextWrapping="Wrap" MaxWidth="460" TextAlignment="Center" />
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0, 8, 0, 0">
+            <Button Content="{loc:Loc tab-replays-select-file}" Command="{Binding OpenFilePickerAndPlay}"
+                    Padding="14, 8" FontWeight="SemiBold" />
+            <Button Content="{loc:Loc tab-replays-open-folder}" Command="{Binding OpenReplaysFolder}"
+                    Padding="14, 8" />
+          </StackPanel>
         </StackPanel>
 
         <!-- Virtualized List of Items -->
