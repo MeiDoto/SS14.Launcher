@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Splat;
 
 namespace SS14.Launcher.Localization;
@@ -14,7 +14,7 @@ public sealed class LocExtension
 
     public object ProvideValue(IServiceProvider services)
     {
-        var locMgr = Locator.Current.GetService<LocalizationManager>()!;
-        return locMgr.GetString(Key);
+        var locMgr = Locator.Current.GetService<LocalizationManager>();
+        return locMgr?.GetString(Key) ?? Key;
     }
 }
