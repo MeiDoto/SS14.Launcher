@@ -218,10 +218,8 @@ public sealed class ReplayDetailsViewModel : ViewModelBase
                 {
                     using var stream = metaEntry.Open();
                     using var reader = new StreamReader(stream);
-                    var content = reader.ReadToEnd();
-
-                    var lines = content.Split('\n');
-                    foreach (var line in lines)
+                    string? line;
+                    while ((line = reader.ReadLine()) != null)
                     {
                         var trimmed = line.Trim();
                         if (trimmed.StartsWith("map:", StringComparison.OrdinalIgnoreCase) || trimmed.StartsWith("map_name:", StringComparison.OrdinalIgnoreCase))

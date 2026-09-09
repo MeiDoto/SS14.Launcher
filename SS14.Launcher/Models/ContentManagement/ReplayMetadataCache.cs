@@ -11,33 +11,70 @@ using Serilog;
 
 namespace SS14.Launcher.Models.ContentManagement;
 
+/// <summary>
+/// Represents a cached record containing metadata and user customizations for a single SS14 replay archive.
+/// </summary>
 public sealed class ReplayMetadataEntry
 {
+    /// <summary>Absolute filesystem path to the replay zip file.</summary>
     public string FilePath { get; set; } = "";
+
+    /// <summary>Filename including extension.</summary>
     public string FileName { get; set; } = "";
+
+    /// <summary>Display title (typically filename without extension).</summary>
     public string Title { get; set; } = "";
+
+    /// <summary>Size of the zip file on disk in bytes.</summary>
     public long FileSize { get; set; }
+
+    /// <summary>Last modification timestamp of the file on disk.</summary>
     public DateTime LastWriteTime { get; set; }
+
+    /// <summary>Map name played during the recorded round.</summary>
     public string MapName { get; set; } = "";
+
+    /// <summary>Name of the server where the round took place.</summary>
     public string ServerName { get; set; } = "";
+
+    /// <summary>Round duration information string.</summary>
     public string Duration { get; set; } = "";
+
+    /// <summary>Gamemode (e.g. Traitor, Secret, NukeOps, Extended).</summary>
     public string Gamemode { get; set; } = "";
+
+    /// <summary>Sequential round identifier number.</summary>
     public string RoundId { get; set; } = "";
+
+    /// <summary>Number of files contained in the zip archive.</summary>
     public int EntriesCount { get; set; }
+
+    /// <summary>Sum of uncompressed sizes of all archive entries in bytes.</summary>
     public long UncompressedBytes { get; set; }
+
+    /// <summary>Whether the zip archive was successfully opened and parsed without corruption.</summary>
     public bool IsValid { get; set; } = true;
+
+    /// <summary>Whether this replay is marked as a user favorite (pinned to top).</summary>
     public bool IsFavorite { get; set; }
+
+    /// <summary>Optional user notes, impressions, or tags for this round.</summary>
     public string? Note { get; set; }
+
+    /// <summary>Lazily calculated and cached cryptographic SHA-256 hash of the archive.</summary>
     public string? Sha256 { get; set; }
 }
 
 /// <summary>
 /// High-performance cache for SS14 replay archives with persistent JSON backing,
-/// change detection (mtime + size), and lazy hash/metadata extraction.
+/// fast change detection (mtime + size), thread-safe atomic file writing,
+/// and lazy SHA-256 hash/metadata extraction.
 /// </summary>
 public sealed class ReplayMetadataCache
 {
     private static readonly Lazy<ReplayMetadataCache> _defaultInstance = new(() => new ReplayMetadataCache());
+
+    /// <summary>Default singleton instance registered in the application container.</summary>
     public static ReplayMetadataCache Instance => _defaultInstance.Value;
 
     private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
@@ -48,16 +85,26 @@ public sealed class ReplayMetadataCache
     private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
     private bool _isDirty;
 
+    /// <summary>
+    /// Initializes a new instance with the default user data storage path.
+    /// </summary>
     public ReplayMetadataCache() : this(Path.Combine(LauncherPaths.DirUserData, "replays_cache.json"))
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance with a custom cache file path (used for tests or isolated profiles).
+    /// </summary>
+    /// <param name="cacheFilePath">Path to the JSON cache file.</param>
     public ReplayMetadataCache(string cacheFilePath)
     {
         _cacheFilePath = cacheFilePath;
         Load();
     }
 
+    /// <summary>
+    /// Returns a snapshot dictionary of all currently cached metadata entries.
+    /// </summary>
     public IReadOnlyDictionary<string, ReplayMetadataEntry> GetAllCached()
     {
         lock (_lock)
@@ -66,6 +113,9 @@ public sealed class ReplayMetadataCache
         }
     }
 
+    /// <summary>
+    /// Attempts to retrieve a cached entry without reading disk if available.
+    /// </summary>
     public bool TryGet(string filePath, out ReplayMetadataEntry? entry)
     {
         lock (_lock)
@@ -76,6 +126,7 @@ public sealed class ReplayMetadataCache
 
     /// <summary>
     /// Retrieves replay metadata from cache if valid, or extracts it from the archive if missing/modified.
+    /// Uses semaphore throttling to prevent UI freezes during batch indexing.
     /// </summary>
     public async Task<ReplayMetadataEntry> GetOrUpdateAsync(string filePath, CancellationToken cancel = default)
     {
@@ -134,6 +185,9 @@ public sealed class ReplayMetadataCache
         }
     }
 
+    /// <summary>
+    /// Streams and parses metadata from the zip archive line-by-line to avoid large heap allocations.
+    /// </summary>
     private static ReplayMetadataEntry ExtractMetadata(FileInfo fi, ReplayMetadataEntry? previous)
     {
         var entry = new ReplayMetadataEntry
@@ -168,10 +222,10 @@ public sealed class ReplayMetadataCache
             {
                 using var stream = metaEntry.Open();
                 using var reader = new StreamReader(stream);
-                var content = reader.ReadToEnd();
+                string? line;
 
-                var lines = content.Split('\n');
-                foreach (var line in lines)
+                // Stream line-by-line without allocating large arrays
+                while ((line = reader.ReadLine()) != null)
                 {
                     var trimmed = line.Trim();
                     if (trimmed.StartsWith("map:", StringComparison.OrdinalIgnoreCase) ||
@@ -218,6 +272,9 @@ public sealed class ReplayMetadataCache
         return entry;
     }
 
+    /// <summary>
+    /// Computes the cryptographic SHA-256 hash of the archive or returns the cached hash.
+    /// </summary>
     public async Task<string> ComputeOrGetSha256Async(string filePath, CancellationToken cancel = default)
     {
         lock (_lock)
@@ -252,6 +309,9 @@ public sealed class ReplayMetadataCache
         return hash;
     }
 
+    /// <summary>
+    /// Marks or unmarks a replay as user favorite and triggers asynchronous persistence.
+    /// </summary>
     public void SetFavorite(string filePath, bool isFavorite)
     {
         lock (_lock)
@@ -280,6 +340,9 @@ public sealed class ReplayMetadataCache
         _ = SaveAsync();
     }
 
+    /// <summary>
+    /// Sets or clears a custom note for a replay and triggers asynchronous persistence.
+    /// </summary>
     public void SetNote(string filePath, string? note)
     {
         lock (_lock)
@@ -294,6 +357,9 @@ public sealed class ReplayMetadataCache
         _ = SaveAsync();
     }
 
+    /// <summary>
+    /// Removes an entry from the cache by file path.
+    /// </summary>
     public void Remove(string filePath)
     {
         lock (_lock)
@@ -307,6 +373,9 @@ public sealed class ReplayMetadataCache
         _ = SaveAsync();
     }
 
+    /// <summary>
+    /// Prunes cached entries that no longer exist on disk.
+    /// </summary>
     public void PruneMissing(IEnumerable<string> existingPaths)
     {
         var set = new HashSet<string>(existingPaths, StringComparer.OrdinalIgnoreCase);
@@ -334,6 +403,9 @@ public sealed class ReplayMetadataCache
         }
     }
 
+    /// <summary>
+    /// Loads cached replay metadata entries from disk.
+    /// </summary>
     public void Load()
     {
         lock (_lock)
@@ -361,6 +433,10 @@ public sealed class ReplayMetadataCache
         }
     }
 
+    /// <summary>
+    /// Asynchronously flushes all dirty cache entries to disk using an atomic move operation.
+    /// Protected by a semaphore to ensure thread-safe non-colliding writes.
+    /// </summary>
     public async Task SaveAsync()
     {
         await _saveSemaphore.WaitAsync();
@@ -413,6 +489,9 @@ public sealed class ReplayMetadataCache
         }
     }
 
+    /// <summary>
+    /// Parses a duration string (formatted as hh:mm:ss, mm:ss, or numeric seconds) into a TimeSpan.
+    /// </summary>
     public static TimeSpan? ParseDuration(string? durationStr)
     {
         if (string.IsNullOrWhiteSpace(durationStr))
@@ -433,6 +512,9 @@ public sealed class ReplayMetadataCache
         return null;
     }
 
+    /// <summary>
+    /// Formats a TimeSpan into a human-readable duration string (e.g. '1d 4h 30m', '2h 15m 30s', or '45m 12s').
+    /// </summary>
     public static string FormatDuration(TimeSpan ts)
     {
         if (ts.TotalDays >= 1)
