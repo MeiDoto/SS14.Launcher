@@ -74,6 +74,7 @@ public sealed class DataManager : ObservableObject
 
     public DataManager()
     {
+        InitializeCVars();
         Filters = new ServerFilterCollection(this);
         Hubs = new HubCollection(this);
         // Set up subscriptions to listen for when the list-data (e.g. logins) changes in any way.
@@ -267,7 +268,10 @@ public sealed class DataManager : ObservableObject
     /// </summary>
     public void Load()
     {
-        InitializeCVars();
+        if (_configEntries.Count == 0)
+        {
+            InitializeCVars();
+        }
 
         var dbPath = Path.Combine(LauncherPaths.DirUserData, "settings.db");
         try
@@ -391,7 +395,8 @@ public sealed class DataManager : ObservableObject
 
     private void InitializeCVars()
     {
-        Debug.Assert(_configEntries.Count == 0);
+        if (_configEntries.Count > 0)
+            return;
 
         var baseMethod = typeof(DataManager)
             .GetMethod(nameof(CreateEntry), BindingFlags.NonPublic | BindingFlags.Instance)!;

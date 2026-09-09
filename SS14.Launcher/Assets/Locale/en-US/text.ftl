@@ -947,4 +947,51 @@ replay-cleaner-preview-freed-label = Space to reclaim:
 replay-cleaner-execute-button = Start Cleaning
 replay-cleaner-cancel-button = Cancel
 
+## Replay Downloader
+tab-replays-download-button = Download
+tab-replays-download-tooltip = Download a round replay by Round ID or direct URL
+replay-download-dialog-title = Download Replay
+replay-download-dialog-desc = Download replay archives directly into launcher by Round ID or direct URL.
+replay-download-mode-round-id = By Round ID
+replay-download-mode-url = By Direct URL
+replay-download-provider-label = Server / Provider:
+replay-download-provider-wizden = Wizard's Den (Official)
+replay-download-provider-corvax = Corvax
+replay-download-provider-custom = Custom Template
+replay-download-custom-template-label = URL template with {"{roundId}"} placeholder:
+replay-download-round-id-label = Round ID:
+replay-download-round-id-watermark = e.g. 14290 or #14290
+replay-download-url-label = Direct URL to archive (.zip):
+replay-download-status-connecting = Connecting to server…
+replay-download-status-downloading = Downloading replay…
+replay-download-status-success = Replay successfully downloaded and added to library!
+replay-download-status-canceled = Download canceled.
+replay-download-status-failed = Download failed: { $error }
+replay-download-play-now = Watch Now
+replay-download-close = Close
+replay-download-start-button = Download
+replay-download-cancel-button = Cancel
+
+## Friend Tracker
+tab-home-friends = Friends
+tab-home-friends-tooltip = Manage friends and servers
+tab-servers-friends = Friends
+tab-servers-friends-tooltip = Open friends list and activity
+friends-dialog-title = Friends List
+friends-add-title = Add Friend
+friends-username-watermark = Friend's username
+friends-note-watermark = Personal note (optional)
+friends-server-watermark = Server address (optional)
+friends-add-button = Add
+friends-search-watermark = Search friends by username, note, or server…
+friends-empty = Friends list is empty. Add your friends above!
+friends-connect = Connect
+friends-remove = ✕
+friends-remove-tooltip = Remove from friends
+friends-close = Close
+friends-status-offline = Not in game
+server-entry-friends-tooltip = Friends on this server
+server-entry-friends-details = 👥 Friends on server: { $friends }
+
+
 

@@ -808,6 +808,24 @@ public sealed class ReplaysTabViewModel : MainWindowTabViewModel
             dialog.Show();
     }
 
+    public void OpenDownloadDialog()
+    {
+        var window = Control?.GetVisualRoot() as Window;
+        var dialog = new Views.DownloadReplayDialog(ReplaysDirectory, filePath =>
+        {
+            Dispatcher.UIThread.Post(() => _ = LaunchReplay(filePath));
+        },
+        () =>
+        {
+            Dispatcher.UIThread.Post(() => _ = RefreshReplays());
+        });
+
+        if (window != null)
+            dialog.ShowDialog(window);
+        else
+            dialog.Show();
+    }
+
     public async Task OpenFilePickerAndPlay()
     {
         if (Control?.GetVisualRoot() is not Window window)

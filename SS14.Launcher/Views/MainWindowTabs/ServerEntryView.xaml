@@ -27,6 +27,17 @@
 
           <Border Grid.Column="0" Classes="GridCell">
             <DockPanel LastChildFill="True">
+              <!-- Friends Badge -->
+              <TextBlock DockPanel.Dock="Right"
+                         Text="{Binding FriendsOnlineBadgeText}"
+                         FontSize="12"
+                         Foreground="{DynamicResource ThemeNanoGoldBrush}"
+                         FontWeight="SemiBold"
+                         Margin="6,0,2,0"
+                         IsVisible="{Binding HasFriendsOnline}"
+                         ToolTip.Tip="{Binding FriendsOnlineToolTip}"
+                         VerticalAlignment="Center" />
+
               <!-- Panic Bunker Badge -->
               <TextBlock DockPanel.Dock="Right"
                          Text="{loc:Loc server-entry-bunker-tag}"
@@ -85,6 +96,14 @@
                    IsVisible="{Binding HasPanicBunker}"
                    TextWrapping="Wrap"
                    Foreground="{DynamicResource ThemeSubTextBrush}"
+                   Margin="4,0,4,6" />
+
+        <!-- Friends Details -->
+        <TextBlock DockPanel.Dock="Top"
+                   Text="{Binding FriendsDetailedDescription}"
+                   IsVisible="{Binding HasFriendsOnline}"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource ThemeNanoGoldBrush}"
                    Margin="4,0,4,6" />
 
         <TextBlock DockPanel.Dock="Top"

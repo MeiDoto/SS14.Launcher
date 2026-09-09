@@ -5,6 +5,7 @@ using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Messaging;
 using SS14.Launcher.Localization;
 using SS14.Launcher.Models.Data;
+using SS14.Launcher.Models.Friends;
 using SS14.Launcher.Models.ServerStatus;
 using SS14.Launcher.Utility;
 using static SS14.Launcher.Utility.HubUtility;
@@ -249,6 +250,55 @@ public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<Favor
         OnPropertyChanged(nameof(SlotWatcherToolTip));
     }
 
+    public bool HasFriendsOnline => FriendManager.Instance.HasFriendsOnServer(Address);
+
+    public string FriendsOnlineBadgeText
+    {
+        get
+        {
+            var friends = FriendManager.Instance.GetFriendsOnServer(Address);
+            if (friends.Count == 0)
+                return "";
+            if (friends.Count == 1)
+                return $"👥 {friends[0].Username}";
+            return $"👥 {friends.Count}";
+        }
+    }
+
+    public string FriendsOnlineToolTip
+    {
+        get
+        {
+            var friends = FriendManager.Instance.GetFriendsOnServer(Address);
+            if (friends.Count == 0)
+                return "";
+
+            var lines = friends.Select(f => string.IsNullOrWhiteSpace(f.Note) ? $"• {f.Username}" : $"• {f.Username} ({f.Note})");
+            return $"{_loc.GetString("server-entry-friends-tooltip")}\n{string.Join("\n", lines)}";
+        }
+    }
+
+    public string FriendsDetailedDescription
+    {
+        get
+        {
+            var friends = FriendManager.Instance.GetFriendsOnServer(Address);
+            if (friends.Count == 0)
+                return "";
+
+            var names = friends.Select(f => string.IsNullOrWhiteSpace(f.Note) ? f.Username : $"{f.Username} ({f.Note})");
+            return _loc.GetString("server-entry-friends-details", ("friends", string.Join(", ", names)));
+        }
+    }
+
+    private void OnFriendsChanged()
+    {
+        OnPropertyChanged(nameof(HasFriendsOnline));
+        OnPropertyChanged(nameof(FriendsOnlineBadgeText));
+        OnPropertyChanged(nameof(FriendsOnlineToolTip));
+        OnPropertyChanged(nameof(FriendsDetailedDescription));
+    }
+
     public bool HasPlaytime => _cfg.GetCVar(CVars.TrackPlaytime) && PlaytimeSeconds > 0;
 
     public long PlaytimeSeconds => _cfg.GetPlaytimeForServer(Address);
@@ -337,6 +387,8 @@ public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<Favor
         base.OnActivated();
 
         _cacheData.PropertyChanged += OnCacheDataOnPropertyChanged;
+        FriendManager.Instance.FriendsChanged += OnFriendsChanged;
+        OnFriendsChanged();
     }
 
     protected override void OnDeactivated()
@@ -344,6 +396,7 @@ public sealed class ServerEntryViewModel : ObservableRecipient, IRecipient<Favor
         base.OnDeactivated();
 
         _cacheData.PropertyChanged -= OnCacheDataOnPropertyChanged;
+        FriendManager.Instance.FriendsChanged -= OnFriendsChanged;
     }
 
     private void OnCacheDataOnPropertyChanged(object? _, PropertyChangedEventArgs args)

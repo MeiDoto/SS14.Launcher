@@ -1123,4 +1123,51 @@ replay-cleaner-preview-freed-label = Место к освобождению:
 replay-cleaner-execute-button = Выполнить очистку
 replay-cleaner-cancel-button = Отмена
 
+## Скачивание реплеев
+tab-replays-download-button = Скачать
+tab-replays-download-tooltip = Скачать запись раунда по номеру (Round ID) или прямой ссылке
+replay-download-dialog-title = Скачивание реплея
+replay-download-dialog-desc = Загрузка архива реплея напрямую в лаунчер по номеру раунда или URL.
+replay-download-mode-round-id = По номеру раунда
+replay-download-mode-url = По прямой ссылке
+replay-download-provider-label = Сервер / Провайдер:
+replay-download-provider-wizden = Wizard's Den (Официальные)
+replay-download-provider-corvax = Corvax
+replay-download-provider-custom = Пользовательский шаблон
+replay-download-custom-template-label = Шаблон URL с переменной {"{roundId}"}:
+replay-download-round-id-label = Номер раунда (Round ID):
+replay-download-round-id-watermark = Например: 14290 или #14290
+replay-download-url-label = Прямой URL на архив (.zip):
+replay-download-status-connecting = Подключение к серверу…
+replay-download-status-downloading = Загрузка записи…
+replay-download-status-success = Реплей успешно скачан и добавлен в библиотеку!
+replay-download-status-canceled = Загрузка отменена.
+replay-download-status-failed = Ошибка загрузки: { $error }
+replay-download-play-now = Смотреть сейчас
+replay-download-close = Закрыть
+replay-download-start-button = Скачать
+replay-download-cancel-button = Отмена
+
+## Отслеживание друзей
+tab-home-friends = Друзья
+tab-home-friends-tooltip = Управление списком друзей и серверами
+tab-servers-friends = Друзья
+tab-servers-friends-tooltip = Открыть список друзей и их активность
+friends-dialog-title = Список друзей
+friends-add-title = Добавить друга
+friends-username-watermark = Никнейм друга
+friends-note-watermark = Заметка (необязательно)
+friends-server-watermark = Адрес сервера (необязательно)
+friends-add-button = Добавить
+friends-search-watermark = Поиск друзей по нику, заметке или серверу…
+friends-empty = Список друзей пуст. Добавьте друзей выше!
+friends-connect = Подключиться
+friends-remove = ✕
+friends-remove-tooltip = Удалить из друзей
+friends-close = Закрыть
+friends-status-offline = Не в игре
+server-entry-friends-tooltip = Друзья на этом сервере
+server-entry-friends-details = 👥 Друзья на сервере: { $friends }
+
+
 

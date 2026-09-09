@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using Avalonia.Controls;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Splat;
 using SS14.Launcher.Localization;
@@ -17,11 +19,29 @@ public partial class ServerListTabViewModel : MainWindowTabViewModel
     private readonly MainWindowViewModel _windowVm;
     private readonly ServerListCache _serverListCache;
 
+    public Control? Control { get; set; }
+
     public ObservableList<ServerEntryViewModel> SearchedServers { get; } = [];
     private readonly Dictionary<string, ServerEntryViewModel> _serverViewModels = new();
 
     private string? _searchString;
     private readonly DispatcherTimer _searchThrottle = new() { Interval = TimeSpan.FromMilliseconds(200) };
+
+    public async void OpenFriendsPressed()
+    {
+        var window = Control?.GetVisualRoot() as Window
+            ?? (Avalonia.Application.Current?.ApplicationLifetime as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+
+        var dialog = new Views.FriendsDialog(address =>
+        {
+            ConnectingViewModel.StartConnect(_windowVm, address);
+        });
+
+        if (window != null)
+            await dialog.ShowDialog(window);
+        else
+            dialog.Show();
+    }
 
     public override string Name
     {

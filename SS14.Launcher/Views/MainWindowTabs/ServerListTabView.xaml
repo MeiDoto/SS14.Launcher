@@ -20,6 +20,10 @@
 
   <DockPanel LastChildFill="True">
     <DockPanel DockPanel.Dock="Bottom" Margin="4 4 4 0" Height="32">
+      <Button DockPanel.Dock="Left" Command="{Binding OpenFriendsPressed}"
+              Content="{loc:Loc tab-servers-friends}"
+              ToolTip.Tip="{loc:Loc tab-servers-friends-tooltip}"
+              Classes="OpenBoth" />
       <Button DockPanel.Dock="Right" Command="{Binding RefreshPressed}"
               IsEnabled="{Binding RefreshEnabled}"
               Classes="OpenLeft" ToolTip.Tip="{loc:Loc tab-servers-refresh}">

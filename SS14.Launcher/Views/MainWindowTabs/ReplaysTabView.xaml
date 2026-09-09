@@ -56,6 +56,12 @@
               Command="{Binding OpenReplaysFolder}"
               Classes="OpenBoth" VerticalAlignment="Center" />
 
+      <!-- Download Replay -->
+      <Button DockPanel.Dock="Right" Content="{loc:Loc tab-replays-download-button}"
+              Command="{Binding OpenDownloadDialog}"
+              Classes="OpenBoth" VerticalAlignment="Center"
+              ToolTip.Tip="{loc:Loc tab-replays-download-tooltip}" />
+
       <!-- Open File -->
       <Button DockPanel.Dock="Right" Content="{loc:Loc tab-replays-browse-zip}"
               Command="{Binding OpenFilePickerAndPlay}"
