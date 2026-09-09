@@ -971,27 +971,3 @@ replay-download-play-now = Watch Now
 replay-download-close = Close
 replay-download-start-button = Download
 replay-download-cancel-button = Cancel
-
-## Friend Tracker
-tab-home-friends = Friends
-tab-home-friends-tooltip = Manage friends and servers
-tab-servers-friends = Friends
-tab-servers-friends-tooltip = Open friends list and activity
-friends-dialog-title = Friends List
-friends-add-title = Add Friend
-friends-username-watermark = Friend's username
-friends-note-watermark = Personal note (optional)
-friends-server-watermark = Server address (optional)
-friends-add-button = Add
-friends-search-watermark = Search friends by username, note, or server…
-friends-empty = Friends list is empty. Add your friends above!
-friends-connect = Connect
-friends-remove = ✕
-friends-remove-tooltip = Remove from friends
-friends-close = Close
-friends-status-offline = Not in game
-server-entry-friends-tooltip = Friends on this server
-server-entry-friends-details = 👥 Friends on server: { $friends }
-
-
-

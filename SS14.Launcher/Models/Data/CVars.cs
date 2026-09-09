@@ -346,11 +346,6 @@ public static class CVars
     /// Network connection timeout in seconds per attempt. Default is 6 seconds.
     /// </summary>
     public static readonly CVarDef<int> NetworkTimeout = CVarDef.Create("NetworkTimeout", 6);
-
-    /// <summary>
-    /// JSON array storing user-defined friends list with notes and favorite servers.
-    /// </summary>
-    public static readonly CVarDef<string> FriendsList = CVarDef.Create("FriendsList", "[]");
 }
 
 /// <summary>

@@ -27,22 +27,6 @@ public partial class ServerListTabViewModel : MainWindowTabViewModel
     private string? _searchString;
     private readonly DispatcherTimer _searchThrottle = new() { Interval = TimeSpan.FromMilliseconds(200) };
 
-    public async void OpenFriendsPressed()
-    {
-        var window = Control?.GetVisualRoot() as Window
-            ?? (Avalonia.Application.Current?.ApplicationLifetime as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)?.MainWindow;
-
-        var dialog = new Views.FriendsDialog(address =>
-        {
-            ConnectingViewModel.StartConnect(_windowVm, address);
-        });
-
-        if (window != null)
-            await dialog.ShowDialog(window);
-        else
-            dialog.Show();
-    }
-
     public override string Name
     {
         get

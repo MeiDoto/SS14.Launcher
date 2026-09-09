@@ -119,20 +119,6 @@ public partial class HomePageViewModel : MainWindowTabViewModel
         await new ServerHistoryDialog().ShowDialog(window);
     }
 
-    public async void OpenFriendsPressed()
-    {
-        if (!TryGetWindow(out var window))
-        {
-            return;
-        }
-
-        var dialog = new FriendsDialog(address =>
-        {
-            ConnectingViewModel.StartConnect(MainWindowViewModel, address);
-        });
-        await dialog.ShowDialog(window);
-    }
-
     public async void AddFavoritePressed()
     {
         if (!TryGetWindow(out var window))

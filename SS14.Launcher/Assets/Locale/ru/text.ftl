@@ -1147,27 +1147,3 @@ replay-download-play-now = Смотреть сейчас
 replay-download-close = Закрыть
 replay-download-start-button = Скачать
 replay-download-cancel-button = Отмена
-
-## Отслеживание друзей
-tab-home-friends = Друзья
-tab-home-friends-tooltip = Управление списком друзей и серверами
-tab-servers-friends = Друзья
-tab-servers-friends-tooltip = Открыть список друзей и их активность
-friends-dialog-title = Список друзей
-friends-add-title = Добавить друга
-friends-username-watermark = Никнейм друга
-friends-note-watermark = Заметка (необязательно)
-friends-server-watermark = Адрес сервера (необязательно)
-friends-add-button = Добавить
-friends-search-watermark = Поиск друзей по нику, заметке или серверу…
-friends-empty = Список друзей пуст. Добавьте друзей выше!
-friends-connect = Подключиться
-friends-remove = ✕
-friends-remove-tooltip = Удалить из друзей
-friends-close = Закрыть
-friends-status-offline = Не в игре
-server-entry-friends-tooltip = Друзья на этом сервере
-server-entry-friends-details = 👥 Друзья на сервере: { $friends }
-
-
-
