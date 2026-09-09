@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
+using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Serilog;
 using SS14.Launcher.Localization;
@@ -15,6 +17,7 @@ namespace SS14.Launcher.ViewModels;
 public sealed class ReplayDetailsViewModel : ViewModelBase
 {
     private readonly Action? _onPlay;
+    private readonly ReplayMetadataCache _cache = ReplayMetadataCache.Instance;
 
     public string FilePath { get; }
     public string FileName { get; }
@@ -76,6 +79,61 @@ public sealed class ReplayDetailsViewModel : ViewModelBase
         private set => SetProperty(ref _uncompressedSizeFormatted, value);
     }
 
+    private string _compressionRatioFormatted = "";
+    public string CompressionRatioFormatted
+    {
+        get => _compressionRatioFormatted;
+        private set => SetProperty(ref _compressionRatioFormatted, value);
+    }
+
+    private string _sha256 = "";
+    public string Sha256
+    {
+        get => _sha256;
+        private set => SetProperty(ref _sha256, value);
+    }
+
+    private bool _isSha256Loading = true;
+    public bool IsSha256Loading
+    {
+        get => _isSha256Loading;
+        private set => SetProperty(ref _isSha256Loading, value);
+    }
+
+    private bool _isFavorite;
+    public bool IsFavorite
+    {
+        get => _isFavorite;
+        set
+        {
+            if (SetProperty(ref _isFavorite, value))
+            {
+                _cache.SetFavorite(FilePath, value);
+            }
+        }
+    }
+
+    private string _note = "";
+    public string Note
+    {
+        get => _note;
+        set => SetProperty(ref _note, value);
+    }
+
+    private string _noteFeedback = "";
+    public string NoteFeedback
+    {
+        get => _noteFeedback;
+        set => SetProperty(ref _noteFeedback, value);
+    }
+
+    private string _copyFeedback = "";
+    public string CopyFeedback
+    {
+        get => _copyFeedback;
+        set => SetProperty(ref _copyFeedback, value);
+    }
+
     private int _entriesCount;
     public int EntriesCount
     {
@@ -103,7 +161,30 @@ public sealed class ReplayDetailsViewModel : ViewModelBase
             FileSizeFormatted = StorageAnalyzer.FormatBytes(fi.Length);
         }
 
+        if (_cache.TryGet(filePath, out var cached) && cached != null)
+        {
+            MapName = cached.MapName;
+            ServerName = cached.ServerName;
+            Gamemode = cached.Gamemode;
+            RoundId = cached.RoundId;
+            Duration = cached.Duration;
+            IsFavorite = cached.IsFavorite;
+            Note = cached.Note ?? "";
+            if (!string.IsNullOrEmpty(cached.Sha256))
+            {
+                Sha256 = cached.Sha256;
+                IsSha256Loading = false;
+            }
+            if (cached.UncompressedBytes > 0)
+            {
+                UncompressedSizeFormatted = StorageAnalyzer.FormatBytes(cached.UncompressedBytes);
+                var ratio = (1.0 - (double)cached.FileSize / cached.UncompressedBytes) * 100.0;
+                CompressionRatioFormatted = $"{ratio:F1}%";
+            }
+        }
+
         _ = LoadDetailsAsync();
+        _ = LoadSha256Async();
     }
 
     private async Task LoadDetailsAsync()
@@ -171,6 +252,12 @@ public sealed class ReplayDetailsViewModel : ViewModelBase
                     }
                 }
 
+                var fi = new FileInfo(FilePath);
+                var compressedBytes = fi.Exists ? fi.Length : 0;
+                var ratioStr = uncompressedBytes > 0 && compressedBytes > 0
+                    ? $"{((1.0 - (double)compressedBytes / uncompressedBytes) * 100.0):F1}%"
+                    : "";
+
                 Dispatcher.UIThread.Post(() =>
                 {
                     if (map != null) MapName = map;
@@ -181,6 +268,10 @@ public sealed class ReplayDetailsViewModel : ViewModelBase
 
                     EntriesCount = archive.Entries.Count;
                     UncompressedSizeFormatted = StorageAnalyzer.FormatBytes(uncompressedBytes);
+                    if (!string.IsNullOrEmpty(ratioStr))
+                    {
+                        CompressionRatioFormatted = ratioStr;
+                    }
 
                     FileEntries.Clear();
                     foreach (var name in entryNames)
@@ -194,6 +285,34 @@ public sealed class ReplayDetailsViewModel : ViewModelBase
                 Log.Warning(ex, "Failed to load detailed metadata for replay {Path}", FilePath);
             }
         });
+    }
+
+    private async Task LoadSha256Async()
+    {
+        try
+        {
+            var hash = await _cache.ComputeOrGetSha256Async(FilePath);
+            Dispatcher.UIThread.Post(() =>
+            {
+                Sha256 = hash;
+                IsSha256Loading = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to compute SHA256 for replay {Path}", FilePath);
+            Dispatcher.UIThread.Post(() =>
+            {
+                IsSha256Loading = false;
+            });
+        }
+    }
+
+    public void SaveNote()
+    {
+        _cache.SetNote(FilePath, Note);
+        _ = ClipboardHelper.CopyWithFeedbackAsync(Note, s => NoteFeedback = s,
+            LocalizationManager.Instance.GetString("account-info-copied"), 2);
     }
 
     public void Play()
@@ -219,6 +338,66 @@ public sealed class ReplayDetailsViewModel : ViewModelBase
 
     public async Task CopyPathToClipboard()
     {
-        await ClipboardHelper.SetTextAsync(FilePath);
+        _ = ClipboardHelper.CopyWithFeedbackAsync(FilePath, s => CopyFeedback = s);
+        await Task.CompletedTask;
+    }
+
+    public async Task CopySha256ToClipboard()
+    {
+        if (!string.IsNullOrEmpty(Sha256))
+        {
+            _ = ClipboardHelper.CopyWithFeedbackAsync(Sha256, s => CopyFeedback = s,
+                LocalizationManager.Instance.GetString("replay-dialog-hash-copied"));
+        }
+        await Task.CompletedTask;
+    }
+
+    public async Task CopyDiscordSummary()
+    {
+        var summary = $"**Space Station 14 Replay**\n" +
+                      $"🪐 **Server:** {(string.IsNullOrWhiteSpace(ServerName) ? "Unknown" : ServerName)}\n" +
+                      $"🗺️ **Map:** {(string.IsNullOrWhiteSpace(MapName) ? "Unknown" : MapName)}\n" +
+                      $"🎮 **Mode:** {(string.IsNullOrWhiteSpace(Gamemode) ? "Standard" : Gamemode)}" +
+                      (string.IsNullOrWhiteSpace(RoundId) ? "" : $" (Round #{RoundId})") + "\n" +
+                      $"⏱️ **Duration:** {(string.IsNullOrWhiteSpace(Duration) ? "Unknown" : Duration)}\n" +
+                      $"📅 **Date:** {DateFormatted}\n" +
+                      $"💾 **Size:** {FileSizeFormatted}" +
+                      (string.IsNullOrWhiteSpace(Note) ? "" : $"\n📝 **Note:** {Note}");
+
+        _ = ClipboardHelper.CopyWithFeedbackAsync(summary, s => CopyFeedback = s,
+            LocalizationManager.Instance.GetString("tab-replays-copied-summary"));
+        await Task.CompletedTask;
+    }
+
+    public async Task ExportReplayAsync(Window window)
+    {
+        try
+        {
+            var result = await window.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = LocalizationManager.Instance.GetString("tab-replays-export-picker-title"),
+                SuggestedFileName = FileName,
+                DefaultExtension = "zip",
+                FileTypeChoices =
+                [
+                    new FilePickerFileType("SS14 Replay (*.zip)")
+                    {
+                        Patterns = ["*.zip"],
+                        MimeTypes = ["application/zip"]
+                    }
+                ]
+            });
+
+            if (result != null)
+            {
+                await using var destStream = await result.OpenWriteAsync();
+                await using var srcStream = File.OpenRead(FilePath);
+                await srcStream.CopyToAsync(destStream);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to export replay {Path}", FilePath);
+        }
     }
 }

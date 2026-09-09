@@ -4,8 +4,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:SS14.Launcher.ViewModels"
         xmlns:loc="clr-namespace:SS14.Launcher.Localization"
-        mc:Ignorable="d" d:DesignWidth="650" d:DesignHeight="520"
-        Width="650" Height="520"
+        mc:Ignorable="d" d:DesignWidth="680" d:DesignHeight="620"
+        Width="680" Height="620"
         CanResize="True"
         x:Class="SS14.Launcher.Views.ReplayDetailsDialog"
         x:DataType="vm:ReplayDetailsViewModel"
@@ -18,57 +18,110 @@
     <vm:ReplayDetailsViewModel />
   </Design.DataContext>
 
-  <DockPanel>
+  <DockPanel LastChildFill="True">
     <!-- BOTTOM ACTIONS -->
     <DockPanel DockPanel.Dock="Bottom" Margin="0, 12, 0, 0" LastChildFill="False">
       <Button DockPanel.Dock="Left" Click="PlayClicked" Content="{loc:Loc replay-dialog-play}"
-              Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="Bold" />
+              Background="#27AE60" Foreground="White" FontWeight="Bold" />
+      <Button DockPanel.Dock="Left" Click="ToggleFavoriteClicked" Margin="6, 0, 0, 0">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Text="{Binding IsFavorite, Converter={x:Static ObjectConverters.IsNull}}" IsVisible="False" />
+          <TextBlock Text="⭐" Foreground="#F1C40F" />
+          <TextBlock Text="{loc:Loc replay-dialog-favorite}" />
+        </StackPanel>
+      </Button>
+      <Button DockPanel.Dock="Left" Click="ShareClicked" Content="{loc:Loc replay-dialog-share}" Margin="6, 0, 0, 0" />
+      <Button DockPanel.Dock="Left" Click="ExportClicked" Content="{loc:Loc replay-dialog-export}" Margin="6, 0, 0, 0" />
       <Button DockPanel.Dock="Left" Click="OpenFolderClicked" Content="{loc:Loc replay-dialog-open-folder}" Margin="6, 0, 0, 0" />
-      <Button DockPanel.Dock="Left" Click="CopyPathClicked" Content="{loc:Loc replay-dialog-copy-path}" Margin="6, 0, 0, 0" />
+
       <Button DockPanel.Dock="Right" Click="CloseClicked" Content="{loc:Loc replay-dialog-close}" Margin="6, 0, 0, 0" />
+      <TextBlock DockPanel.Dock="Right" Text="{Binding CopyFeedback}" VerticalAlignment="Center"
+                 Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" FontSize="12" Margin="0, 0, 8, 0" />
     </DockPanel>
 
-    <StackPanel Spacing="10">
-      <!-- ROUND OVERVIEW CARD -->
-      <Border Classes="Card" Padding="14">
-        <StackPanel Spacing="6">
-          <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource ThemeNanoGoldBrush}" />
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+      <StackPanel Spacing="10">
+        <!-- ROUND OVERVIEW CARD -->
+        <Border Classes="Card" Padding="14">
+          <StackPanel Spacing="6">
+            <DockPanel LastChildFill="True">
+              <Border IsVisible="{Binding IsFavorite}" DockPanel.Dock="Right"
+                      Background="#F39C12" CornerRadius="4" Padding="6, 2" Margin="6, 0, 0, 0">
+                <TextBlock Text="★ FAVORITE" FontSize="10" FontWeight="Bold" Foreground="White" />
+              </Border>
+              <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource ThemeNanoGoldBrush}" />
+            </DockPanel>
 
-          <Grid ColumnDefinitions="140, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" Margin="0, 4, 0, 0">
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc replay-dialog-server}" Classes="SubText" />
-            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ServerName}" FontWeight="SemiBold" TextWrapping="Wrap" />
+            <Grid ColumnDefinitions="140, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto" Margin="0, 4, 0, 0">
+              <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Loc replay-dialog-server}" Classes="SubText" />
+              <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ServerName}" FontWeight="SemiBold" TextWrapping="Wrap" />
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc replay-dialog-map}" Classes="SubText" Margin="0, 3, 0, 0" />
-            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding MapName}" Margin="0, 3, 0, 0" />
+              <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Loc replay-dialog-map}" Classes="SubText" Margin="0, 3, 0, 0" />
+              <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding MapName}" Margin="0, 3, 0, 0" />
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc replay-dialog-duration}" Classes="SubText" Margin="0, 3, 0, 0" />
-            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Duration}" Margin="0, 3, 0, 0" />
+              <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Loc replay-dialog-gamemode}" Classes="SubText" Margin="0, 3, 0, 0" />
+              <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Gamemode}" Margin="0, 3, 0, 0" />
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc replay-dialog-date}" Classes="SubText" Margin="0, 3, 0, 0" />
-            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DateFormatted}" Margin="0, 3, 0, 0" />
+              <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Loc replay-dialog-round-id}" Classes="SubText" Margin="0, 3, 0, 0" />
+              <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding RoundId}" Margin="0, 3, 0, 0" />
 
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Loc replay-dialog-size}" Classes="SubText" Margin="0, 3, 0, 0" />
-            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding FileSizeFormatted}" Margin="0, 3, 0, 0" />
+              <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Loc replay-dialog-duration}" Classes="SubText" Margin="0, 3, 0, 0" />
+              <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Duration}" Margin="0, 3, 0, 0" />
 
-            <TextBlock Grid.Row="5" Grid.Column="0" Text="{loc:Loc replay-dialog-uncompressed}" Classes="SubText" Margin="0, 3, 0, 0" />
-            <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding UncompressedSizeFormatted}" Margin="0, 3, 0, 0" />
-          </Grid>
-        </StackPanel>
-      </Border>
+              <TextBlock Grid.Row="5" Grid.Column="0" Text="{loc:Loc replay-dialog-date}" Classes="SubText" Margin="0, 3, 0, 0" />
+              <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding DateFormatted}" Margin="0, 3, 0, 0" />
 
-      <!-- ARCHIVE CONTENTS LIST -->
-      <Border Classes="Card" Padding="12" MinHeight="180" MaxHeight="220">
-        <StackPanel Spacing="6">
-          <TextBlock Text="{loc:Loc replay-dialog-files-header}" Classes="SectionTitle" FontSize="13" />
-          <ListBox ItemsSource="{Binding FileEntries}" Height="150">
-            <ListBox.ItemTemplate>
-              <DataTemplate>
-                <TextBlock Text="{Binding}" FontFamily="Consolas, Monospace, Courier New" FontSize="11" />
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-        </StackPanel>
-      </Border>
-    </StackPanel>
+              <TextBlock Grid.Row="6" Grid.Column="0" Text="{loc:Loc replay-dialog-size}" Classes="SubText" Margin="0, 3, 0, 0" />
+              <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding FileSizeFormatted}" Margin="0, 3, 0, 0" />
+
+              <TextBlock Grid.Row="7" Grid.Column="0" Text="{loc:Loc replay-dialog-uncompressed}" Classes="SubText" Margin="0, 3, 0, 0" />
+              <StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0, 3, 0, 0">
+                <TextBlock Text="{Binding UncompressedSizeFormatted}" />
+                <Border Background="#2E4053" CornerRadius="3" Padding="4, 1"
+                        IsVisible="{Binding CompressionRatioFormatted, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                  <TextBlock Text="{Binding CompressionRatioFormatted, StringFormat='Saved {0}'}" FontSize="10" Foreground="#A9DFBF" />
+                </Border>
+              </StackPanel>
+
+              <TextBlock Grid.Row="8" Grid.Column="0" Text="{loc:Loc replay-dialog-sha256}" Classes="SubText" Margin="0, 3, 0, 0" VerticalAlignment="Center" />
+              <DockPanel Grid.Row="8" Grid.Column="1" Margin="0, 3, 0, 0" LastChildFill="True">
+                <Button DockPanel.Dock="Right" Click="CopyHashClicked" Content="📋" Padding="6, 2" Margin="6, 0, 0, 0"
+                        ToolTip.Tip="{loc:Loc replay-dialog-copy-hash}" />
+                <TextBlock Text="{Binding Sha256}" FontFamily="Consolas, Monospace, Courier New" FontSize="11"
+                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+              </DockPanel>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <!-- USER NOTE CARD -->
+        <Border Classes="Card" Padding="12">
+          <StackPanel Spacing="6">
+            <DockPanel LastChildFill="False">
+              <TextBlock DockPanel.Dock="Left" Text="{loc:Loc replay-dialog-note-header}" FontWeight="Bold" FontSize="13" VerticalAlignment="Center" />
+              <Button DockPanel.Dock="Right" Click="SaveNoteClicked" Content="{loc:Loc replay-dialog-note-save}" Padding="10, 3" />
+              <TextBlock DockPanel.Dock="Right" Text="{Binding NoteFeedback}" VerticalAlignment="Center"
+                         Foreground="{DynamicResource ThemeNanoGoldBrush}" Margin="0, 0, 8, 0" FontSize="11" />
+            </DockPanel>
+            <TextBox Text="{Binding Note}" Watermark="{loc:Loc replay-dialog-note-watermark}"
+                     AcceptsReturn="True" Height="50" TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+
+        <!-- ARCHIVE CONTENTS LIST -->
+        <Border Classes="Card" Padding="12" MinHeight="140" MaxHeight="180">
+          <StackPanel Spacing="6">
+            <TextBlock Text="{loc:Loc replay-dialog-files-header}" Classes="SectionTitle" FontSize="13" />
+            <ListBox ItemsSource="{Binding FileEntries}" Height="110">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding}" FontFamily="Consolas, Monospace, Courier New" FontSize="11" />
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
   </DockPanel>
 </Window>

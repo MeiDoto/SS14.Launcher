@@ -26,6 +26,46 @@ public partial class ReplayDetailsDialog : Window
         Close();
     }
 
+    private void ToggleFavoriteClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is ReplayDetailsViewModel vm)
+        {
+            vm.IsFavorite = !vm.IsFavorite;
+        }
+    }
+
+    private void SaveNoteClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is ReplayDetailsViewModel vm)
+        {
+            vm.SaveNote();
+        }
+    }
+
+    private async void CopyHashClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is ReplayDetailsViewModel vm)
+        {
+            await vm.CopySha256ToClipboard();
+        }
+    }
+
+    private async void ShareClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is ReplayDetailsViewModel vm)
+        {
+            await vm.CopyDiscordSummary();
+        }
+    }
+
+    private async void ExportClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is ReplayDetailsViewModel vm)
+        {
+            await vm.ExportReplayAsync(this);
+        }
+    }
+
     private void OpenFolderClicked(object? sender, RoutedEventArgs e)
     {
         if (DataContext is ReplayDetailsViewModel vm)

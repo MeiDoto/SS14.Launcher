@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mainWindowTabs="clr-namespace:SS14.Launcher.ViewModels.MainWindowTabs"
              xmlns:loc="clr-namespace:SS14.Launcher.Localization"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+             mc:Ignorable="d" d:DesignWidth="880" d:DesignHeight="600"
              x:Class="SS14.Launcher.Views.MainWindowTabs.ReplaysTabView"
              x:DataType="mainWindowTabs:ReplaysTabViewModel">
   <Design.DataContext>
@@ -12,30 +12,119 @@
   </Design.DataContext>
 
   <DockPanel Margin="10" LastChildFill="True">
-    <!-- Top Action Bar -->
-    <Border DockPanel.Dock="Top" Classes="Card" Margin="0, 0, 0, 8" Padding="8">
-      <Grid ColumnDefinitions="*, 160, Auto, Auto, Auto" RowDefinitions="Auto">
-        <!-- Search -->
-        <TextBox Grid.Column="0" Text="{Binding SearchString}"
-                 Watermark="{loc:Loc tab-replays-search-watermark}"
-                 Margin="0, 0, 8, 0" VerticalAlignment="Center" />
+    <!-- STATS DASHBOARD BAR -->
+    <Border DockPanel.Dock="Top" Classes="Card" Margin="0, 0, 0, 6" Padding="10, 6">
+      <Grid ColumnDefinitions="*, *, *, *">
+        <!-- Total Replays -->
+        <Border Grid.Column="0" Background="#14FFFFFF" CornerRadius="4" Padding="8, 4" Margin="0, 0, 3, 0">
+          <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <TextBlock Text="🎬" FontSize="15" VerticalAlignment="Center" />
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="{loc:Loc tab-replays-stats-total-label}" Classes="SubText" FontSize="10" />
+              <TextBlock Text="{Binding TotalCount}" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource ThemeHeadingBrush}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
 
-        <!-- Sort ComboBox -->
-        <ComboBox Grid.Column="1" ItemsSource="{Binding SortOptions}" SelectedIndex="{Binding SelectedSortIndex}"
-                  Margin="0, 0, 8, 0" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+        <!-- Total Size -->
+        <Border Grid.Column="1" Background="#14FFFFFF" CornerRadius="4" Padding="8, 4" Margin="3, 0, 3, 0">
+          <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <TextBlock Text="💾" FontSize="15" VerticalAlignment="Center" />
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="{loc:Loc tab-replays-stats-size-label}" Classes="SubText" FontSize="10" />
+              <TextBlock Text="{Binding TotalSizeFormatted}" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource ThemeNanoGoldBrush}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
 
-        <!-- Open External File -->
-        <Button Grid.Column="2" Content="{loc:Loc tab-replays-browse-zip}" Command="{Binding OpenFilePickerAndPlay}"
-                Classes="OpenBoth" Margin="0, 0, 6, 0" VerticalAlignment="Center" />
+        <!-- Total Duration -->
+        <Border Grid.Column="2" Background="#14FFFFFF" CornerRadius="4" Padding="8, 4" Margin="3, 0, 3, 0">
+          <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <TextBlock Text="⏱️" FontSize="15" VerticalAlignment="Center" />
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="{loc:Loc tab-replays-stats-time-label}" Classes="SubText" FontSize="10" />
+              <TextBlock Text="{Binding TotalDurationFormatted}" FontWeight="Bold" FontSize="12" Foreground="#A9DFBF" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
 
-        <!-- Open Folder -->
-        <Button Grid.Column="3" Content="{loc:Loc tab-replays-open-folder}" Command="{Binding OpenReplaysFolder}"
-                Classes="OpenBoth" Margin="0, 0, 6, 0" VerticalAlignment="Center" />
-
-        <!-- Refresh -->
-        <Button Grid.Column="4" Content="🔄" Command="{Binding RefreshReplays}"
-                Classes="OpenLeft" VerticalAlignment="Center" ToolTip.Tip="{loc:Loc tab-replays-refresh-tooltip}" />
+        <!-- Favorites Count -->
+        <Border Grid.Column="3" Background="#14FFFFFF" CornerRadius="4" Padding="8, 4" Margin="3, 0, 0, 0">
+          <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <TextBlock Text="⭐" FontSize="15" VerticalAlignment="Center" />
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="{loc:Loc tab-replays-stats-favs-label}" Classes="SubText" FontSize="10" />
+              <TextBlock Text="{Binding FavoritesCount}" FontWeight="Bold" FontSize="12" Foreground="#F39C12" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
       </Grid>
+    </Border>
+
+    <!-- TOP FILTER AND ACTION BAR -->
+    <Border DockPanel.Dock="Top" Classes="Card" Margin="0, 0, 0, 6" Padding="8">
+      <StackPanel Spacing="6">
+        <!-- Row 1: Search, Sort, Favorites, Cleaner, Actions -->
+        <Grid ColumnDefinitions="*, 150, Auto, Auto, Auto, Auto, Auto, Auto" RowDefinitions="Auto">
+          <!-- Search -->
+          <TextBox Grid.Column="0" Text="{Binding SearchString}"
+                   Watermark="{loc:Loc tab-replays-search-watermark}"
+                   Margin="0, 0, 6, 0" VerticalAlignment="Center" />
+
+          <!-- Sort -->
+          <ComboBox Grid.Column="1" ItemsSource="{Binding SortOptions}" SelectedIndex="{Binding SelectedSortIndex}"
+                    Margin="0, 0, 6, 0" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+
+          <!-- Favorites Only Toggle -->
+          <ToggleButton Grid.Column="2" IsChecked="{Binding OnlyFavorites}" Content="{loc:Loc tab-replays-filter-favorites}"
+                        Margin="0, 0, 6, 0" VerticalAlignment="Center" Padding="8, 5" />
+
+          <!-- Smart Cleaner -->
+          <Button Grid.Column="3" Content="{loc:Loc tab-replays-cleaner-button}" Command="{Binding OpenSmartCleaner}"
+                  Margin="0, 0, 6, 0" VerticalAlignment="Center" Padding="8, 5"
+                  ToolTip.Tip="{loc:Loc tab-replays-cleaner-tooltip}" />
+
+          <!-- Batch Mode Toggle -->
+          <ToggleButton Grid.Column="4" IsChecked="{Binding IsBatchMode}" Content="{loc:Loc tab-replays-batch-button}"
+                        Margin="0, 0, 6, 0" VerticalAlignment="Center" Padding="8, 5"
+                        ToolTip.Tip="{loc:Loc tab-replays-batch-tooltip}" />
+
+          <!-- Open External File -->
+          <Button Grid.Column="5" Content="{loc:Loc tab-replays-browse-zip}" Command="{Binding OpenFilePickerAndPlay}"
+                  Classes="OpenBoth" Margin="0, 0, 6, 0" VerticalAlignment="Center" />
+
+          <!-- Open Folder -->
+          <Button Grid.Column="6" Content="{loc:Loc tab-replays-open-folder}" Command="{Binding OpenReplaysFolder}"
+                  Classes="OpenBoth" Margin="0, 0, 6, 0" VerticalAlignment="Center" />
+
+          <!-- Refresh -->
+          <Button Grid.Column="7" Content="🔄" Command="{Binding RefreshReplays}"
+                  Classes="OpenLeft" VerticalAlignment="Center" ToolTip.Tip="{loc:Loc tab-replays-refresh-tooltip}" />
+        </Grid>
+
+        <!-- Row 2: Secondary Dropdown Filters (Gamemode, Server) -->
+        <Grid ColumnDefinitions="Auto, 160, 16, Auto, 200, *" RowDefinitions="Auto">
+          <TextBlock Grid.Column="0" Text="{loc:Loc tab-replays-filter-mode-label}" VerticalAlignment="Center" Classes="SubText" FontSize="11" Margin="0, 0, 6, 0" />
+          <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableGamemodes}" SelectedItem="{Binding SelectedGamemode}"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+
+          <TextBlock Grid.Column="3" Text="{loc:Loc tab-replays-filter-server-label}" VerticalAlignment="Center" Classes="SubText" FontSize="11" Margin="0, 0, 6, 0" />
+          <ComboBox Grid.Column="4" ItemsSource="{Binding AvailableServers}" SelectedItem="{Binding SelectedServer}"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+        </Grid>
+      </StackPanel>
+    </Border>
+
+    <!-- BATCH ACTION BAR (Shown only in Batch Mode) -->
+    <Border DockPanel.Dock="Top" Classes="Card" Margin="0, 0, 0, 6" Padding="8" Background="#1F1B24"
+            IsVisible="{Binding IsBatchMode}">
+      <DockPanel LastChildFill="False">
+        <Button DockPanel.Dock="Left" Content="{loc:Loc tab-replays-batch-select-all}" Command="{Binding SelectAll}" Margin="0, 0, 6, 0" />
+        <Button DockPanel.Dock="Left" Content="{loc:Loc tab-replays-batch-deselect-all}" Command="{Binding DeselectAll}" Margin="0, 0, 6, 0" />
+        <Button DockPanel.Dock="Left" Content="{Binding DeleteSelectedButtonText}" Command="{Binding DeleteSelected}"
+                IsEnabled="{Binding HasSelectedItems}" Background="#C0392B" Foreground="White" FontWeight="Bold" Margin="0, 0, 6, 0" />
+        <Button DockPanel.Dock="Right" Content="{loc:Loc tab-replays-batch-cancel}" Command="{Binding ToggleBatchMode}" />
+      </DockPanel>
     </Border>
 
     <!-- Status / Info Bar -->
@@ -66,38 +155,103 @@
                         CornerRadius="6" Margin="4, 3" Padding="10, 8">
                   <DockPanel LastChildFill="True">
                     <!-- Actions Right -->
-                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                      <!-- Share Feedback Text -->
+                      <TextBlock Text="{Binding ShareFeedback}" VerticalAlignment="Center"
+                                 Foreground="{DynamicResource ThemeNanoGoldBrush}" FontSize="11" Margin="0, 0, 4, 0" />
+
+                      <!-- Play -->
                       <Button Content="{loc:Loc tab-replays-play}" Command="{Binding Play}"
-                              Background="#27AE60" Foreground="White" FontWeight="Bold" Padding="14, 6" />
+                              Background="#27AE60" Foreground="White" FontWeight="Bold" Padding="12, 5" />
+
+                      <!-- Favorite Toggle (Star) -->
+                      <Button Content="⭐" Command="{Binding ToggleFavorite}"
+                              Background="{Binding IsFavorite, Converter={x:Static ObjectConverters.IsNull}}"
+                              Foreground="{DynamicResource ThemeNanoGoldBrush}" Padding="7, 5"
+                              ToolTip.Tip="{loc:Loc tab-replays-card-fav-tooltip}" />
+
+                      <!-- Share / Copy Info -->
+                      <Button Content="📋" Command="{Binding CopyShareInfo}"
+                              Background="#34495E" Foreground="White" Padding="7, 5"
+                              ToolTip.Tip="{loc:Loc tab-replays-card-share-tooltip}" />
+
+                      <!-- Open in Folder -->
+                      <Button Content="📂" Command="{Binding OpenContainingFolder}"
+                              Background="#2C3E50" Foreground="White" Padding="7, 5"
+                              ToolTip.Tip="{loc:Loc tab-replays-card-folder-tooltip}" />
+
+                      <!-- Details Info -->
                       <Button Content="ℹ️" Command="{Binding ShowDetails}"
-                              Background="#2980B9" Foreground="White" Padding="8, 6" ToolTip.Tip="{loc:Loc tab-replays-details-tooltip}" />
+                              Background="#2980B9" Foreground="White" Padding="7, 5"
+                              ToolTip.Tip="{loc:Loc tab-replays-details-tooltip}" />
+
+                      <!-- Delete -->
                       <Button Content="🗑" Command="{Binding Delete}"
-                              Background="#C0392B" Foreground="White" Padding="8, 6" ToolTip.Tip="{loc:Loc tab-replays-delete-tooltip}" />
+                              Background="#C0392B" Foreground="White" Padding="7, 5"
+                              ToolTip.Tip="{loc:Loc tab-replays-delete-tooltip}" />
                     </StackPanel>
 
-                    <!-- Icon Left -->
-                    <Border DockPanel.Dock="Left" Background="#262734" CornerRadius="4" Width="40" Height="40"
+                    <!-- Checkbox (for Batch Mode) -->
+                    <CheckBox DockPanel.Dock="Left" IsChecked="{Binding IsSelected}"
+                              IsVisible="{Binding $parent[UserControl].((mainWindowTabs:ReplaysTabViewModel)DataContext).IsBatchMode}"
+                              VerticalAlignment="Center" Margin="0, 0, 6, 0" />
+
+                    <!-- Icon Left with Favorite Badge -->
+                    <Border DockPanel.Dock="Left" Background="#262734" CornerRadius="4" Width="42" Height="42"
                             Margin="0, 0, 10, 0" VerticalAlignment="Center">
-                      <TextBlock Text="🎥" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      <Panel>
+                        <TextBlock Text="🎥" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <TextBlock Text="⭐" FontSize="11" Foreground="#F1C40F" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                   Margin="0, 2, 2, 0" IsVisible="{Binding IsFavorite}" />
+                      </Panel>
                     </Border>
 
                     <!-- Info Center -->
                     <StackPanel VerticalAlignment="Center" Spacing="3">
+                      <!-- Row 1: Title and Badges -->
                       <DockPanel LastChildFill="True">
-                        <Border IsVisible="{Binding MapName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                DockPanel.Dock="Right" Background="#2E4053" CornerRadius="3" Padding="5, 1" Margin="6, 0, 0, 0">
-                          <TextBlock Text="{Binding MapName}" FontSize="11" FontWeight="SemiBold" Foreground="#E5E8E8" />
-                        </Border>
+                        <!-- Badges Right -->
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4" Margin="6, 0, 0, 0">
+                          <!-- Round ID Badge -->
+                          <Border IsVisible="{Binding RoundId, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                  Background="#1B4F72" CornerRadius="3" Padding="4, 1">
+                            <TextBlock Text="{Binding RoundId, StringFormat='#{0}'}" FontSize="10" FontWeight="SemiBold" Foreground="#AED6F1" />
+                          </Border>
+
+                          <!-- Gamemode Badge -->
+                          <Border IsVisible="{Binding Gamemode, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                  Background="#6C3483" CornerRadius="3" Padding="4, 1">
+                            <TextBlock Text="{Binding Gamemode}" FontSize="10" FontWeight="SemiBold" Foreground="#E8DAEF" />
+                          </Border>
+
+                          <!-- Map Badge -->
+                          <Border IsVisible="{Binding MapName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                  Background="#2E4053" CornerRadius="3" Padding="4, 1">
+                            <TextBlock Text="{Binding MapName}" FontSize="10" FontWeight="SemiBold" Foreground="#E5E8E8" />
+                          </Border>
+                        </StackPanel>
+
+                        <!-- Title -->
                         <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="13" TextTrimming="CharacterEllipsis" />
                       </DockPanel>
 
+                      <!-- Row 2: Metadata items -->
                       <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="{Binding DateFormatted, StringFormat='📅 {0}'}" FontSize="11" Foreground="{DynamicResource ThemeSubTextBrush}" />
                         <TextBlock Text="{Binding FileSizeFormatted, StringFormat='💾 {0}'}" FontSize="11" Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding DurationInfo, StringFormat='⏱️ {0}'}"
+                                   IsVisible="{Binding DurationInfo, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                   FontSize="11" Foreground="#A9DFBF" />
                         <TextBlock Text="{Binding ServerName, StringFormat='🪐 {0}'}"
                                    IsVisible="{Binding ServerName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                   FontSize="11" Foreground="#A9DFBF" TextTrimming="CharacterEllipsis" MaxWidth="220" />
+                                   FontSize="11" Foreground="#85C1E9" TextTrimming="CharacterEllipsis" MaxWidth="200" />
                       </StackPanel>
+
+                      <!-- Row 3: Custom Note (if set) -->
+                      <TextBlock Text="{Binding Note, StringFormat='📝 {0}'}"
+                                 IsVisible="{Binding HasNote}"
+                                 FontStyle="Italic" FontSize="11" Foreground="#FAD7A0"
+                                 TextTrimming="CharacterEllipsis" MaxWidth="500" />
                     </StackPanel>
                   </DockPanel>
                 </Border>

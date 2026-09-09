@@ -142,6 +142,7 @@ internal static class Program
         var cfg = new DataManager();
         cfg.Load();
         Locator.CurrentMutable.RegisterConstant(cfg);
+        Locator.CurrentMutable.RegisterConstant(ReplayMetadataCache.Instance);
 
         CheckWindowsVersion();
         // Legacy antivirus conflict check disabled.
