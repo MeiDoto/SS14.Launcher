@@ -10,6 +10,13 @@ public partial class DownloadReplayDialog : Window
     public DownloadReplayDialog()
     {
         InitializeComponent();
+        Loaded += async (_, _) =>
+        {
+            if (DataContext is DownloadReplayViewModel vm)
+            {
+                await vm.TryAutoPasteFromClipboardAsync();
+            }
+        };
     }
 
     public DownloadReplayDialog(string targetDirectory, Action<string>? onPlay = null, Action? onCompleted = null) : this()

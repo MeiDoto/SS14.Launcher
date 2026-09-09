@@ -5,9 +5,10 @@
         xmlns:vm="clr-namespace:SS14.Launcher.ViewModels"
         xmlns:loc="clr-namespace:SS14.Launcher.Localization"
         xmlns:views="clr-namespace:SS14.Launcher.Views"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="460"
-        Width="600" Height="460"
-        CanResize="False"
+        mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="520"
+        Width="620" MinWidth="540" MinHeight="440" MaxHeight="680"
+        SizeToContent="Height"
+        CanResize="True"
         x:Class="SS14.Launcher.Views.DownloadReplayDialog"
         x:DataType="vm:DownloadReplayViewModel"
         Icon="/Assets/icon.ico"
@@ -17,83 +18,90 @@
         WindowStartupLocation="CenterOwner">
 
   <DockPanel LastChildFill="True">
-    <!-- BOTTOM ACTIONS -->
-    <DockPanel DockPanel.Dock="Bottom" Margin="0, 14, 0, 0" LastChildFill="False">
-      <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="0" IsVisible="{Binding IsSuccess}">
-        <Button Classes="OpenRight" Click="PlayClicked" Content="{loc:Loc replay-download-play-now}" />
+    <!-- BOTTOM ACTIONS (always pinned to the bottom) -->
+    <DockPanel DockPanel.Dock="Bottom" Margin="0, 16, 0, 0" LastChildFill="False">
+      <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="4" IsVisible="{Binding IsSuccess}">
+        <Button Classes="OpenRight" Click="PlayClicked" Content="{loc:Loc replay-download-play-now}"
+                Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
         <Button Classes="OpenLeft" Click="CloseClicked" Content="{loc:Loc replay-download-close}" />
       </StackPanel>
 
       <Button DockPanel.Dock="Right" Classes="OpenLeft" Click="CloseClicked" Content="{loc:Loc replay-download-close}"
-              IsVisible="{Binding !IsSuccess}" />
+              IsVisible="{Binding !IsSuccess}" IsCancel="True" />
       <Button DockPanel.Dock="Right" Classes="OpenRight" Click="StartDownloadClicked" Content="{loc:Loc replay-download-start-button}"
-              IsEnabled="{Binding CanDownload}" IsVisible="{Binding !IsSuccess}" />
+              IsEnabled="{Binding CanDownload}" IsVisible="{Binding !IsSuccess}" IsDefault="True"
+              Foreground="{DynamicResource ThemeNanoGoldBrush}" FontWeight="SemiBold" />
       <Button DockPanel.Dock="Right" Click="CancelDownloadClicked" Content="{loc:Loc replay-download-cancel-button}"
-              IsVisible="{Binding IsDownloading}" Margin="0, 0, 6, 0" />
+              IsVisible="{Binding IsDownloading}" Margin="0, 0, 8, 0" />
     </DockPanel>
 
-    <StackPanel Spacing="12">
-      <!-- HEADER -->
-      <Border Classes="Card" Padding="14">
-        <StackPanel Spacing="4">
-          <TextBlock Text="{loc:Loc replay-download-dialog-title}" Classes="NanoHeadingMedium" />
-          <TextBlock Text="{loc:Loc replay-download-dialog-desc}" Classes="SubText" TextWrapping="Wrap" Margin="0, 4, 0, 0" />
-        </StackPanel>
-      </Border>
-
-      <!-- SOURCE SELECTION CARD -->
-      <Border Classes="Card" Padding="14" IsEnabled="{Binding CanChangeInputs}">
-        <StackPanel Spacing="10">
-          <!-- Mode Tabs/Switches -->
-          <StackPanel Orientation="Horizontal" Spacing="16">
-            <RadioButton Content="{loc:Loc replay-download-mode-round-id}" IsChecked="{Binding IsByRoundId, Mode=TwoWay}" />
-            <RadioButton Content="{loc:Loc replay-download-mode-url}" IsChecked="{Binding IsByUrl, Mode=TwoWay}" />
+    <!-- SCROLLABLE BODY (ensures all elements fit any display/scaling) -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Spacing="12">
+        <!-- HEADER -->
+        <Border Classes="Card" Padding="14">
+          <StackPanel Spacing="4">
+            <TextBlock Text="{loc:Loc replay-download-dialog-title}" Classes="NanoHeadingMedium" />
+            <TextBlock Text="{loc:Loc replay-download-dialog-desc}" Classes="SubText" TextWrapping="Wrap" Margin="0, 4, 0, 0" />
           </StackPanel>
+        </Border>
 
-          <!-- MODE 1: Round ID -->
-          <StackPanel Spacing="6" IsVisible="{Binding IsByRoundId}">
-            <TextBlock Text="{loc:Loc replay-download-provider-label}" Classes="SubText" FontSize="11" />
-            <ComboBox SelectedIndex="{Binding SelectedProviderIndex}" HorizontalAlignment="Stretch">
-              <ComboBoxItem Content="{loc:Loc replay-download-provider-spacestories}" />
-              <ComboBoxItem Content="{loc:Loc replay-download-provider-custom}" />
-            </ComboBox>
-
-            <!-- Custom Template if selected -->
-            <StackPanel Spacing="2" IsVisible="{Binding IsCustomProvider}" Margin="0, 4, 0, 0">
-              <TextBlock Text="{loc:Loc replay-download-custom-template-label}" Classes="SubText" FontSize="10" />
-              <TextBox Text="{Binding CustomTemplateInput}" Watermark="https://example.com/replays/round_{roundId}.zip" />
+        <!-- SOURCE SELECTION CARD -->
+        <Border Classes="Card" Padding="14" IsEnabled="{Binding CanChangeInputs}">
+          <StackPanel Spacing="10">
+            <!-- Mode Tabs/Switches -->
+            <StackPanel Orientation="Horizontal" Spacing="20">
+              <RadioButton Content="{loc:Loc replay-download-mode-round-id}" IsChecked="{Binding IsByRoundId, Mode=TwoWay}" />
+              <RadioButton Content="{loc:Loc replay-download-mode-url}" IsChecked="{Binding IsByUrl, Mode=TwoWay}" />
             </StackPanel>
 
-            <TextBlock Text="{loc:Loc replay-download-round-id-label}" Classes="SubText" FontSize="11" Margin="0, 4, 0, 0" />
-            <Grid ColumnDefinitions="*, Auto">
-              <TextBox Grid.Column="0" Text="{Binding RoundIdInput}" Watermark="{loc:Loc replay-download-round-id-watermark}" Margin="0, 0, 4, 0" />
-              <Button Grid.Column="1" Click="PasteClicked" Content="{loc:Loc dialog-paste}" ToolTip.Tip="{loc:Loc dialog-paste-tooltip}" />
-            </Grid>
-          </StackPanel>
+            <!-- MODE 1: Round ID -->
+            <StackPanel Spacing="6" IsVisible="{Binding IsByRoundId}">
+              <TextBlock Text="{loc:Loc replay-download-provider-label}" Classes="SubText" FontSize="11" />
+              <ComboBox SelectedIndex="{Binding SelectedProviderIndex}" HorizontalAlignment="Stretch">
+                <ComboBoxItem Content="{loc:Loc replay-download-provider-spacestories}" />
+                <ComboBoxItem Content="{loc:Loc replay-download-provider-custom}" />
+              </ComboBox>
 
-          <!-- MODE 2: Direct URL -->
-          <StackPanel Spacing="6" IsVisible="{Binding IsByUrl}">
-            <TextBlock Text="{loc:Loc replay-download-url-label}" Classes="SubText" FontSize="11" />
-            <Grid ColumnDefinitions="*, Auto">
-              <TextBox Grid.Column="0" Text="{Binding UrlInput}" Watermark="https://example.com/path/to/replay.zip" Margin="0, 0, 4, 0" />
-              <Button Grid.Column="1" Click="PasteClicked" Content="{loc:Loc dialog-paste}" ToolTip.Tip="{loc:Loc dialog-paste-tooltip}" />
-            </Grid>
-          </StackPanel>
-        </StackPanel>
-      </Border>
+              <!-- Custom Template if selected -->
+              <StackPanel Spacing="2" IsVisible="{Binding IsCustomProvider}" Margin="0, 4, 0, 0">
+                <TextBlock Text="{loc:Loc replay-download-custom-template-label}" Classes="SubText" FontSize="10" />
+                <TextBox Text="{Binding CustomTemplateInput}" Watermark="https://example.com/replays/round_{roundId}.zip" />
+              </StackPanel>
 
-      <!-- PROGRESS & STATUS CARD -->
-      <Border Classes="Card" Padding="14">
-        <StackPanel Spacing="6">
-          <DockPanel LastChildFill="True">
-            <TextBlock DockPanel.Dock="Right" Text="{Binding DownloadProgressText}" Classes="SubText" FontSize="11" VerticalAlignment="Center" />
-            <TextBlock Text="{Binding StatusMessage}" Classes="SubText" FontSize="12" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-          </DockPanel>
-          <ProgressBar Minimum="0" Maximum="100" Value="{Binding DownloadProgress}" Height="12"
-                       IsIndeterminate="{Binding IsDownloading, Converter={x:Static ObjectConverters.IsNull}}"
-                       Margin="0, 4, 0, 0" />
-        </StackPanel>
-      </Border>
-    </StackPanel>
+              <TextBlock Text="{loc:Loc replay-download-round-id-label}" Classes="SubText" FontSize="11" Margin="0, 4, 0, 0" />
+              <Grid ColumnDefinitions="*, Auto">
+                <TextBox Grid.Column="0" Text="{Binding RoundIdInput}" Watermark="{loc:Loc replay-download-round-id-watermark}" Margin="0, 0, 6, 0" />
+                <Button Grid.Column="1" Click="PasteClicked" Content="📋 {loc:Loc dialog-paste}" ToolTip.Tip="{loc:Loc dialog-paste-tooltip}" />
+              </Grid>
+            </StackPanel>
+
+            <!-- MODE 2: Direct URL -->
+            <StackPanel Spacing="6" IsVisible="{Binding IsByUrl}">
+              <TextBlock Text="{loc:Loc replay-download-url-label}" Classes="SubText" FontSize="11" />
+              <Grid ColumnDefinitions="*, Auto">
+                <TextBox Grid.Column="0" Text="{Binding UrlInput}" Watermark="https://example.com/path/to/replay.zip" Margin="0, 0, 6, 0" />
+                <Button Grid.Column="1" Click="PasteClicked" Content="📋 {loc:Loc dialog-paste}" ToolTip.Tip="{loc:Loc dialog-paste-tooltip}" />
+              </Grid>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- PROGRESS & STATUS CARD -->
+        <Border Classes="Card" Padding="14">
+          <StackPanel Spacing="8">
+            <DockPanel LastChildFill="True">
+              <TextBlock DockPanel.Dock="Right" Text="{Binding DownloadProgressText}" Classes="SubText"
+                         FontSize="11" VerticalAlignment="Center" FontWeight="SemiBold" Margin="8, 0, 0, 0" />
+              <TextBlock Text="{Binding StatusMessage}" Foreground="{Binding StatusBrush}"
+                         Classes="SubText" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap" />
+            </DockPanel>
+            <ProgressBar Minimum="0" Maximum="100" Value="{Binding DownloadProgress}" Height="12"
+                         IsIndeterminate="{Binding IsIndeterminate}"
+                         Margin="0, 2, 0, 0" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
   </DockPanel>
 </Window>

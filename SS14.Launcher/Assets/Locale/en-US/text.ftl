@@ -659,7 +659,8 @@ launcher-customizer-sandbox-execute = ▶ Execute & apply script
 launcher-customizer-sandbox-watermark = // Enter commands or paste a template above…&#x0a;Accent = #00F2FE&#x0a;Button = #2D1B4E&#x0a;TabSelected = #FF007F&#x0a;Opacity = 0.85&#x0a;Servers = Stations
 launcher-customizer-sandbox-cheatsheet-title = Commands reference:
 account-info-toggle-id-tooltip = Show / hide User ID
-account-info-toggle-hwid-tooltip = Show / hide HWID
+account-info-toggle-hwid-tooltip = Toggle HWID visibility
+dialog-paste = Paste
 dialog-paste-tooltip = Paste from clipboard
 direct-connect-default-port-hint = 💡 Default port: 1212 (ss14://host:port)
 
@@ -961,6 +962,7 @@ replay-download-custom-template-label = URL template with {"{roundId}"} placehol
 replay-download-round-id-label = Round ID:
 replay-download-round-id-watermark = e.g. 14290 or #14290
 replay-download-url-label = Direct URL to archive (.zip):
+replay-download-status-resolving = Looking up round in Space Stories archive…
 replay-download-status-connecting = Connecting to server…
 replay-download-status-downloading = Downloading replay…
 replay-download-status-success = Replay successfully downloaded and added to library!

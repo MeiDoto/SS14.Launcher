@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -19,7 +20,8 @@ public readonly record struct ReplayDownloadProgress(
     long? TotalBytes,
     double ProgressPercentage,
     double SpeedBytesPerSecond,
-    string FormattedProgress);
+    string FormattedProgress,
+    TimeSpan? EstimatedRemaining = null);
 
 public enum ReplayProviderPreset
 {
@@ -198,55 +200,82 @@ public static class ReplayDownloader
             var totalBytes = response.Content.Headers.ContentLength;
 
             await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            await using (var fileStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None, 81920, useAsync: true))
+
+            const int bufferSize = 262144; // 256 KB high-performance buffer
+            await using (var fileStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize, useAsync: true))
             {
-                var buffer = new byte[81920];
-                long totalDownloaded = 0;
-                var stopwatch = Stopwatch.StartNew();
-                var lastReportTime = TimeSpan.Zero;
-                long bytesSinceLastReport = 0;
-                double currentSpeed = 0;
-
-                while (true)
+                var buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
+                try
                 {
-                    var read = await contentStream.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken);
-                    if (read == 0)
-                        break;
+                    long totalDownloaded = 0;
+                    var stopwatch = Stopwatch.StartNew();
+                    var lastReportTime = TimeSpan.Zero;
+                    long bytesSinceLastReport = 0;
+                    double smoothedSpeed = 0;
 
-                    await fileStream.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
-                    totalDownloaded += read;
-                    bytesSinceLastReport += read;
-
-                    var elapsed = stopwatch.Elapsed;
-                    if (elapsed - lastReportTime >= TimeSpan.FromMilliseconds(200))
+                    while (true)
                     {
-                        var timeDiff = (elapsed - lastReportTime).TotalSeconds;
-                        if (timeDiff > 0)
+                        var read = await contentStream.ReadAsync(buffer.AsMemory(0, bufferSize), cancellationToken);
+                        if (read == 0)
+                            break;
+
+                        await fileStream.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
+                        totalDownloaded += read;
+                        bytesSinceLastReport += read;
+
+                        var elapsed = stopwatch.Elapsed;
+                        // Throttle UI reports to every 120ms to avoid overloading the Avalonia dispatcher
+                        if (elapsed - lastReportTime >= TimeSpan.FromMilliseconds(120))
                         {
-                            currentSpeed = bytesSinceLastReport / timeDiff;
+                            var timeDiff = (elapsed - lastReportTime).TotalSeconds;
+                            if (timeDiff > 0)
+                            {
+                                var instantSpeed = bytesSinceLastReport / timeDiff;
+                                smoothedSpeed = smoothedSpeed <= 0 ? instantSpeed : (smoothedSpeed * 0.65 + instantSpeed * 0.35);
+                            }
+                            lastReportTime = elapsed;
+                            bytesSinceLastReport = 0;
+
+                            double percent = totalBytes.HasValue && totalBytes.Value > 0
+                                ? Math.Clamp((double)totalDownloaded / totalBytes.Value * 100.0, 0.0, 100.0)
+                                : 0;
+
+                            TimeSpan? eta = null;
+                            if (totalBytes.HasValue && totalBytes.Value > totalDownloaded && smoothedSpeed > 0)
+                            {
+                                var remainingSecs = (totalBytes.Value - totalDownloaded) / smoothedSpeed;
+                                if (remainingSecs >= 0 && remainingSecs < 86400)
+                                    eta = TimeSpan.FromSeconds(remainingSecs);
+                            }
+
+                            string formatted;
+                            if (totalBytes.HasValue)
+                            {
+                                var etaString = FormatEta(eta);
+                                var etaPart = !string.IsNullOrEmpty(etaString) ? $", {etaString}" : "";
+                                formatted = $"{StorageAnalyzer.FormatBytes(totalDownloaded)} / {StorageAnalyzer.FormatBytes(totalBytes.Value)} ({StorageAnalyzer.FormatBytes((long)smoothedSpeed)}/s{etaPart})";
+                            }
+                            else
+                            {
+                                formatted = $"{StorageAnalyzer.FormatBytes(totalDownloaded)} ({StorageAnalyzer.FormatBytes((long)smoothedSpeed)}/s)";
+                            }
+
+                            progress?.Report(new ReplayDownloadProgress(totalDownloaded, totalBytes, percent, smoothedSpeed, formatted, eta));
                         }
-                        lastReportTime = elapsed;
-                        bytesSinceLastReport = 0;
-
-                        double percent = totalBytes.HasValue && totalBytes.Value > 0
-                            ? Math.Clamp((double)totalDownloaded / totalBytes.Value * 100.0, 0.0, 100.0)
-                            : 0;
-
-                        var formatted = totalBytes.HasValue
-                            ? $"{StorageAnalyzer.FormatBytes(totalDownloaded)} / {StorageAnalyzer.FormatBytes(totalBytes.Value)} ({StorageAnalyzer.FormatBytes((long)currentSpeed)}/s)"
-                            : $"{StorageAnalyzer.FormatBytes(totalDownloaded)} ({StorageAnalyzer.FormatBytes((long)currentSpeed)}/s)";
-
-                        progress?.Report(new ReplayDownloadProgress(totalDownloaded, totalBytes, percent, currentSpeed, formatted));
                     }
+
+                    // Final report (100%)
+                    var finalPercent = totalBytes.HasValue && totalBytes.Value > 0 ? 100.0 : 0.0;
+                    var finalFormatted = totalBytes.HasValue
+                        ? $"{StorageAnalyzer.FormatBytes(totalDownloaded)} / {StorageAnalyzer.FormatBytes(totalBytes.Value)}"
+                        : StorageAnalyzer.FormatBytes(totalDownloaded);
+
+                    progress?.Report(new ReplayDownloadProgress(totalDownloaded, totalBytes, finalPercent, smoothedSpeed, finalFormatted));
                 }
-
-                // Final report
-                var finalPercent = totalBytes.HasValue && totalBytes.Value > 0 ? 100.0 : 0.0;
-                var finalFormatted = totalBytes.HasValue
-                    ? $"{StorageAnalyzer.FormatBytes(totalDownloaded)} / {StorageAnalyzer.FormatBytes(totalBytes.Value)}"
-                    : StorageAnalyzer.FormatBytes(totalDownloaded);
-
-                progress?.Report(new ReplayDownloadProgress(totalDownloaded, totalBytes, finalPercent, currentSpeed, finalFormatted));
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(buffer);
+                }
             }
 
             // Verify that tempPath is a valid zip archive
@@ -294,5 +323,20 @@ public static class ReplayDownloader
                 }
             }
         }
+    }
+
+    public static string FormatEta(TimeSpan? eta)
+    {
+        if (!eta.HasValue)
+            return "";
+
+        var totalSecs = (int)Math.Round(eta.Value.TotalSeconds);
+        if (totalSecs <= 0)
+            return "";
+        if (totalSecs < 60)
+            return $"~{totalSecs} с.";
+        if (totalSecs < 3600)
+            return $"~{totalSecs / 60} мин. {totalSecs % 60:D2} с.";
+        return $"~{totalSecs / 3600} ч. {(totalSecs % 3600) / 60} мин.";
     }
 }

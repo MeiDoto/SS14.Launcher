@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Serilog;
 using SS14.Launcher.Localization;
@@ -13,6 +14,10 @@ namespace SS14.Launcher.ViewModels;
 
 public sealed class DownloadReplayViewModel : ViewModelBase
 {
+    private static readonly IBrush SuccessBrush = new SolidColorBrush(Color.Parse("#4EAF51"));
+    private static readonly IBrush ErrorBrush = new SolidColorBrush(Color.Parse("#FF6B6B"));
+    private static readonly IBrush DefaultBrush = new SolidColorBrush(Color.Parse("#CCCCCC"));
+
     private readonly LocalizationManager _loc = LocalizationManager.Instance;
     private readonly string _targetDirectory;
     private readonly Action<string>? _onPlay;
@@ -104,6 +109,7 @@ public sealed class DownloadReplayViewModel : ViewModelBase
             {
                 OnPropertyChanged(nameof(CanDownload));
                 OnPropertyChanged(nameof(CanChangeInputs));
+                OnPropertyChanged(nameof(IsIndeterminate));
             }
         }
     }
@@ -136,11 +142,19 @@ public sealed class DownloadReplayViewModel : ViewModelBase
         }
     }
 
+    public bool IsIndeterminate => IsDownloading && DownloadProgress <= 0;
+
     private double _downloadProgress;
     public double DownloadProgress
     {
         get => _downloadProgress;
-        private set => SetProperty(ref _downloadProgress, value);
+        private set
+        {
+            if (SetProperty(ref _downloadProgress, value))
+            {
+                OnPropertyChanged(nameof(IsIndeterminate));
+            }
+        }
     }
 
     private string _downloadProgressText = "";
@@ -167,9 +181,25 @@ public sealed class DownloadReplayViewModel : ViewModelBase
             {
                 OnPropertyChanged(nameof(CanChangeInputs));
                 OnPropertyChanged(nameof(CanDownload));
+                OnPropertyChanged(nameof(StatusBrush));
             }
         }
     }
+
+    private bool _isError;
+    public bool IsError
+    {
+        get => _isError;
+        private set
+        {
+            if (SetProperty(ref _isError, value))
+            {
+                OnPropertyChanged(nameof(StatusBrush));
+            }
+        }
+    }
+
+    public IBrush StatusBrush => IsSuccess ? SuccessBrush : (IsError ? ErrorBrush : DefaultBrush);
 
     public string? DownloadedFilePath { get; private set; }
 
@@ -180,31 +210,76 @@ public sealed class DownloadReplayViewModel : ViewModelBase
         _onCompleted = onCompleted;
     }
 
-    public async Task PasteUrlFromClipboard()
+    public async Task TryAutoPasteFromClipboardAsync()
     {
-        var text = await ClipboardHelper.GetTextAsync();
-        if (!string.IsNullOrWhiteSpace(text))
+        try
         {
+            var text = await ClipboardHelper.GetTextAsync();
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
             text = text.Trim();
-            if (IsByUrl)
+
+            // If it's a URL
+            if (Uri.TryCreate(text, UriKind.Absolute, out var uri) &&
+                (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
             {
-                UrlInput = text;
-            }
-            else
-            {
-                // If it's a number, paste into RoundId
-                if (int.TryParse(text.TrimStart('#'), out _))
+                if (string.IsNullOrWhiteSpace(UrlInput) && string.IsNullOrWhiteSpace(RoundIdInput))
                 {
-                    RoundIdInput = text.TrimStart('#');
-                }
-                else
-                {
-                    // If it's a full URL, automatically switch to ByUrl
                     UrlInput = text;
                     IsByUrl = true;
                 }
+                return;
+            }
+
+            // If it's a round number (like 50135 or #50135)
+            var clean = text.TrimStart('#').Trim();
+            if (int.TryParse(clean, out var roundNum) && roundNum > 0 && clean.Length <= 8)
+            {
+                if (string.IsNullOrWhiteSpace(RoundIdInput) && string.IsNullOrWhiteSpace(UrlInput))
+                {
+                    RoundIdInput = clean;
+                    IsByRoundId = true;
+                    SelectedProviderIndex = 0; // Space Stories
+                }
             }
         }
+        catch (Exception ex)
+        {
+            Log.Debug(ex, "Failed to auto-paste from clipboard");
+        }
+    }
+
+    public async Task PasteUrlFromClipboard()
+    {
+        var text = await ClipboardHelper.GetTextAsync();
+        if (string.IsNullOrWhiteSpace(text))
+            return;
+
+        text = text.Trim();
+
+        // If it's a URL, switch to ByUrl
+        if (Uri.TryCreate(text, UriKind.Absolute, out var uri) &&
+            (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
+        {
+            UrlInput = text;
+            IsByUrl = true;
+            return;
+        }
+
+        // If it's a round ID, clean and switch to ByRoundId
+        var clean = text.TrimStart('#').Trim();
+        if (int.TryParse(clean, out _))
+        {
+            RoundIdInput = clean;
+            IsByRoundId = true;
+            return;
+        }
+
+        if (IsByUrl)
+            UrlInput = text;
+        else
+            RoundIdInput = text;
     }
 
     public async Task StartDownloadAsync()
@@ -213,9 +288,11 @@ public sealed class DownloadReplayViewModel : ViewModelBase
             return;
 
         IsDownloading = true;
-        StatusMessage = _loc.GetString("replay-download-status-connecting");
+        IsSuccess = false;
+        IsError = false;
         DownloadProgress = 0;
         DownloadProgressText = "";
+        OnPropertyChanged(nameof(StatusBrush));
 
         _cancelTokenSource = new CancellationTokenSource();
 
@@ -225,6 +302,15 @@ public sealed class DownloadReplayViewModel : ViewModelBase
             if (IsByRoundId)
             {
                 var preset = (ReplayProviderPreset)SelectedProviderIndex;
+                if (preset == ReplayProviderPreset.SpaceStories)
+                {
+                    StatusMessage = _loc.GetString("replay-download-status-resolving");
+                }
+                else
+                {
+                    StatusMessage = _loc.GetString("replay-download-status-connecting");
+                }
+
                 targetUrl = await ReplayDownloader.ResolveUrlFromRoundIdAsync(
                     RoundIdInput,
                     preset,
@@ -233,6 +319,7 @@ public sealed class DownloadReplayViewModel : ViewModelBase
             }
             else
             {
+                StatusMessage = _loc.GetString("replay-download-status-connecting");
                 targetUrl = ReplayDownloader.NormalizeDownloadUrl(UrlInput.Trim());
             }
         }
@@ -240,6 +327,7 @@ public sealed class DownloadReplayViewModel : ViewModelBase
         {
             StatusMessage = ex.Message;
             IsDownloading = false;
+            IsError = true;
             return;
         }
 
@@ -260,17 +348,23 @@ public sealed class DownloadReplayViewModel : ViewModelBase
 
             DownloadedFilePath = savedPath;
             IsSuccess = true;
+            IsError = false;
             StatusMessage = _loc.GetString("replay-download-status-success");
             _onCompleted?.Invoke();
         }
         catch (OperationCanceledException)
         {
             StatusMessage = _loc.GetString("replay-download-status-canceled");
+            DownloadProgress = 0;
+            DownloadProgressText = "";
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Failed to download replay from {Url}", targetUrl);
             StatusMessage = _loc.GetString("replay-download-status-failed", ("error", ex.Message));
+            IsError = true;
+            DownloadProgress = 0;
+            DownloadProgressText = "";
         }
         finally
         {

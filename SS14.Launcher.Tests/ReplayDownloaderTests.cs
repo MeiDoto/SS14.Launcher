@@ -82,4 +82,14 @@ public sealed class ReplayDownloaderTests
                 Directory.Delete(tempDir, true);
         }
     }
+
+    [Test]
+    public void FormatEta_FormatsCorrectly()
+    {
+        Assert.That(ReplayDownloader.FormatEta(null), Is.EqualTo(""));
+        Assert.That(ReplayDownloader.FormatEta(TimeSpan.FromSeconds(0)), Is.EqualTo(""));
+        Assert.That(ReplayDownloader.FormatEta(TimeSpan.FromSeconds(45)), Is.EqualTo("~45 с."));
+        Assert.That(ReplayDownloader.FormatEta(TimeSpan.FromSeconds(95)), Is.EqualTo("~1 мин. 35 с."));
+        Assert.That(ReplayDownloader.FormatEta(TimeSpan.FromHours(1.5)), Is.EqualTo("~1 ч. 30 мин."));
+    }
 }

@@ -836,6 +836,7 @@ launcher-customizer-sandbox-watermark = // Введите команды или 
 launcher-customizer-sandbox-cheatsheet-title = Справка команд:
 account-info-toggle-id-tooltip = Показать / скрыть User ID
 account-info-toggle-hwid-tooltip = Показать / скрыть HWID
+dialog-paste = Вставить
 dialog-paste-tooltip = Вставить из буфера
 direct-connect-default-port-hint = 💡 Порт по умолчанию: 1212 (ss14://host:port)
 
@@ -1137,6 +1138,7 @@ replay-download-custom-template-label = Шаблон URL с переменной
 replay-download-round-id-label = Номер раунда (Round ID):
 replay-download-round-id-watermark = Например: 14290 или #14290
 replay-download-url-label = Прямой URL на архив (.zip):
+replay-download-status-resolving = Поиск раунда в архиве Space Stories…
 replay-download-status-connecting = Подключение к серверу…
 replay-download-status-downloading = Загрузка записи…
 replay-download-status-success = Реплей успешно скачан и добавлен в библиотеку!
