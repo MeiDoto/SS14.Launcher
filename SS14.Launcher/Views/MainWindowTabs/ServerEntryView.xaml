@@ -25,13 +25,7 @@
   <Panel>
     <Expander Name="Expando" Classes="NoPad" IsExpanded="{Binding IsExpanded}">
       <Expander.Header>
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" /> <!-- Server Name -->
-            <ColumnDefinition SharedSizeGroup="TimeCol" MinWidth="80" Width="Auto" />
-            <ColumnDefinition SharedSizeGroup="StatusCol" MinWidth="80" Width="Auto" />
-            <ColumnDefinition SharedSizeGroup="ConnectCol" Width="Auto" />
-          </Grid.ColumnDefinitions>
+        <Grid ColumnDefinitions="*,100,100,112">
 
           <Border Grid.Column="0" Classes="GridCell">
             <DockPanel LastChildFill="True">

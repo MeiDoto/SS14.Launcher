@@ -873,6 +873,13 @@ public partial class Connector : ObservableObject
             commandBuilder.Append($" [{i}] {arg}");
         }
 
+        // On Linux the Steam Overlay conflicts with OpenTK/GLFW on X11 systems with dead keys
+        // (e.g. typing accented characters or special dead keys in chat causing crash).
+        if (Environment.OSVersion.Platform == PlatformID.Unix)
+        {
+            EnvVar("XMODIFIERS", "@im=none");
+        }
+
         Log.Debug("Launch command: {LaunchCommand}", commandBuilder.ToString());
 
         var highPriority = isReplay || _cfg.GetCVar(CVars.HighProcessPriority);

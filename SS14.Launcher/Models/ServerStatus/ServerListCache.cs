@@ -54,6 +54,9 @@ public sealed partial class ServerListCache : ObservableObject, IServerSource
     /// </summary>
     public void RequestRefresh()
     {
+        if (Status == RefreshListStatus.UpdatingMaster)
+            return;
+
         _refreshCancel?.Cancel();
         _refreshCancel = new CancellationTokenSource(15000);
         _ = RefreshServerList(_refreshCancel.Token);
