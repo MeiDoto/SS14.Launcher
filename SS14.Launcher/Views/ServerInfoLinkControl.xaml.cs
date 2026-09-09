@@ -10,7 +10,7 @@ namespace SS14.Launcher.Views;
 
 public sealed partial class ServerInfoLinkControl : UserControl
 {
-    private static readonly HashSet<string> ValidIcons = new()
+    private static readonly HashSet<string> ValidIcons = new(StringComparer.OrdinalIgnoreCase)
     {
         "discord",
         "wiki",
@@ -40,15 +40,26 @@ public sealed partial class ServerInfoLinkControl : UserControl
         if (DataContext is not ServerInfoLink link)
             return;
 
-        if (link.Icon == null)
+        if (string.IsNullOrWhiteSpace(link.Icon))
             return;
 
-        if (!ValidIcons.Contains(link.Icon))
+        var iconName = link.Icon.Trim().ToLowerInvariant();
+        var resourceKey = iconName switch
         {
-            Log.Warning("Invalid info icon: {Icon}", link.Icon);
-            return;
-        }
+            "gitlab" => "InfoIcon-github",
+            "vk" or "vkontakte" => "InfoIcon-forum",
+            "matrix" => "InfoIcon-discord",
+            _ when ValidIcons.Contains(iconName) => $"InfoIcon-{iconName}",
+            _ => "InfoIcon-web"
+        };
 
-        IconLabel.Icon = (IImage)this.FindResource($"InfoIcon-{link.Icon}")!;
+        if (this.TryFindResource(resourceKey, out var res) && res is IImage img)
+        {
+            IconLabel.Icon = img;
+        }
+        else if (this.TryFindResource("InfoIcon-web", out var fallbackRes) && fallbackRes is IImage fallbackImg)
+        {
+            IconLabel.Icon = fallbackImg;
+        }
     }
 }
