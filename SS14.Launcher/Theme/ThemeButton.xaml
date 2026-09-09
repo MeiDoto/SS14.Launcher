@@ -84,4 +84,11 @@ Taken & modified from Avalonia's git repo.
     <Setter Property="RenderTransform" Value="scale(0.96)" />
     <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}" />
   </Style>
+
+  <Style Selector="Button.FavoriteButton > views|IconLabel">
+    <Setter Property="Icon" Value="{DynamicResource 'ButtonIcon-star-outline'}" />
+  </Style>
+  <Style Selector="Button.FavoriteButton.IsFavorite > views|IconLabel">
+    <Setter Property="Icon" Value="{DynamicResource 'ButtonIcon-star'}" />
+  </Style>
 </Styles>

@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:SS14.Launcher.ViewModels"
         xmlns:loc="clr-namespace:SS14.Launcher.Localization"
+        xmlns:views="clr-namespace:SS14.Launcher.Views"
         mc:Ignorable="d" d:DesignWidth="680" d:DesignHeight="620"
         Width="680" Height="620"
         CanResize="True"
@@ -21,18 +22,16 @@
   <DockPanel LastChildFill="True">
     <!-- BOTTOM ACTIONS -->
     <DockPanel DockPanel.Dock="Bottom" Margin="0, 12, 0, 0" LastChildFill="False">
-      <Button DockPanel.Dock="Left" Click="PlayClicked" Content="{loc:Loc replay-dialog-play}"
-              Background="#27AE60" Foreground="White" FontWeight="Bold" />
-      <Button DockPanel.Dock="Left" Click="ToggleFavoriteClicked" Margin="6, 0, 0, 0">
-        <StackPanel Orientation="Horizontal" Spacing="4">
-          <TextBlock Text="{Binding IsFavorite, Converter={x:Static ObjectConverters.IsNull}}" IsVisible="False" />
-          <TextBlock Text="⭐" Foreground="#F1C40F" />
-          <TextBlock Text="{loc:Loc replay-dialog-favorite}" />
-        </StackPanel>
-      </Button>
-      <Button DockPanel.Dock="Left" Click="ShareClicked" Content="{loc:Loc replay-dialog-share}" Margin="6, 0, 0, 0" />
-      <Button DockPanel.Dock="Left" Click="ExportClicked" Content="{loc:Loc replay-dialog-export}" Margin="6, 0, 0, 0" />
-      <Button DockPanel.Dock="Left" Click="OpenFolderClicked" Content="{loc:Loc replay-dialog-open-folder}" Margin="6, 0, 0, 0" />
+      <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="0">
+        <Button Classes="OpenRight" Click="PlayClicked" Content="{loc:Loc replay-dialog-play}" />
+        <Button Classes="OpenBoth FavoriteButton" Classes.IsFavorite="{Binding IsFavorite}" Click="ToggleFavoriteClicked"
+                ToolTip.Tip="{loc:Loc replay-dialog-favorite}" Padding="6, 4">
+          <views:IconLabel Height="18" Width="18" />
+        </Button>
+        <Button Classes="OpenBoth" Click="ShareClicked" Content="{loc:Loc replay-dialog-share}" />
+        <Button Classes="OpenBoth" Click="ExportClicked" Content="{loc:Loc replay-dialog-export}" />
+        <Button Classes="OpenLeft" Click="OpenFolderClicked" Content="{loc:Loc replay-dialog-open-folder}" />
+      </StackPanel>
 
       <Button DockPanel.Dock="Right" Click="CloseClicked" Content="{loc:Loc replay-dialog-close}" Margin="6, 0, 0, 0" />
       <TextBlock DockPanel.Dock="Right" Text="{Binding CopyFeedback}" VerticalAlignment="Center"
@@ -46,8 +45,8 @@
           <StackPanel Spacing="6">
             <DockPanel LastChildFill="True">
               <Border IsVisible="{Binding IsFavorite}" DockPanel.Dock="Right"
-                      Background="#F39C12" CornerRadius="4" Padding="6, 2" Margin="6, 0, 0, 0">
-                <TextBlock Text="★ FAVORITE" FontSize="10" FontWeight="Bold" Foreground="White" />
+                      Background="{DynamicResource ThemeNanoGoldBrush}" CornerRadius="3" Padding="6, 2" Margin="6, 0, 0, 0">
+                <TextBlock Text="FAVORITE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource ThemeBackgroundColor}" />
               </Border>
               <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource ThemeNanoGoldBrush}" />
             </DockPanel>
@@ -77,16 +76,15 @@
               <TextBlock Grid.Row="7" Grid.Column="0" Text="{loc:Loc replay-dialog-uncompressed}" Classes="SubText" Margin="0, 3, 0, 0" />
               <StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0, 3, 0, 0">
                 <TextBlock Text="{Binding UncompressedSizeFormatted}" />
-                <Border Background="#2E4053" CornerRadius="3" Padding="4, 1"
+                <Border Background="{DynamicResource ThemeControlMidBrush}" CornerRadius="3" Padding="4, 1"
                         IsVisible="{Binding CompressionRatioFormatted, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                  <TextBlock Text="{Binding CompressionRatioFormatted, StringFormat='Saved {0}'}" FontSize="10" Foreground="#A9DFBF" />
+                  <TextBlock Text="{Binding CompressionRatioFormatted, StringFormat='Saved {0}'}" FontSize="10" Foreground="{DynamicResource ThemeForegroundColor}" />
                 </Border>
               </StackPanel>
 
               <TextBlock Grid.Row="8" Grid.Column="0" Text="{loc:Loc replay-dialog-sha256}" Classes="SubText" Margin="0, 3, 0, 0" VerticalAlignment="Center" />
               <DockPanel Grid.Row="8" Grid.Column="1" Margin="0, 3, 0, 0" LastChildFill="True">
-                <Button DockPanel.Dock="Right" Click="CopyHashClicked" Content="📋" Padding="6, 2" Margin="6, 0, 0, 0"
-                        ToolTip.Tip="{loc:Loc replay-dialog-copy-hash}" />
+                <Button DockPanel.Dock="Right" Click="CopyHashClicked" Content="{loc:Loc replay-dialog-copy-hash}" Padding="6, 2" Margin="6, 0, 0, 0" />
                 <TextBlock Text="{Binding Sha256}" FontFamily="Consolas, Monospace, Courier New" FontSize="11"
                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
               </DockPanel>

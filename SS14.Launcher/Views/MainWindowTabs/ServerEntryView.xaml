@@ -13,14 +13,6 @@
     <mainWindowTabs:ServerEntryViewModel />
   </Design.DataContext>
 
-  <UserControl.Styles>
-    <Style Selector="Button.FavoriteButton > views|IconLabel">
-      <Setter Property="Icon" Value="{DynamicResource 'ButtonIcon-star-outline'}" />
-    </Style>
-    <Style Selector="Button.FavoriteButton.IsFavorite > views|IconLabel">
-      <Setter Property="Icon" Value="{DynamicResource 'ButtonIcon-star'}" />
-    </Style>
-  </UserControl.Styles>
 
   <Panel>
     <Expander Name="Expando" Classes="NoPad" IsExpanded="{Binding IsExpanded}">

@@ -18,21 +18,16 @@
   <DockPanel LastChildFill="True">
     <!-- BOTTOM ACTIONS -->
     <DockPanel DockPanel.Dock="Bottom" Margin="0, 14, 0, 0" LastChildFill="False">
-      <Button DockPanel.Dock="Right" Click="CancelClicked" Content="{loc:Loc replay-cleaner-cancel-button}" Margin="6, 0, 0, 0" />
-      <Button DockPanel.Dock="Right" Click="ExecuteCleanClicked" Content="{loc:Loc replay-cleaner-execute-button}"
-              IsEnabled="{Binding CanClean}"
-              Background="#C0392B" Foreground="White" FontWeight="Bold" />
+      <Button DockPanel.Dock="Right" Classes="OpenLeft" Click="CancelClicked" Content="{loc:Loc replay-cleaner-cancel-button}" />
+      <Button DockPanel.Dock="Right" Classes="OpenRight" Click="ExecuteCleanClicked" Content="{loc:Loc replay-cleaner-execute-button}"
+              IsEnabled="{Binding CanClean}" />
     </DockPanel>
 
     <StackPanel Spacing="12">
       <!-- HEADER -->
       <Border Classes="Card" Padding="14">
         <StackPanel Spacing="4">
-          <DockPanel LastChildFill="True">
-            <TextBlock Text="🧹" FontSize="22" Margin="0, 0, 8, 0" VerticalAlignment="Center" />
-            <TextBlock Text="{loc:Loc replay-cleaner-title}" FontWeight="Bold" FontSize="16"
-                       Foreground="{DynamicResource ThemeNanoGoldBrush}" VerticalAlignment="Center" />
-          </DockPanel>
+          <TextBlock Text="{loc:Loc replay-cleaner-title}" Classes="NanoHeadingMedium" />
           <TextBlock Text="{loc:Loc replay-cleaner-desc}" Classes="SubText" TextWrapping="Wrap" Margin="0, 4, 0, 0" />
         </StackPanel>
       </Border>
@@ -59,20 +54,23 @@
       </Border>
 
       <!-- PREVIEW CARD -->
-      <Border Classes="Card" Padding="14" Background="#161822">
+      <Border Classes="Card" Padding="14">
         <StackPanel Spacing="6">
-          <TextBlock Text="{loc:Loc replay-cleaner-preview-header}" FontWeight="Bold" FontSize="14"
-                     Foreground="{DynamicResource ThemeHeadingBrush}" />
+          <TextBlock Text="{loc:Loc replay-cleaner-preview-header}" Classes="SectionTitle" />
           <Grid ColumnDefinitions="*, *" Margin="0, 4, 0, 0">
             <!-- Count -->
-            <Border Grid.Column="0" Background="#1C1F2E" CornerRadius="6" Padding="10, 8" Margin="0, 0, 4, 0">
+            <Border Grid.Column="0" Background="{DynamicResource ThemeServerListBackgroundBrush}"
+                    BorderBrush="{DynamicResource ThemeControlMidBrush}" BorderThickness="1"
+                    CornerRadius="4" Padding="10, 8" Margin="0, 0, 4, 0">
               <StackPanel Spacing="2">
                 <TextBlock Text="{loc:Loc replay-cleaner-preview-count-label}" Classes="SubText" FontSize="11" />
-                <TextBlock Text="{Binding CandidatesCount}" FontWeight="Bold" FontSize="16" Foreground="#E74C3C" />
+                <TextBlock Text="{Binding CandidatesCount}" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource ThemeForegroundColor}" />
               </StackPanel>
             </Border>
             <!-- Space freed -->
-            <Border Grid.Column="1" Background="#1C1F2E" CornerRadius="6" Padding="10, 8" Margin="4, 0, 0, 0">
+            <Border Grid.Column="1" Background="{DynamicResource ThemeServerListBackgroundBrush}"
+                    BorderBrush="{DynamicResource ThemeControlMidBrush}" BorderThickness="1"
+                    CornerRadius="4" Padding="10, 8" Margin="4, 0, 0, 0">
               <StackPanel Spacing="2">
                 <TextBlock Text="{loc:Loc replay-cleaner-preview-freed-label}" Classes="SubText" FontSize="11" />
                 <TextBlock Text="{Binding FreedBytesFormatted}" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource ThemeNanoGoldBrush}" />
