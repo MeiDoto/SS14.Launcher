@@ -10,65 +10,59 @@ namespace SS14.Launcher.Tests;
 public sealed class ReplayDownloaderTests
 {
     [Test]
-    public void BuildUrl_WizDen_StandardRoundId()
+    public void NormalizeDownloadUrl_SpaceStoriesWebUrl_ConvertsToApiDownload()
     {
-        var url = ReplayDownloader.BuildUrlFromRoundId("14290", ReplayProviderPreset.WizDenOfficial);
-        Assert.That(url, Is.EqualTo("https://replays.spacestation14.com/replays/round-14290.zip"));
+        var input = "https://spacestories.club/replays/core/2026_09_09-12_23-round_50135.zip";
+        var expected = "https://spacestories.club/replays/api/download/core/2026_09_09-12_23-round_50135.zip";
+        Assert.That(ReplayDownloader.NormalizeDownloadUrl(input), Is.EqualTo(expected));
     }
 
     [Test]
-    public void BuildUrl_WizDen_WithLeadingHash()
+    public void NormalizeDownloadUrl_AlreadyApiUrl_Unchanged()
     {
-        var url = ReplayDownloader.BuildUrlFromRoundId("#14290", ReplayProviderPreset.WizDenOfficial);
-        Assert.That(url, Is.EqualTo("https://replays.spacestation14.com/replays/round-14290.zip"));
+        var input = "https://spacestories.club/replays/api/download/core/2026_09_09-12_23-round_50135.zip";
+        Assert.That(ReplayDownloader.NormalizeDownloadUrl(input), Is.EqualTo(input));
     }
 
     [Test]
-    public void BuildUrl_Corvax_StandardRoundId()
+    public void NormalizeDownloadUrl_GenericUrl_Unchanged()
     {
-        var url = ReplayDownloader.BuildUrlFromRoundId("501", ReplayProviderPreset.Corvax);
-        Assert.That(url, Is.EqualTo("https://corvax.fun/replays/round_501.zip"));
+        var input = "https://example.com/replays/round-123.zip";
+        Assert.That(ReplayDownloader.NormalizeDownloadUrl(input), Is.EqualTo(input));
     }
 
     [Test]
-    public void BuildUrl_Corvax_WithLeadingHash()
+    public async Task ResolveUrl_CustomTemplate_Success()
     {
-        var url = ReplayDownloader.BuildUrlFromRoundId("#501", ReplayProviderPreset.Corvax);
-        Assert.That(url, Is.EqualTo("https://corvax.fun/replays/round_501.zip"));
-    }
-
-    [Test]
-    public void BuildUrl_CustomTemplate_Success()
-    {
-        var url = ReplayDownloader.BuildUrlFromRoundId("999", ReplayProviderPreset.CustomTemplate, "https://myreplays.org/download/{roundId}.zip");
+        var url = await ReplayDownloader.ResolveUrlFromRoundIdAsync("999", ReplayProviderPreset.CustomTemplate, "https://myreplays.org/download/{roundId}.zip");
         Assert.That(url, Is.EqualTo("https://myreplays.org/download/999.zip"));
     }
 
     [Test]
-    public void BuildUrl_CustomTemplate_MissingPlaceholder_ThrowsArgumentException()
+    public void ResolveUrl_CustomTemplate_MissingPlaceholder_ThrowsArgumentException()
     {
-        Assert.Throws<ArgumentException>(() =>
-            ReplayDownloader.BuildUrlFromRoundId("999", ReplayProviderPreset.CustomTemplate, "https://myreplays.org/download/archive.zip"));
+        Assert.ThrowsAsync<ArgumentException>(async () =>
+            await ReplayDownloader.ResolveUrlFromRoundIdAsync("999", ReplayProviderPreset.CustomTemplate, "https://myreplays.org/download/archive.zip"));
     }
 
     [TestCase("")]
     [TestCase("   ")]
     [TestCase("#")]
     [TestCase("###")]
-    public void BuildUrl_InvalidRoundId_ThrowsArgumentException(string invalidId)
+    public void ResolveUrl_InvalidRoundId_ThrowsArgumentException(string invalidId)
     {
-        Assert.Throws<ArgumentException>(() =>
-            ReplayDownloader.BuildUrlFromRoundId(invalidId, ReplayProviderPreset.WizDenOfficial));
+        Assert.ThrowsAsync<ArgumentException>(async () =>
+            await ReplayDownloader.ResolveUrlFromRoundIdAsync(invalidId, ReplayProviderPreset.SpaceStories));
     }
 
     [Test]
-    public void BuildUrl_CustomTemplate_NullOrEmpty_ThrowsArgumentException()
+    public void ResolveUrl_CustomTemplate_NullOrEmpty_ThrowsArgumentException()
     {
-        Assert.Throws<ArgumentException>(() =>
-            ReplayDownloader.BuildUrlFromRoundId("100", ReplayProviderPreset.CustomTemplate, null));
+        Assert.ThrowsAsync<ArgumentException>(async () =>
+            await ReplayDownloader.ResolveUrlFromRoundIdAsync("100", ReplayProviderPreset.CustomTemplate, null));
 
-        Assert.Throws<ArgumentException>(() =>
-            ReplayDownloader.BuildUrlFromRoundId("100", ReplayProviderPreset.CustomTemplate, ""));
+        Assert.ThrowsAsync<ArgumentException>(async () =>
+            await ReplayDownloader.ResolveUrlFromRoundIdAsync("100", ReplayProviderPreset.CustomTemplate, ""));
     }
 
     [TestCase("not-a-valid-url")]

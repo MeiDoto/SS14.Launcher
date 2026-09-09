@@ -54,8 +54,7 @@
           <StackPanel Spacing="6" IsVisible="{Binding IsByRoundId}">
             <TextBlock Text="{loc:Loc replay-download-provider-label}" Classes="SubText" FontSize="11" />
             <ComboBox SelectedIndex="{Binding SelectedProviderIndex}" HorizontalAlignment="Stretch">
-              <ComboBoxItem Content="{loc:Loc replay-download-provider-wizden}" />
-              <ComboBoxItem Content="{loc:Loc replay-download-provider-corvax}" />
+              <ComboBoxItem Content="{loc:Loc replay-download-provider-spacestories}" />
               <ComboBoxItem Content="{loc:Loc replay-download-provider-custom}" />
             </ComboBox>
 

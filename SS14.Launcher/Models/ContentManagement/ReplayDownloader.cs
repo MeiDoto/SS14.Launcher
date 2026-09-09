@@ -3,6 +3,9 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
@@ -20,15 +23,85 @@ public readonly record struct ReplayDownloadProgress(
 
 public enum ReplayProviderPreset
 {
-    WizDenOfficial = 0,
-    Corvax = 1,
-    CustomTemplate = 2
+    SpaceStories = 0,
+    CustomTemplate = 1
+}
+
+public sealed class SpaceStoriesSearchResponse
+{
+    [JsonPropertyName("found")]
+    public bool Found { get; set; }
+
+    [JsonPropertyName("server_name")]
+    public string? ServerName { get; set; }
+
+    [JsonPropertyName("filename")]
+    public string? FileName { get; set; }
 }
 
 public static class ReplayDownloader
 {
-    public const string WizDenTemplate = "https://replays.spacestation14.com/replays/round-{roundId}.zip";
-    public const string CorvaxTemplate = "https://corvax.fun/replays/round_{roundId}.zip";
+    public static string NormalizeDownloadUrl(string rawUrl)
+    {
+        if (string.IsNullOrWhiteSpace(rawUrl))
+            return "";
+
+        var url = rawUrl.Trim().TrimEnd('?');
+
+        // Space Stories frontend page to direct download API:
+        // https://spacestories.club/replays/{server}/{filename.zip} -> https://spacestories.club/replays/api/download/{server}/{filename.zip}
+        var match = Regex.Match(url, @"^https?://(?:www\.)?spacestories\.club/replays/(?!api/download/)([a-zA-Z0-9_\-]+)/([^/?#]+\.zip)", RegexOptions.IgnoreCase);
+        if (match.Success)
+        {
+            var server = match.Groups[1].Value;
+            var file = match.Groups[2].Value;
+            return $"https://spacestories.club/replays/api/download/{server}/{file}";
+        }
+
+        return url;
+    }
+
+    public static async Task<string> ResolveUrlFromRoundIdAsync(
+        string roundId,
+        ReplayProviderPreset preset,
+        string? customTemplate = null,
+        HttpClient? customClient = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(roundId))
+            throw new ArgumentException("Round ID cannot be empty", nameof(roundId));
+
+        var cleanId = roundId.Trim().TrimStart('#');
+        if (string.IsNullOrWhiteSpace(cleanId))
+            throw new ArgumentException("Round ID cannot be empty", nameof(roundId));
+
+        if (preset == ReplayProviderPreset.SpaceStories)
+        {
+            var client = customClient ?? Locator.Current.GetService<HttpClient>() ?? new HttpClient();
+            var searchUrl = $"https://spacestories.club/replays/api/search?round_id={Uri.EscapeDataString(cleanId)}";
+
+            using var response = await client.GetAsync(searchUrl, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            var searchResult = await response.Content.ReadFromJsonAsync<SpaceStoriesSearchResponse>(cancellationToken: cancellationToken);
+            if (searchResult == null || !searchResult.Found || string.IsNullOrWhiteSpace(searchResult.ServerName) || string.IsNullOrWhiteSpace(searchResult.FileName))
+            {
+                throw new InvalidOperationException($"Раунд #{cleanId} не найден в архиве Space Stories.");
+            }
+
+            return $"https://spacestories.club/replays/api/download/{searchResult.ServerName}/{searchResult.FileName}";
+        }
+
+        if (preset == ReplayProviderPreset.CustomTemplate)
+        {
+            if (string.IsNullOrWhiteSpace(customTemplate) || !customTemplate.Contains("{roundId}", StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("Шаблон должен содержать маркер {roundId}");
+
+            return customTemplate.Replace("{roundId}", cleanId, StringComparison.OrdinalIgnoreCase);
+        }
+
+        throw new ArgumentException("Неизвестный провайдер записей.");
+    }
 
     public static string BuildUrlFromRoundId(string roundId, ReplayProviderPreset preset, string? customTemplate = null)
     {
@@ -41,11 +114,9 @@ public static class ReplayDownloader
 
         return preset switch
         {
-            ReplayProviderPreset.WizDenOfficial => WizDenTemplate.Replace("{roundId}", cleanId, StringComparison.OrdinalIgnoreCase),
-            ReplayProviderPreset.Corvax => CorvaxTemplate.Replace("{roundId}", cleanId, StringComparison.OrdinalIgnoreCase),
             ReplayProviderPreset.CustomTemplate when !string.IsNullOrWhiteSpace(customTemplate) && customTemplate.Contains("{roundId}", StringComparison.OrdinalIgnoreCase) =>
                 customTemplate.Replace("{roundId}", cleanId, StringComparison.OrdinalIgnoreCase),
-            _ => throw new ArgumentException("Invalid provider or missing custom template with {roundId}")
+            _ => throw new ArgumentException("Provider requires async resolution or invalid custom template")
         };
     }
 
@@ -57,6 +128,8 @@ public static class ReplayDownloader
         CancellationToken cancellationToken = default)
     {
         var client = customClient ?? Locator.Current.GetService<HttpClient>() ?? new HttpClient();
+
+        url = NormalizeDownloadUrl(url);
 
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
         {
@@ -91,6 +164,36 @@ public static class ReplayDownloader
         {
             using var response = await client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
             response.EnsureSuccessStatusCode();
+
+            // Detect if response is HTML webpage instead of binary zip
+            var mediaType = response.Content.Headers.ContentType?.MediaType?.ToLowerInvariant();
+            if (mediaType == "text/html" || mediaType == "text/plain")
+            {
+                var htmlContent = await response.Content.ReadAsStringAsync(cancellationToken);
+
+                // If it's a spacestories link that wasn't normalized, try api download
+                var ssMatch = Regex.Match(url, @"spacestories\.club/replays/([a-zA-Z0-9_\-]+)/([^/?#]+\.zip)", RegexOptions.IgnoreCase);
+                if (ssMatch.Success && !url.Contains("/api/download/"))
+                {
+                    var convertedUrl = $"https://spacestories.club/replays/api/download/{ssMatch.Groups[1].Value}/{ssMatch.Groups[2].Value}";
+                    return await DownloadReplayAsync(convertedUrl, targetDirectory, progress, client, cancellationToken);
+                }
+
+                // Check for a .zip link inside the HTML
+                var zipMatch = Regex.Match(htmlContent, @"href=[""']([^""']+\.zip[^""']*)[""']", RegexOptions.IgnoreCase);
+                if (zipMatch.Success)
+                {
+                    var extractedUrl = zipMatch.Groups[1].Value;
+                    if (!extractedUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) && !extractedUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                    {
+                        extractedUrl = new Uri(uri, extractedUrl).ToString();
+                    }
+
+                    return await DownloadReplayAsync(extractedUrl, targetDirectory, progress, client, cancellationToken);
+                }
+
+                throw new InvalidDataException("Указанная ссылка ведёт на веб-страницу (HTML), а не на файл архива записи (.zip).");
+            }
 
             var totalBytes = response.Content.Headers.ContentLength;
 

@@ -79,7 +79,7 @@ public sealed class DownloadReplayViewModel : ViewModelBase
         }
     }
 
-    public bool IsCustomProvider => SelectedProviderIndex == 2;
+    public bool IsCustomProvider => SelectedProviderIndex == 1;
 
     private string _customTemplateInput = "https://example.com/replays/round_{roundId}.zip";
     public string CustomTemplateInput
@@ -212,31 +212,36 @@ public sealed class DownloadReplayViewModel : ViewModelBase
         if (!CanDownload)
             return;
 
-        string targetUrl;
-        try
-        {
-            if (IsByRoundId)
-            {
-                var preset = (ReplayProviderPreset)SelectedProviderIndex;
-                targetUrl = ReplayDownloader.BuildUrlFromRoundId(RoundIdInput, preset, CustomTemplateInput);
-            }
-            else
-            {
-                targetUrl = UrlInput.Trim();
-            }
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = ex.Message;
-            return;
-        }
-
         IsDownloading = true;
         StatusMessage = _loc.GetString("replay-download-status-connecting");
         DownloadProgress = 0;
         DownloadProgressText = "";
 
         _cancelTokenSource = new CancellationTokenSource();
+
+        string targetUrl;
+        try
+        {
+            if (IsByRoundId)
+            {
+                var preset = (ReplayProviderPreset)SelectedProviderIndex;
+                targetUrl = await ReplayDownloader.ResolveUrlFromRoundIdAsync(
+                    RoundIdInput,
+                    preset,
+                    CustomTemplateInput,
+                    cancellationToken: _cancelTokenSource.Token);
+            }
+            else
+            {
+                targetUrl = ReplayDownloader.NormalizeDownloadUrl(UrlInput.Trim());
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+            IsDownloading = false;
+            return;
+        }
 
         var progressReporter = new Progress<ReplayDownloadProgress>(p =>
         {
