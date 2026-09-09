@@ -7,17 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [1.2.8] - 2026-09-09
 
 ### Added
-- **Code Coverage Collection**: Integrated `coverlet.collector` into test suite and GitHub Actions workflow with Cobertura XML artifact reporting.
-- **Dependency Injection**: Registered `IThemeService` into Splat DI locator; injected into `MainWindowViewModel`.
-- **Theming**: Extracted hardcoded `#1A1B24` wallpaper overlay into `ThemeBackgroundOverlayColor` and `ThemeBackgroundOverlayBrush` dynamic resources.
-- **Localization**: Added missing auth-override keys to `ru/text.ftl` (`login-login-auth-server-changed`, `main-window-auth-override-*`) achieving 100% key parity (810/810 keys).
+- **Headless UI Testing Suite**: Integrated `Avalonia.Headless.NUnit` into automated test suite with full headless rendering tests for UserControls, `AngleBox`, and theme resource dictionaries (195 tests total, 100% pass rate).
+- **Code Coverage in CI/CD**: Integrated `coverlet.collector` into test project and GitHub Actions pipelines (`build-test.yml`, `publish-release.yml`) with automated `coverage.cobertura.xml` artifact generation.
+- **Dependency Injection**: Registered `IThemeService` into Splat DI locator; decoupled and injected via interface in `MainWindowViewModel`.
+- **Theme Resources**: Extracted wallpaper dimming overlay color into `ThemeBackgroundOverlayColor` and `ThemeBackgroundOverlayBrush` dynamic resources.
+- **Complete Localization Parity**: Added missing auth-override keys to `ru/text.ftl` (`login-login-auth-server-changed`, `main-window-auth-override-*`) achieving 100% key parity (810/810 keys) enforced by an automated test.
 
 ### Fixed
-- **Table Transparency**: Resolved issue where alternating server and replay table rows (`:nth-child(2n)`) were opaque black when a custom background wallpaper or video was active.
-- **Upstream Notes**: Clarified and formalized legacy upstream TODO comments into clean architecture documentation.
+- **Table Zebra Transparency**: Resolved bug where alternating server and replay list rows (`:nth-child(2n)`) remained opaque `#262626` over custom wallpapers and animated backgrounds; dynamic alpha blending applied.
+- **Theme Font Resolution**: Corrected relative font URI in `Theme.xaml` to absolute `avares://SS14.Launcher/Assets/Fonts/noto_sans/*.ttf#Noto Sans`, preventing typeface loading errors.
+- **Localization Extension Safety**: Made `LocExtension` null-safe against uninitialized service locators.
+- **Technical Debt**: Audited and formalized all 13 legacy upstream `// TODO` comments into architectural specifications.
 
 ---
 

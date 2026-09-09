@@ -84,6 +84,18 @@
   </content_rating>
   
   <releases>
+    <release version="1.2.8" date="2026-09-09">
+      <description>
+        <p>Release 1.2.8 adds Headless UI test suite, fixes table transparency over custom wallpapers, integrates Code Coverage in CI, registers IThemeService in DI, and brings 100% localization parity.</p>
+        <p xml:lang="ru">Версия 1.2.8: Набор Headless UI-тестов, исправление полупрозрачности строк таблиц над кастомными обоями, замер покрытия кода в CI, регистрация IThemeService в DI и 100% паритет русской и английской локализаций.</p>
+      </description>
+    </release>
+    <release version="1.2.7" date="2026-09-09">
+      <description>
+        <p>Release 1.2.7: Autonomous custom replay downloads, ADR 0004, unified canonical UI design, and full decoupling from external dependencies.</p>
+        <p xml:lang="ru">Версия 1.2.7: Автономное скачивание кастомных реплеев, архитектурное решение ADR 0004, каноничный дизайн диалогов и полная независимость от сторонних сервисов.</p>
+      </description>
+    </release>
     <release version="1.2.6" date="2026-09-08">
       <description>
         <p>Release 1.2.6 brings Network Diagnostics Tool, Storage Manager dialog, Replay Details Inspector, full Linux Wayland icon auto-installation, and expanded 157-test suite.</p>
