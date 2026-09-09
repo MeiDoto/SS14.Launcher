@@ -19,6 +19,11 @@ public interface IThemeService
     void ApplyTheme(DataManager cfg, bool hasCustomBackground);
 
     /// <summary>
+    /// Applies custom theme colors, brushes, and font sizes from the current configuration to the specified resource dictionary.
+    /// </summary>
+    void ApplyTheme(Avalonia.Controls.IResourceDictionary res, DataManager cfg, bool hasCustomBackground);
+
+    /// <summary>
     /// Safely loads a bitmap from disk without throwing unhandled exceptions.
     /// </summary>
     Bitmap? LoadBitmapSafely(string? path);
@@ -33,6 +38,11 @@ public sealed class ThemeService : IThemeService
         if (Application.Current?.Resources is not { } res)
             return;
 
+        ApplyTheme(res, cfg, hasCustomBackground);
+    }
+
+    public void ApplyTheme(Avalonia.Controls.IResourceDictionary res, DataManager cfg, bool hasCustomBackground)
+    {
         var accent = cfg.GetCVar(CVars.CustomAccentColor);
         if (!string.IsNullOrWhiteSpace(accent) && PaletteUtility.TryParseHexColor(accent, out var accentCol))
         {
@@ -78,7 +88,24 @@ public sealed class ThemeService : IThemeService
         if (hasCustomBackground)
         {
             res["ThemeBackgroundBrush"] = new SolidColorBrush(Color.FromRgb(0x25, 0x25, 0x2A));
-            res["ThemeServerListBackgroundBrush"] = new SolidColorBrush(Color.FromArgb(0x28, 0x10, 0x10, 0x18));
+            var serverListBg = Color.FromArgb(0x28, 0x10, 0x10, 0x18);
+            res["ThemeServerListBackgroundBrush"] = new SolidColorBrush(serverListBg);
+            res["ThemeServerListBackgroundColor"] = serverListBg;
+
+            var rowAlt = Color.FromArgb(0x38, 0x15, 0x15, 0x22);
+            res["ThemeServerListRowAltBrush"] = new SolidColorBrush(rowAlt);
+            res["ThemeServerListRowAltColor"] = rowAlt;
+        }
+        else
+        {
+            res["ThemeBackgroundBrush"] = new SolidColorBrush(Color.FromRgb(0x25, 0x25, 0x2A));
+            var serverListBg = Color.FromRgb(0x1E, 0x1E, 0x22);
+            res["ThemeServerListBackgroundBrush"] = new SolidColorBrush(serverListBg);
+            res["ThemeServerListBackgroundColor"] = serverListBg;
+
+            var rowAlt = Color.FromRgb(0x26, 0x26, 0x26);
+            res["ThemeServerListRowAltBrush"] = new SolidColorBrush(rowAlt);
+            res["ThemeServerListRowAltColor"] = rowAlt;
         }
     }
 
