@@ -221,4 +221,5 @@ The replay management subsystem is architected for maximum autonomy, low-latency
 - [ADR 0002: Async Safety & Error Handling Policy](adr/0002-async-safety-error-handling.md)
 - [ADR 0003: Continuous Integration & Deployment Pipeline Design](adr/0003-cicd-pipeline-design.md)
 - [ADR 0004: Replay Subsystem, User-Centric Downloads, I/O Optimization & Architectural Stability](adr/0004-replay-subsystem-and-user-architecture.md)
+- [ADR 0005: Modular Architecture, Dependency Inversion & Code Review Governance](adr/0005-modular-architecture-and-code-review-governance.md)
 

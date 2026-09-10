@@ -1,0 +1,7 @@
+# Global code owners
+* @MeiDoto
+
+# Architecture and documentation
+/docs/ @MeiDoto
+/.github/ @MeiDoto
+/Launcher.props @MeiDoto

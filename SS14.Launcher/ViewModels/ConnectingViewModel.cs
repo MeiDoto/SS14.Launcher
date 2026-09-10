@@ -14,7 +14,7 @@ namespace SS14.Launcher.ViewModels;
 public class ConnectingViewModel : ViewModelBase
 {
     private readonly Connector _connector;
-    private readonly Updater _updater;
+    private readonly IUpdater _updater;
     private readonly MainWindowViewModel _windowVm;
     private readonly ConnectionType _connectionType;
     private readonly LocalizationManager _loc;
@@ -33,7 +33,7 @@ public class ConnectingViewModel : ViewModelBase
 
     public ConnectingViewModel(Connector connector, MainWindowViewModel windowVm, string? givenReason, ConnectionType connectionType)
     {
-        _updater = Locator.Current.GetRequiredService<Updater>();
+        _updater = Locator.Current.GetRequiredService<IUpdater>();
         _loc = LocalizationManager.Instance;
         _connector = connector;
         _windowVm = windowVm;

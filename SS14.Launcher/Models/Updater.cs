@@ -26,7 +26,7 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace SS14.Launcher.Models;
 
-public sealed partial class Updater : ObservableObject
+public sealed partial class Updater : ObservableObject, IUpdater
 {
     private const int ManifestDownloadProtocolVersion = 1;
 
@@ -56,7 +56,7 @@ public sealed partial class Updater : ObservableObject
     [ObservableProperty] private (long downloaded, long total, ProgressUnit unit)? _progress;
     [ObservableProperty] private long? _speed;
 
-    public Exception? UpdateException;
+    public Exception? UpdateException { get; set; }
 
     public async Task<ContentLaunchInfo?> RunUpdateForLaunchAsync(
         ServerBuildInformation buildInformation,

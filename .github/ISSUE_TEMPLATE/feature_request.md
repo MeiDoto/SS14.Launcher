@@ -1,18 +1,19 @@
 ---
-name: Предложение функции / Feature Request
-about: Предложить новую функцию или улучшение / Suggest a new feature or improvement
-title: "[FEATURE] "
-labels: enhancement
+name: Feature Request / Предложение функции
+about: Предложить новую функцию или улучшение для лаунчера SS14
+title: '[FEATURE] '
+labels: 'enhancement'
+assignees: ''
 ---
 
-## 💡 Проблема или потребность / Problem
-<!-- Какую проблему решает эта функция? / What problem does this feature solve? -->
+**Связанная проблема / Problem Statement**
+Опишите проблему или ограничение, с которым вы сталкиваетесь.
 
-## 🚀 Предлагаемое решение / Proposed Solution
-<!-- Как это должно работать? / How should this work? -->
+**Предлагаемое решение / Proposed Solution**
+Чёткое и ясное описание того, что вы хотите добавить.
 
-## 🔄 Рассмотренные альтернативы / Alternatives Considered
-<!-- Какие альтернативные решения вы рассматривали? / Any alternative approaches you've thought of -->
+**Альтернативные варианты / Alternatives Considered**
+Любые альтернативные решения или обходные пути.
 
-## 📌 Дополнительный контекст / Additional Context
-<!-- Скриншоты, макеты, ссылки на обсуждения / Screenshots, mockups, or links to relevant discussions -->
+**Дополнительный контекст / Additional Context**
+Скриншоты, мокапы или ссылки.

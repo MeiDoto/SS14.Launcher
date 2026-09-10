@@ -38,7 +38,7 @@ public interface ICVarEntry<T> : INotifyPropertyChanged
 /// All data is stored in an SQLite DB. Simple config variables are stored K/V in a single table.
 /// More complex things like logins is stored in individual tables.
 /// </remarks>
-public sealed class DataManager : ObservableObject
+public sealed class DataManager : ObservableObject, IDataManager
 {
     private delegate void DbCommand(SqliteConnection connection);
 

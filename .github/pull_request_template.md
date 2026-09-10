@@ -1,23 +1,22 @@
-## 📝 Описание / Description
+## 📋 Описание изменений / Change Description
 
-<!-- Кратко опишите, что делает этот PR и зачем / Briefly describe what this PR does and why -->
+<!-- Кратко опишите суть изменений и проблему, которую они решают. -->
+<!-- Briefly describe the changes and the problem they solve. -->
 
-## 🔧 Изменения / Changes
+---
 
-<!-- Список ключевых изменений / List the specific changes made -->
-- 
+## 🔍 Чек-лист качества / Code Quality Checklist
 
-## 🧪 Тестирование / Testing
+- [ ] **Компиляция / Build**: Код компилируется без предупреждений и ошибок (`dotnet build -warnaserror:CS4014`).
+- [ ] **Тестирование / Tests**: Все 225+ модульных и Headless UI-тестов пройдены успешно (`dotnet test`).
+- [ ] **Покрытие кода / Code Coverage**: Изменения покрыты автотестами, покрытие не снижается.
+- [ ] **Локализация / Localization**: Все новые строки переведены на русский и английский (100% паритет ключей в `ru/text.ftl` и `en-US/text.ftl`).
+- [ ] **Архитектура / Architecture**: Зависимости зарегистрированы через интерфейсы (`IDataManager`, `IUpdater`, `ILoginManager`, `IThemeService`).
+- [ ] **История изменений / Changelog**: Добавлена запись в `CHANGELOG.md` в секцию `[Unreleased]`.
+- [ ] **Форматирование / Formatting**: Соблюдаются правила `.editorconfig` (`dotnet format --verify-no-changes`).
 
-<!-- Как проверялись изменения? / How was this tested? -->
-- [ ] Все модульные тесты успешно проходят / Unit tests pass (`dotnet test`)
-- [ ] Сборка компилируется без ошибок и предупреждений / Build succeeds with 0 warnings
-- [ ] Форматирование кода проверено / Code formatting verified (`dotnet format --verify-no-changes`)
+---
 
-## 📋 Чеклист качества / Quality Checklist
+## 🧪 Как проверялось / How Tested
 
-- [ ] **Error Handling**: Нет пустых `catch {}` блоков — все исключения типизированы и логируются через Serilog / No empty catch blocks, all exceptions are logged
-- [ ] **Async Safety**: Нет `async void` вне UI-событий Avalonia / No `async void` outside UI event handlers
-- [ ] **Task Discard**: Фоновые задачи (fire-and-forget) используют оператор сброса `_ = Method()` / Background tasks use `_ = Method()` discard pattern
-- [ ] **Localization (i18n)**: Новые строки пользовательского интерфейса добавлены в `en-US` и `ru` `.ftl` файлы / UI strings added to both `en-US` and `ru` locale files
-- [ ] **Documentation**: Публичные методы задокументированы XML-комментариями / Public methods documented with XML comments
+<!-- Опишите сценарии ручного или автоматического тестирования. -->

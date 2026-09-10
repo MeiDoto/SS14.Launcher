@@ -16,7 +16,7 @@ public static class GameEnvironmentHelper
     /// <summary>
     /// Injects configured environment variables (PGO, JIT, GC, GPU, Proxy) into the process start info.
     /// </summary>
-    public static void ConfigureEnvironment(ProcessStartInfo startInfo, DataManager cfg)
+    public static void ConfigureEnvironment(ProcessStartInfo startInfo, IDataManager cfg)
     {
         void EnvVar(string key, string val)
         {

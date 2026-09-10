@@ -12,7 +12,7 @@ namespace SS14.Launcher.Models.Logins;
 
 // This is different from DataManager in that this class actually manages logic more complex than raw storage.
 // Checking and refreshing tokens, marking accounts as "need signing in again", etc...
-public sealed class LoginManager : ObservableObject
+public sealed class LoginManager : ObservableObject, ILoginManager
 {
     // Tokens are refreshed periodically and cached; in-flight connection attempts re-check ActiveAccount validity.
 

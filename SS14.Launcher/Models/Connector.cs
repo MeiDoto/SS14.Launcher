@@ -30,9 +30,9 @@ namespace SS14.Launcher.Models;
 /// </summary>
 public partial class Connector : ObservableObject
 {
-    private readonly Updater _updater = Locator.Current.GetRequiredService<Updater>();
-    private readonly DataManager _cfg = Locator.Current.GetRequiredService<DataManager>();
-    private readonly LoginManager _loginManager = Locator.Current.GetRequiredService<LoginManager>();
+    private readonly IUpdater _updater = Locator.Current.GetRequiredService<IUpdater>();
+    private readonly IDataManager _cfg = Locator.Current.GetRequiredService<IDataManager>();
+    private readonly ILoginManager _loginManager = Locator.Current.GetRequiredService<ILoginManager>();
     private readonly IEngineManager _engineManager = Locator.Current.GetRequiredService<IEngineManager>();
 
     private readonly HttpClient _http = Locator.Current.GetRequiredService<HttpClient>();

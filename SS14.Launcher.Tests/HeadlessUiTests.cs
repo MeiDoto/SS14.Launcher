@@ -37,11 +37,15 @@ public sealed class TestHeadlessApplication : Application
         Styles.Add(new StyleInclude(baseUri) { Source = new Uri("avares://SS14.Launcher/Theme/ThemeButton.xaml") });
         Styles.Add(new StyleInclude(baseUri) { Source = new Uri("avares://SS14.Launcher/Theme/ThemeServerList.axaml") });
         Styles.Add(new StyleInclude(baseUri) { Source = new Uri("avares://SS14.Launcher/Theme/ThemeCheckBox.axaml") });
+        Styles.Add(new StyleInclude(baseUri) { Source = new Uri("avares://SS14.Launcher/Theme/ThemeOverlayBox.xaml") });
+        Styles.Add(new StyleInclude(baseUri) { Source = new Uri("avares://SS14.Launcher/Theme/ThemeDungSpinner.xaml") });
+        Styles.Add(new StyleInclude(baseUri) { Source = new Uri("avares://SS14.Launcher/Theme/ThemeRandomMessage.xaml") });
 
         // Setup mock/test DI services for LocExtension and views
         var dataManager = new DataManager();
         var locManager = new LocalizationManager(dataManager);
         locManager.Initialize();
+        Locator.CurrentMutable.RegisterConstant<IDataManager>(dataManager);
         Locator.CurrentMutable.RegisterConstant(dataManager);
         Locator.CurrentMutable.RegisterConstant(locManager);
     }
@@ -66,6 +70,35 @@ public sealed class HeadlessUiTests
 
         Assert.That(box.Bounds.Width, Is.EqualTo(200));
         Assert.That(box.Bounds.Height, Is.EqualTo(100));
+    }
+
+    [AvaloniaTest]
+    public void TestAngleBox_AllSideStyles_MeasureWithoutError()
+    {
+        AngleBoxSideStyle[] styles =
+        [
+            AngleBoxSideStyle.Full,
+            AngleBoxSideStyle.OpenLeft,
+            AngleBoxSideStyle.OpenRight,
+            AngleBoxSideStyle.OpenBoth
+        ];
+
+        foreach (var style in styles)
+        {
+            var box = new AngleBox
+            {
+                Width = 150,
+                Height = 60,
+                CornerSize = 8,
+                SideStyle = style
+            };
+
+            box.Measure(new Size(150, 60));
+            box.Arrange(new Rect(0, 0, 150, 60));
+
+            Assert.That(box.Bounds.Width, Is.EqualTo(150));
+            Assert.That(box.Bounds.Height, Is.EqualTo(60));
+        }
     }
 
     [AvaloniaTest]
@@ -124,5 +157,58 @@ public sealed class HeadlessUiTests
 
         Assert.That(view.Bounds.Width, Is.EqualTo(400));
         Assert.That(view.Bounds.Height, Is.EqualTo(300));
+    }
+
+    [AvaloniaTest]
+    public void TestDungSpinner_InstantiatesAndMeasures()
+    {
+        var spinner = new DungSpinner
+        {
+            Width = 48,
+            Height = 48
+        };
+
+        spinner.Measure(new Size(48, 48));
+        spinner.Arrange(new Rect(0, 0, 48, 48));
+
+        Assert.That(spinner.Bounds.Width, Is.EqualTo(48));
+        Assert.That(spinner.Bounds.Height, Is.EqualTo(48));
+    }
+
+    [AvaloniaTest]
+    public void TestRandomMessage_InstantiatesAndMeasures()
+    {
+        var msg = new RandomMessage
+        {
+            Width = 250,
+            Height = 30
+        };
+
+        msg.Measure(new Size(250, 30));
+        msg.Arrange(new Rect(0, 0, 250, 30));
+
+        Assert.That(msg.Bounds.Width, Is.EqualTo(250));
+        Assert.That(msg.Bounds.Height, Is.EqualTo(30));
+    }
+
+    [AvaloniaTest]
+    public void TestConnectingOverlay_InstantiatesAndMeasures()
+    {
+        var overlay = new ConnectingOverlay();
+        Assert.That(overlay, Is.Not.Null);
+
+        overlay.Measure(new Size(400, 200));
+        overlay.Arrange(new Rect(0, 0, 400, 200));
+
+        Assert.That(overlay.Bounds.Width, Is.EqualTo(400));
+        Assert.That(overlay.Bounds.Height, Is.EqualTo(200));
+    }
+
+    [AvaloniaTest]
+    public void TestLauncherUpdatePromptOverlayView_InstantiatesAndMeasures()
+    {
+        var prompt = new LauncherUpdatePromptOverlayView();
+        Assert.That(prompt, Is.Not.Null);
+        Assert.That(prompt.Content, Is.Not.Null);
     }
 }

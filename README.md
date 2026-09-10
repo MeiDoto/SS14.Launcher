@@ -4,7 +4,7 @@
 
 [![Build & Test](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/build-test.yml/badge.svg)](https://github.com/MeiDoto/SS14.Launcher/actions/workflows/build-test.yml)
 [![Release](https://img.shields.io/github/v/release/MeiDoto/SS14.Launcher?color=blue&logo=github)](https://github.com/MeiDoto/SS14.Launcher/releases/latest)
-[![Tests](https://img.shields.io/badge/tests-195%20passed%20%7C%20100%25-brightgreen)](https://github.com/MeiDoto/SS14.Launcher)
+[![Tests](https://img.shields.io/badge/tests-225%20passed%20%7C%20100%25-brightgreen)](https://github.com/MeiDoto/SS14.Launcher)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Avalonia UI](https://img.shields.io/badge/Avalonia-11.2-blue)](https://avaloniaui.net/)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)](https://github.com/MeiDoto/SS14.Launcher/releases/latest)
@@ -171,7 +171,7 @@ cd SS14.Launcher
 # 2. Сборка решения в конфигурации Release
 dotnet build -c Release -p:UseSharedCompilation=false
 
-# 3. Запуск полного набора автоматических тестов (195 тестов, 100% успех)
+# 3. Запуск полного набора автоматических тестов (225 тестов, 100% успех)
 dotnet test SS14.Launcher.Tests/SS14.Launcher.Tests.csproj --configuration Release
 
 # 4. Локальный запуск приложения

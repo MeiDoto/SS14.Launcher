@@ -287,13 +287,18 @@ internal static class Program
         var loginManager = new LoginManager(cfg, authApi);
         var engineManager = new EngineManagerDynamic();
 
+        locator.RegisterConstant<IDataManager>(cfg);
+        locator.RegisterConstant(cfg);
         locator.RegisterConstant(loc);
         locator.RegisterConstant(new ContentManager());
         locator.RegisterConstant<IEngineManager>(engineManager);
-        locator.RegisterConstant(new Updater());
+        var updater = new Updater();
+        locator.RegisterConstant<IUpdater>(updater);
+        locator.RegisterConstant(updater);
         locator.RegisterConstant(authApi);
         locator.RegisterConstant(hubApi);
         locator.RegisterConstant(new ServerListCache());
+        locator.RegisterConstant<ILoginManager>(loginManager);
         locator.RegisterConstant(loginManager);
         locator.RegisterConstant(overrideAssets);
         locator.RegisterConstant(launcherInfo);

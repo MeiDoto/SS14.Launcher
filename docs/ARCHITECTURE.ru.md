@@ -220,3 +220,4 @@ sequenceDiagram
 - [ADR 0002: Политика Async-безопасности и обработки ошибок](adr/0002-async-safety-error-handling.ru.md)
 - [ADR 0003: Дизайн конвейера непрерывной интеграции (CI/CD)](adr/0003-cicd-pipeline-design.ru.md)
 - [ADR 0004: Подсистема реплеев, пользовательская загрузка, оптимизация I/O и архитектурная стабильность](adr/0004-replay-subsystem-and-user-architecture.ru.md)
+- [ADR 0005: Модульная архитектура, инверсия зависимостей и процесс рецензирования кода](adr/0005-modular-architecture-and-code-review-governance.ru.md)
