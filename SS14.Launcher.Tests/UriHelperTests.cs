@@ -31,6 +31,11 @@ public class UriHelperTests
     [TestCase("ftp://malicious.com", false)]
     [TestCase("", false)]
     [TestCase("   ", false)]
+    // New: additional injection vectors blocked by strengthened sanitization
+    [TestCase("ss14://server.com<script>", false)]
+    [TestCase("ss14://server.com>output", false)]
+    [TestCase("ss14://server.com\\..\\etc\\passwd", false)]
+    [TestCase("ss14://server.com\tevil", false)]
     public void TestTryParseSs14Uri_SecuritySanitation(string input, bool expectedValid)
     {
         var success = UriHelper.TryParseSs14Uri(input, out var uri);

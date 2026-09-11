@@ -25,6 +25,10 @@
     <PackageVersion Include="Avalonia.Desktop" Version="11.2.4" />
     <PackageVersion Include="Avalonia.Diagnostics" Version="11.2.4" />
     <PackageVersion Include="Avalonia.Themes.Simple" Version="11.2.4" />
+    <!-- GHSA-xrw6-gwf8-vvr9: Patched in 0.92.0+, but Avalonia 11.2.4 depends on
+         Tmds.DBus.Protocol.Connection which was removed in 0.92.0. Upgrade blocked
+         until Avalonia supports newer Tmds.DBus.Protocol. Risk: local D-Bus peer
+         spoofing (requires local machine access). Suppressed via NU1903. -->
     <PackageVersion Include="Tmds.DBus.Protocol" Version="0.23.0" />
     <PackageVersion Include="CodeHollow.FeedReader" Version="1.2.6" />
     <PackageVersion Include="Dapper" Version="2.0.123" />

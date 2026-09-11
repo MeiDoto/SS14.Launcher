@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.9] - 2026-09-11
+
+### Security
+- **Known: GHSA-xrw6-gwf8-vvr9 (Tmds.DBus.Protocol)**: Documented and suppressed — patched versions (0.92.0+) break Avalonia 11.2.4 API (`Connection` class removed). Risk: local D-Bus peer spoofing (requires local machine access). Will be resolved when Avalonia upgrades its D-Bus dependency.
+- **Zip Bomb Protection**: Added entry count limit (50,000) and uncompressed size limit (4 GB) to `ExtractZipToDirectory`, preventing decompression bombs.
+- **OpenUri Scheme Allowlist**: `Helpers.OpenUri()` now validates URI schemes against an allowlist (`http`, `https`, `mailto`) before invoking `Process.Start`, blocking `file://`, `ssh://`, `javascript:`, and other dangerous scheme handlers.
+- **URI Input Hardening**: Extended `TryParseSs14Uri` character blocklist with `<`, `>`, `\`, `\t`, `\b` to prevent HTML injection, path traversal, and tab-based obfuscation. Added `HostNameType` and port validation.
+
+### Added
+- **OpenUri Security Tests** (17 tests): Validates scheme allowlist blocks `file://`, `ssh://`, `telnet://`, `ldap://`, `gopher://`, `javascript:`, `data:` URI schemes.
+- **Extended URI Injection Tests** (4 tests): Validates rejection of `<script>`, path traversal via `\`, tab injection vectors.
+- **Extended Zip Security Tests** (2 tests): Validates zip bomb entry count protection and deeply nested directory traversal (`../../../../../../`).
+
+### Changed
+- **Dependency audit**: All vulnerabilities reviewed; 1 known (`Tmds.DBus.Protocol` GHSA-xrw6-gwf8-vvr9) documented and suppressed due to Avalonia compatibility constraint.
+- Test suite expanded from 225 → 248 tests (100% pass rate).
+
+---
+
 ## [1.2.8] - 2026-09-09
 
 ### Added

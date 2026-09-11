@@ -29,9 +29,22 @@ public static class Helpers
         if (!fullDestinationDirectory.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
             fullDestinationDirectory += Path.DirectorySeparatorChar;
 
+        const long maxArchiveSizeBytes = 4L * 1024 * 1024 * 1024; // 4 GB max uncompressed
+        const int maxEntryCount = 50_000;
+        long totalUncompressedSize = 0;
+        int entryCount = 0;
+
         using var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: false);
         foreach (var entry in zipArchive.Entries)
         {
+            entryCount++;
+            if (entryCount > maxEntryCount)
+                throw new InvalidDataException($"Zip Bomb detected: entry count exceeded limit ({maxEntryCount}).");
+
+            totalUncompressedSize += entry.Length;
+            if (totalUncompressedSize > maxArchiveSizeBytes)
+                throw new InvalidDataException($"Zip Bomb detected: uncompressed size exceeded safe limits ({maxArchiveSizeBytes} bytes).");
+
             var destinationPath = Path.GetFullPath(Path.Combine(fullDestinationDirectory, entry.FullName));
 
             if (!destinationPath.StartsWith(fullDestinationDirectory, StringComparison.Ordinal))
@@ -153,7 +166,25 @@ public static class Helpers
 
     public static void OpenUri(string uri)
     {
-        Process.Start(new ProcessStartInfo(uri) { UseShellExecute = true });
+        if (string.IsNullOrWhiteSpace(uri))
+            return;
+
+        // Allow opening existing directories directly in the system file manager
+        if (Directory.Exists(uri))
+        {
+            Process.Start(new ProcessStartInfo(uri) { UseShellExecute = true });
+            return;
+        }
+
+        // Validate strictly for http, https, and mailto schemes to prevent arbitrary command/handler execution
+        if (Uri.TryCreate(uri, UriKind.Absolute, out var parsedUri) &&
+            (parsedUri.Scheme == Uri.UriSchemeHttp || parsedUri.Scheme == Uri.UriSchemeHttps || parsedUri.Scheme == Uri.UriSchemeMailto))
+        {
+            Process.Start(new ProcessStartInfo(parsedUri.AbsoluteUri) { UseShellExecute = true });
+            return;
+        }
+
+        Log.Warning("Refusing to open unsafe or untrusted URI/path: {Uri}", uri);
     }
 
     private static readonly string[] ByteSuffixes =

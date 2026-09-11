@@ -19,7 +19,7 @@ assignees: ''
 
 **Информация о системе / System Environment**
 - ОС: Linux (Wayland/X11) / Windows 10/11 / macOS
-- Версия лаунчера: 1.2.8+
+- Версия лаунчера: 1.2.9+
 - Версия .NET: 10.0+
 
 **Логи / Logs**

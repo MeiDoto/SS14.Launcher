@@ -42,8 +42,8 @@ public static class UriHelper
 
         address = address.Trim();
 
-        // Prevent control characters and command injection characters in the raw input
-        if (address.IndexOfAny(new[] { '\r', '\n', '\0', '"', '\'', ';', '&', '|', '`', '$' }) >= 0)
+        // Prevent control characters, command injection, and traversal characters in the raw input
+        if (address.IndexOfAny(new[] { '\r', '\n', '\0', '"', '\'', ';', '&', '|', '`', '$', '<', '>', '\\', '\t', '\b' }) >= 0)
             return false;
 
         if (!address.Contains("://", StringComparison.Ordinal))
@@ -61,7 +61,10 @@ public static class UriHelper
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(uri.Host))
+        if (string.IsNullOrWhiteSpace(uri.Host) || uri.HostNameType == UriHostNameType.Unknown)
+            return false;
+
+        if (uri.Port == 0)
             return false;
 
         return true;
