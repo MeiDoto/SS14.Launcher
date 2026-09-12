@@ -22,8 +22,33 @@ public static class Helpers
 
     public static void ExtractZipToDirectory(string directory, Stream zipStream)
     {
+        var fullDestinationDirectory = Path.GetFullPath(directory);
+        if (!fullDestinationDirectory.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal))
+            fullDestinationDirectory += Path.DirectorySeparatorChar;
+
         using var zipArchive = new ZipArchive(zipStream);
-        zipArchive.ExtractToDirectory(directory);
+        foreach (var entry in zipArchive.Entries)
+        {
+            var destinationPath = Path.GetFullPath(Path.Combine(fullDestinationDirectory, entry.FullName));
+
+            if (!destinationPath.StartsWith(fullDestinationDirectory, StringComparison.Ordinal))
+            {
+                throw new InvalidDataException($"Entry '{entry.FullName}' attempts directory traversal outside destination.");
+            }
+
+            if (Path.GetFileName(destinationPath).Length == 0 || entry.FullName.EndsWith('/') || entry.FullName.EndsWith('\\'))
+            {
+                Directory.CreateDirectory(destinationPath);
+            }
+            else
+            {
+                var parentDir = Path.GetDirectoryName(destinationPath);
+                if (!string.IsNullOrEmpty(parentDir))
+                    Directory.CreateDirectory(parentDir);
+
+                entry.ExtractToFile(destinationPath, overwrite: true);
+            }
+        }
     }
 
     public static void ClearDirectory(string directory)
