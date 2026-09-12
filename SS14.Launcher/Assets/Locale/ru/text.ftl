@@ -487,7 +487,7 @@ tab-options-compatibility-mode-desc = Это заставит игру испо�
 # Strings for the "forgot password" view on login
 login-forgot-button-back = Назад ко входу
 # Strings for the "connecting" menu that appears when connecting to a server.
-connecting-status-client-crashed = Клиент вылетает при запуске. Если вылеты повторяются, пожалуйста, обратитесь в Discord или Github за помощью.
+connecting-status-client-crashed = Клиент завершился с ошибкой (код: {$code}). Если вылеты повторяются, обратитесь в Discord или GitHub за помощью.
 # Strings for the "connecting" menu that appears when connecting to a server.
 connecting-update-status-downloading-content = Загрузка контента сервера…
 # Strings for the "connecting" menu that appears when connecting to a server.

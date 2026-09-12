@@ -78,6 +78,12 @@ public class ConnectingViewModel : ViewModelBase
                     {
                         CloseOverlay();
                     }
+                    else if (_connector is { Status: ClientExited, ClientExitedBadly: true })
+                    {
+                        // Re-open the overlay so the user sees the crash error
+                        // (it was closed when Status became ClientRunning)
+                        _windowVm.ConnectingVM = this;
+                    }
 
                     break;
                 case nameof(_connector.PrivacyPolicyDifferentVersion):
@@ -176,7 +182,7 @@ public class ConnectingViewModel : ViewModelBase
             StartingClient => _loc.GetString("connecting-status-starting-client") + _reasonSuffix,
             NotAContentBundle => _loc.GetString("connecting-status-not-a-content-bundle"),
             ClientExited => _connector.ClientExitedBadly
-                ? _loc.GetString("connecting-status-client-crashed")
+                ? _loc.GetString("connecting-status-client-crashed", ("code", _connector.ClientExitCode))
                 : "",
             _ => ""
         };

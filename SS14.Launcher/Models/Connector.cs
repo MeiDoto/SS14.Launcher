@@ -41,6 +41,7 @@ public partial class Connector : ObservableObject
 
     [ObservableProperty] private ConnectionStatus _status = ConnectionStatus.None;
     [ObservableProperty] private bool _clientExitedBadly;
+    [ObservableProperty] private int _clientExitCode;
     [ObservableProperty] private bool _privacyPolicyDifferentVersion;
     public ServerPrivacyPolicyInfo? PrivacyPolicyInfo { get; private set; }
 
@@ -335,22 +336,26 @@ public partial class Connector : ObservableObject
 
                     try
                     {
+                        ClientExitCode = clientProc.HasExited ? clientProc.ExitCode : 0;
                         ClientExitedBadly = clientProc.HasExited && clientProc.ExitCode != 0;
                     }
                     catch
                     {
                         // External process termination
+                        ClientExitCode = -1;
                     }
 
                     Status = ConnectionStatus.ClientExited;
                     return;
                 }
 
+                ClientExitCode = clientProc.ExitCode;
                 ClientExitedBadly = clientProc.ExitCode != 0;
             }
         }
         else
         {
+            ClientExitCode = -1;
             ClientExitedBadly = true;
         }
 
